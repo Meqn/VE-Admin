@@ -57,6 +57,12 @@ const pages = (function (url) {
   }, {})
 }(entryUrl))
 
+if (Object.keys(pages).length === 0) {
+  console.log('💥 未找到入口文件... 💥')
+  console.log('💥 app.js not found... 💥')
+  process.exit(1)
+}
+
 module.exports = {
   pages,
   lintOnSave: process.env.NODE_ENV === 'development',

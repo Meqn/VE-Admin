@@ -11,7 +11,7 @@
   />
 </el-submenu>
 <el-menu-item v-else :index="item.path" @click="hanleMenu">
-  <menu-link :to="item.path" ref="link" class="app-aside-menu-link" />
+  <menu-link :to="item.path" ref="link" class="sidebar-menu-link" />
   <menu-item :title="item.title" :icon="item.icon" />
 </el-menu-item>
 </template>
@@ -21,7 +21,7 @@ import MenuItem from './MenuItem.vue'
 import MenuLink from './MenuLink.vue'
 
 export default {
-  name: 'SidebarItem',
+  name: 'sidebar-item',
   components: {
     MenuItem,
     MenuLink

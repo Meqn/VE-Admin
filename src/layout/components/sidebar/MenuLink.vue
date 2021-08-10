@@ -7,7 +7,7 @@
 <script>
 import { isExternal } from '@/utils/validate'
 export default {
-  name: 'MenuLink',
+  name: 'menu-link',
   props: {
     to: {
       type: String,

@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: 'MenuItem',
+  name: 'menu-item',
   functional: true,
   props: {
     icon: {

@@ -1,6 +1,7 @@
-# vue-element-admin
+# vue-element-admin-mpa
 
-> 基于Element-UI的企业管理后台, 支持多页面应用。
+> 基于Element-UI的企业管理后台, 支持多页面应用配置。  
+> 本项目是基于[@PanJiaChen/vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)开源项目进行开发。
 
 ## Project setup
 ```

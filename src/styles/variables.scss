@@ -1,5 +1,29 @@
-$--text-color: #585858;
+/********************************************************************* element-ui style
+*/
+$--color-primary: #409EFF !default;
+
+$--color-success: #67C23A !default;
+$--color-warning: #E6A23C !default;
+$--color-danger: #F56C6C !default;
+$--color-info: #909399 !default;
+
+$--color-text-primary: #303133 !default;
+$--color-text-regular: #606266 !default;
+$--color-text-secondary: #909399 !default;
+$--color-text-placeholder: #C0C4CC !default;
+
+$--border-color-base: #DCDFE6 !default;
+$--border-color-light: #E4E7ED !default;
+$--border-color-lighter: #EBEEF5 !default;
+$--border-color-extra-light: #F2F6FC !default;
+
+$--background-color-base: #F5F7FA !default;
+
+
+/********************************************************************* custom style
+*/
 
 $--background-color: #f0f2f5;
 
+// layout
 $--layout-header-background-color: #001529;

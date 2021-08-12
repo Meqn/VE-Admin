@@ -2,33 +2,6 @@ import Layout from '@/layout'
 
 export default [
   {
-    path: '/form',
-    component: Layout,
-    name: 'form',
-    redirect: '/form/basic',
-    meta: { title: '表单页', icon: 'el-icon-edit-outline' },
-    children: [
-      {
-        path: 'basic',
-        component: () => import('@demo/views/form/basic'),
-        name: 'form_basic',
-        meta: { title: '基础表单' }
-      },
-      {
-        path: 'step',
-        component: () => import('@demo/views/form/basic'),
-        name: 'form_step',
-        meta: { title: '分步表单' }
-      },
-      {
-        path: 'advanced',
-        component: () => import('@demo/views/form/basic'),
-        name: 'form_advanced',
-        meta: { title: '高级表单' }
-      }
-    ]
-  },
-  {
     path: '/list',
     component: Layout,
     name: 'list',
@@ -94,31 +67,5 @@ export default [
         ]
       }
     ]
-  },
-  {
-    path: '/profile',
-    component: Layout,
-    name: 'profile',
-    redirect: '/profile/basic',
-    meta: { title: '详情页', icon: 'el-icon-edit-outline' },
-    children: [
-      {
-        path: 'basic',
-        component: () => import('@demo/views/form/basic'),
-        name: 'profile_basic',
-        meta: { title: '基础详情页' }
-      },
-      {
-        path: 'advanced',
-        component: () => import('@demo/views/form/basic'),
-        name: 'profile_advanced',
-        meta: { title: '高级详情页' }
-      }
-    ]
-  },
-  {
-    path: 'https://www.baidu.com',
-    name: 'externalLink',
-    meta: { title: '外部链接', icon: 'el-icon-link' }
   }
 ]

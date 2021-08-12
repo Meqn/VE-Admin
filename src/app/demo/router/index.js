@@ -2,7 +2,14 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Layout from '@/layout'
 import Redirect from '@demo/views/redirect'
-import asyncRoutes from './modules'
+
+import formRoutes from './modules/form'
+import listRoutes from './modules/list'
+import profileRoutes from './modules/profile'
+import exceptionRoutes from './modules/exception'
+import resultRoutes from './modules/result'
+import accountRoutes from './modules/account'
+import extentRoutes from './modules/extent'
 
 // Throw Error "NavigationDuplicated" #2872
 // https://stackoverflow.com/questions/57837758/navigationduplicated-navigating-to-current-location-search-is-not-allowed
@@ -55,18 +62,35 @@ const routes = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
-const router = new VueRouter({
-  routes
+// 创建并配置默认路由
+const createRouter = () => new VueRouter({
+  routes: [].concat(formRoutes, extentRoutes, routes)
 })
 
+// 创建并配置默认路由
+const router = createRouter()
+
+// 异步加载路由
+const asyncRoutes = [
+  ...listRoutes,
+  ...profileRoutes,
+  ...resultRoutes,
+  ...exceptionRoutes,
+  ...accountRoutes
+]
+
 setTimeout(() => {
-  if (Array.isArray(asyncRoutes)) {
-    asyncRoutes.forEach(route => router.addRoute(route))
-  } else {
-    router.addRoute(asyncRoutes)
-  }
+  // router.addRoutes 已废弃
+  asyncRoutes.forEach(route => router.addRoute(route))
 }, 1)
 
-export const allRoutes = [...routes, ...asyncRoutes]
+// 所有路由，可排序
+export const allRoutes = [].concat(routes, formRoutes, asyncRoutes, extentRoutes)
+
+// 重置路由
+export function resetRouter() {
+  const newRouter = createRouter()
+  router.matcher = newRouter.matcher // reset router
+}
 
 export default router

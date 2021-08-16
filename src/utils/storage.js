@@ -1,5 +1,4 @@
 const storage = window.localStorage
-// var objArr = /(^\{[\s\S]*\}$)|(^\[[\s\S]*\]$)/
 
 export default {
   get(key) {

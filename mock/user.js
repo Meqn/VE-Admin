@@ -76,9 +76,98 @@ const menus = {
           ]
         }
       ]
+    },
+    {
+      name: 'profile',
+      title: '详情页',
+      children: [
+        {
+          name: 'profile_basic',
+          title: '基础详情页'
+        },
+        {
+          name: 'profile_advanced',
+          title: '高级详情页'
+        }
+      ]
+    },
+    {
+      name: 'result',
+      title: '结果页',
+      children: [
+        {
+          name: 'result_success',
+          title: '成功页'
+        },
+        {
+          name: 'result_fail',
+          title: '失败页'
+        }
+      ]
+    },
+    {
+      name: 'exception',
+      title: '异常页',
+      children: [
+        {
+          name: 'exception_403',
+          title: '403'
+        },
+        {
+          name: 'exception_404',
+          title: '404'
+        },
+        {
+          name: 'exception_500',
+          title: '500'
+        }
+      ]
+    },
+    {
+      name: 'account',
+      title: '个人页',
+      children: [
+        {
+          name: 'account_center',
+          title: '个人中心'
+        },
+        {
+          name: 'account_settings',
+          title: '基本设置'
+        }
+      ]
     }
   ],
-  editor: []
+  editor: [
+    {
+      name: 'profile',
+      title: '详情页',
+      children: [
+        {
+          name: 'profile_basic',
+          title: '基础详情页'
+        },
+        {
+          name: 'profile_advanced',
+          title: '高级详情页'
+        }
+      ]
+    },
+    {
+      name: 'account',
+      title: '个人页',
+      children: [
+        {
+          name: 'account_center',
+          title: '个人中心'
+        },
+        {
+          name: 'account_settings',
+          title: '基本设置'
+        }
+      ]
+    }
+  ]
 }
 
 export default {

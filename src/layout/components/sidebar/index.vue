@@ -16,7 +16,7 @@
     </el-scrollbar>
     <div class="sidebar-links">
       <div class="sidebar-collapse" @click="toggleSideBar">
-        <i :class="[isCollapse ? 'el-icon-s-fold' : 'el-icon-s-unfold']"></i>
+        <i :class="[isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold']"></i>
       </div>
     </div>
   </aside>

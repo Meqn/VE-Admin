@@ -16,8 +16,8 @@ const asyncRoutes = [].concat(formRoutes, listRoutes, profileRoutes, exceptionRo
 
 /**
  * 递归过滤 route
- * @param {*} routes 
- * @param {*} menus 
+ * @param {Array} routes 
+ * @param {Array} menus 
  * @returns 
  */
 function filterRoutes(routes, menus) {
@@ -39,7 +39,7 @@ function filterRoutes(routes, menus) {
 
 /**
  * 扁平化嵌套菜单
- * @param {*} menus 所有侧边栏菜单
+ * @param {Array} menus 所有侧边栏菜单
  * @returns 
  */
 function flatMenus(menus) {

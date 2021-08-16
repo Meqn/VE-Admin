@@ -15,3 +15,15 @@ body{
 html, body, #app{
   height: 100%;
 }
+
+a, a:active, a:visited{
+  color: $--color-primary;
+  background-color: transparent;
+  text-decoration: none;
+  outline: none;
+  cursor: pointer;
+  transition: color .3s;
+}
+a:hover{
+  color: #598cff;
+}

@@ -1,5 +1,5 @@
 <template>
-  <aside :class="['app-aside', { 'is-fixed': isFixed }, { 'is-collapse': isCollapse }]">
+  <aside :class="['app-layout-aside sidebar-dark', { 'is-fixed': isFixed }, { 'is-collapse': isCollapse }]">
     <el-scrollbar class="scrollbar-wrapper">
       <el-menu
         class="sidebar-menu"
@@ -29,7 +29,7 @@ import SidebarItem from './SidebarItem.vue'
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'app-aside',
+  name: 'app-layout-aside',
   components: {
     SidebarItem
   },

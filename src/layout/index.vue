@@ -1,8 +1,8 @@
 <template>
-<section class="app-wrapper">
+<section class="app-layout-wrapper">
   <div v-if="false" class="drawer-mask" />
   <app-header />
-  <section class="app-body">
+  <section class="app-layout-body">
     <app-side />
     <app-main />
   </section>

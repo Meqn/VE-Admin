@@ -1,6 +1,35 @@
-$fixed-zindex: 999;
+$--sidebar-fixed-zindex: 999;
 
-.app-wrapper{
+/**
+ * 侧边栏颜色控制
+ * @param {*} $prop 样式属性
+ * @param {*} $mode 主题模式 ['light', 'dark']
+ * @returns 
+ * 调用: sidebarColor('text') => ($--sidebar-text-color: #fff;)
+ */
+@function sidebarColor($prop, $mode: light) {
+  // 
+  $sidebar: (
+    'background': #fff,
+    'text': $--color-text-regular,
+    'active-text': #fff,
+    'menu-background': #fff,
+    'active-menu-background': #fff
+  );
+
+  @if $mode == dark {
+    $sidebar: (
+      'background': #001529,
+      'text': rgba(255, 255, 255, .65),
+      'active-text': #fff,
+      'menu-background': #000c17,
+      'active-menu-background': $--color-primary
+    );
+  }
+  @return map-get($sidebar, $prop);
+}
+
+.app-layout-wrapper{
   display: flex; flex-direction: column;
   overflow: hidden;
   width: 100%;
@@ -8,31 +37,59 @@ $fixed-zindex: 999;
   background-color: $--background-color;
 
   .drawer-mask {
-    position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: $fixed-zindex;
+    position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: $--sidebar-fixed-zindex;
     background: rgba($color: #000000, $alpha: 0.45);
   }
 }
-.app-header{
+
+.app-layout-header{
   position: relative;
+  display: flex;
   height: 56px;
   color: #fff;
   background-color: $--layout-header-background-color;
   box-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
+
+  .header-left{
+    width: 210px;
+    height: 100%;
+  }
+  .header-center{
+    flex: 1 1 0%;
+  }
+  .header-logo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+
+    img{
+      height: 30px;
+      vertical-align: middle;
+    }
+    h1{
+      margin-left: 12px;
+      color: #fff;
+      font-size: 20px;
+    }
+  }
 }
-.app-body{
+
+.app-layout-body{
   position: relative;
   display: flex;
   flex: 1;
   min-height: 0;
 }
-.app-aside{
+
+.app-layout-aside{
   display: flex;
   flex-direction: column;
-  color: $--color-text-regular;
-  background-color: #fff;
+  color: sidebarColor(text);
+  background-color: sidebarColor(background);
   box-shadow: 0 2px 8px 0 rgba(29, 35, 41, 0.05);
   &.is-fixed{
-    position: fixed; top: 0; left: 0; bottom: 0; z-index: $fixed-zindex;
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: $--sidebar-fixed-zindex;
   }
 
   .scrollbar-wrapper{
@@ -64,7 +121,8 @@ $fixed-zindex: 999;
     cursor: pointer;
   }
 }
-.app-main{
+
+.app-layout-main{
   min-width: 0;
   flex: 1;
 }

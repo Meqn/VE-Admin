@@ -1,4 +1,4 @@
-import request from '@/mock'
+import request from '@root/mock'
 
 export function userLogin(data) {
   return request({
@@ -22,6 +22,16 @@ export function getUserInfo(userId) {
     method: 'get',
     params: {
       role: userId
+    }
+  })
+}
+
+export function getRoleMenus(role) {
+  return request({
+    url: '/user/menus/',
+    method: 'get',
+    params: {
+      role
     }
   })
 }

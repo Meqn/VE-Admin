@@ -1,11 +1,15 @@
 <template>
 <div class="login-wrapper">
-  <el-form :model="form" status-icon :rules="rules" ref="form" class="login-form">
+  <el-form :model="form" :rules="rules" size="default" ref="form" class="login-form">
     <el-form-item class="login-form-header">
       <h1>系统登录</h1>
     </el-form-item>
   <el-form-item prop="username">
-    <el-input type="text" v-model="form.username" placeholder="请填写用户名" autocomplete="off"></el-input>
+    <el-input type="text" v-model="form.username" placeholder="请填写用户名" autocomplete="off">
+      <template #prefix>
+        <i class="el-icon-user-solid"></i>
+      </template>
+    </el-input>
   </el-form-item>
   <el-form-item prop="password">
     <el-input type="password" v-model="form.password" placeholder="请填写密码" autocomplete="off"></el-input>
@@ -15,19 +19,23 @@
     <el-link type="primary" :underline="false" style="float: right">忘记密码？</el-link>
   </el-form-item>
   <el-form-item>
-    <el-button type="primary" @click="submitForm('form')" style="width: 100%">登 录</el-button>
+    <el-button type="primary" :loading="loading" @click="handleLogin('form')" style="width: 100%">
+      {{ loading ? '登录中...' : '登 录' }}
+    </el-button>
   </el-form-item>
 </el-form>
 </div>
 </template>
 
 <script>
-import { userLogin } from '@/api/user.js'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'user-login',
   data() {
     return {
+      loading: false,
+      redirect: undefined,
       form: {
         username: 'admin',
         password: 'admin',
@@ -44,12 +52,27 @@ export default {
       }
     };
   },
+  mounted() {
+    const { query } = this.$route
+    if (query) {
+      this.redirect = query.redirect
+    }
+  },
   methods: {
-    submitForm(formName) {
+    ...mapActions('user', ['login', 'getInfo']),
+    handleLogin(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          userLogin(this.form).then(res => {
-            console.log('login : ', res)
+          this.loading = true
+          this.login(this.form).then(() => {
+            this.$message({
+              type: 'success',
+              message: '登录成功!'
+            })
+            this.getInfo(this.form.username)
+            this.$router.push({ path: this.redirect || '/', query: this.$route.query })
+          }).finally(() => {
+            this.loading = false
           })
         } else {
           console.log('error submit!!');

@@ -27,17 +27,17 @@ const actions = {
     const { data } = result
     commit('SET_TOKEN', data.token)
     setToken(data.token)
-    return result
+    return data
   },
   async getInfo({ commit, state }) {
-    const result = await getUserInfo(state.role)
+    const result = await getUserInfo(state.token)
     const { data } = result
     if (!data) {
       return Promise.reject(new Error('Verification failed, please Login again.'))
     }
-    commit('SET_ROLE', data.role)
+    commit('SET_ROLE', data.role_code)
     commit('SET_PROFILE', data)
-    return result
+    return data
   },
   async logout({ commit, state }) {
     const result = await userLogout(state.role)

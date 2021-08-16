@@ -25,7 +25,6 @@
 <script>
 import { resolve } from 'path'
 import { isExternal } from '@/utils/validate'
-import { allRoutes } from '@demo/router'
 import SidebarItem from './SidebarItem.vue'
 import { mapGetters } from 'vuex'
 
@@ -40,12 +39,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['sidebar']),
+    ...mapGetters([
+      'sidebar',
+      'permission_routes'
+    ]),
     isCollapse() {
       return this.sidebar.opened
     },
     menus() {
-      return this.filterRoutes(allRoutes)
+      return this.filterRoutes(this.permission_routes)
     }
   },
   methods: {

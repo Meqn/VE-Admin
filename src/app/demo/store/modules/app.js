@@ -1,9 +1,15 @@
+import AppConfig from '@demo/app.config'
 import Storage from '@/utils/storage'
+
 const SIDEBAR_STATUS = 'sidebarStatus'
 const SIDEBAR_THEME = 'sidebarStatus'
 
 const state = {
   name: 'demo',
+  logo: {
+    url: AppConfig.logo_url,
+    text: AppConfig.logo_text
+  },
   sidebar: {
     opened: !!Storage.get(SIDEBAR_STATUS),
     theme: Storage.get(SIDEBAR_THEME) || 'light'

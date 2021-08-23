@@ -1,5 +1,5 @@
 <template>
-<el-submenu v-if="item.children" :index="item.path">
+<el-submenu v-if="item.children && !item.asMenu" :index="item.path" popper-append-to-body>
   <template slot="title">
     <menu-item :title="item.title" :icon="item.icon" />
   </template>

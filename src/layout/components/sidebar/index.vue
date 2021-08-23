@@ -3,7 +3,7 @@
     <el-scrollbar class="scrollbar-wrapper">
       <el-menu
         class="sidebar-menu"
-        :default-active="$route.path"
+        :default-active="activeMenu"
         :collapse="isCollapse"
         mode="vertical">
         <sidebar-item
@@ -48,6 +48,13 @@ export default {
     },
     menus() {
       return this.filterRoutes(this.permission_routes)
+    },
+    activeMenu() {
+      const { meta, path } = this.$route
+      if (meta.activeMenu) {
+        return meta.activeMenu
+      }
+      return path
     }
   },
   methods: {
@@ -62,18 +69,19 @@ export default {
 
       for (let route of routes) {
         // skip some route
-        if (route.hidden) { continue }
+        if (route.hidden || route.meta?.hidden) { continue }
 
         const onlyOneShowingChild = this.onlyOneShowingChild(route.children, route)
 
-        if (route.children && onlyOneShowingChild) {
+        if (route.children && onlyOneShowingChild && !route.meta?.asMenu) {
           route = onlyOneShowingChild
         }
 
         const data = {
           path: this.resolvePath(basePath, route.path),
-          title: route.meta && route.meta.title,
-          icon: route.meta && route.meta.icon
+          title: route.meta?.title,
+          icon: route.meta?.icon,
+          asMenu: route.meta?.asMenu
         }
 
         // recursive child routes
@@ -86,7 +94,7 @@ export default {
     },
     onlyOneShowingChild(children = [], parent) {
       let onlyOneChild = null
-      const showingChildren = children.filter(item => !item.hidden)
+      const showingChildren = children.filter(item => !(item.hidden || item.meta?.hidden))
 
       // When there is only one child route, the child route is displayed by default
       if (showingChildren.length === 1) {

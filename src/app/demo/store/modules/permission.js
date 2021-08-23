@@ -8,7 +8,7 @@ import {
   resultRoutes,
   accountRoutes,
   extentRoutes,
-  page404
+  notFoundRoute
 } from '@demo/router/routes'
 
 // 异步路由
@@ -20,14 +20,14 @@ const asyncRoutes = [].concat(formRoutes, listRoutes, profileRoutes, exceptionRo
  * @param {Array} menus 
  * @returns 
  */
-function filterRoutes(routes, menus) {
+function filterRoutes(routes, menus, mount = false) {
   const res = []
   if (Array.isArray(routes) && routes.length > 0 && menus) {
     routes.forEach(route => {
       const tmp = { ...route }
-      if (menus.includes(route.name)) {
+      if (menus.includes(route.name) || (mount && route.meta?.automount)) {
         if (tmp.children) {
-          tmp.children = filterRoutes(tmp.children, menus)
+          tmp.children = filterRoutes(tmp.children, menus, true)
         }
         res.push(tmp)
       }
@@ -72,8 +72,8 @@ const actions = {
     const { data } = await getRoleMenus(rootGetters.role)
     const menus = flatMenus(data)
     const accessedRoutes = filterRoutes(asyncRoutes, menus)
-    // 末尾插入 404 route
-    accessedRoutes.push(page404)
+    // 末尾插入 notFoundRoute
+    accessedRoutes.push(notFoundRoute)
     commit('SET_ROUTES', accessedRoutes)
     return accessedRoutes
   }

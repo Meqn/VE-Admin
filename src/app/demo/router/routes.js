@@ -6,7 +6,7 @@ export const constantRoutes = [
   {
     path: '/redirect',
     component: Redirect,
-    hidden: true,
+    meta: { hidden: true },
     children: [
       {
         path: '/redirect/:path(.*)',
@@ -17,14 +17,13 @@ export const constantRoutes = [
   {
     path: '/login',
     component: () => import('@demo/views/login'),
-    hidden: true,
-    meta: { noRequiresAuth: true }
+    meta: { noRequiresAuth: true, hidden: true }
   },
   {
     path: '/404',
     component: () => import('@demo/views/404'),
     hidden: true,
-    meta: { noRequiresAuth: true }
+    meta: { noRequiresAuth: true, hidden: true }
   },
   {
     path: '/',
@@ -36,7 +35,7 @@ export const constantRoutes = [
         path: 'dashboard',
         component: () => import('@demo/views/dashboard'),
         name: 'dashboard',
-        meta: { title: 'Dashboard', icon: 'el-icon-s-operation' }
+        meta: { title: '首页', icon: 'el-icon-s-operation' }
       }
     ]
   }
@@ -46,7 +45,8 @@ export const constantRoutes = [
   { path: '*', redirect: '/404', hidden: true } */
 ]
 
-export const page404 = { path: '*', redirect: '/404', hidden: true }
+// 未找到页面路由
+export const notFoundRoute = { path: '*', redirect: '/404', hidden: true }
 
 // 其他路由模块
 export { default as exceptionRoutes } from './modules/exception'

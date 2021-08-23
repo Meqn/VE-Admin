@@ -58,7 +58,6 @@ const pages = (function (url) {
 }(entryUrl))
 
 if (Object.keys(pages).length === 0) {
-  console.log('💥 未找到入口文件... 💥')
   console.log('💥 app.js not found... 💥')
   process.exit(1)
 }
@@ -72,6 +71,7 @@ module.exports = {
       // 设置别名
       alias: {
         '@': resolve('src'),
+        '@root': resolve('.'),
         ...appAlias
       }
     }
@@ -84,6 +84,24 @@ module.exports = {
       })
       return definitions
     })
+    // set svg-sprite-loader (svg icon)
+    // 清除svg默认配置对`src/components/Icon/`文件夹的处理
+    config.module
+      .rule('svg')
+      .exclude.add(resolve('src/components/Icon/'))
+      .end()
+    // 添加新的rule处理`src/components/Icon/`内的svg文件 (暂不使用svgo优化)
+    config.module
+      .rule('icons')
+      .test(/\.svg$/)
+      .include.add(resolve('src/components/Icon/'))
+      .end()
+      .use('svg-sprite-loader')
+      .loader('svg-sprite-loader')
+      .options({
+        symbolId: 'icon-[name]'
+      })
+      .end()
     // < 5kb 的图片转base64
     config.module
       .rule('images')

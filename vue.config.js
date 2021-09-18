@@ -64,6 +64,8 @@ if (Object.keys(pages).length === 0) {
 
 module.exports = {
   pages,
+  outputDir: 'dist',
+  assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   configureWebpack: {
@@ -115,5 +117,17 @@ module.exports = {
         prependData: '@import "~@/styles/variables.scss";'
       }
     }
+  },
+  devServer: {
+    // development server port 3000
+    port: 3000,
+    open: true
+    // proxy: {
+    //   '/api': {
+    //     target: 'https://services.mock.com/api',
+    //     ws: false,
+    //     changeOrigin: true
+    //   }
+    // }
   }
 }

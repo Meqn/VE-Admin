@@ -1,6 +1,6 @@
 {
-  "name": "vue-element-admin-mpa",
-  "description": "",
+  "name": "ve-admin",
+  "description": "A vue admin.",
   "keywords": [
     "vue",
     "vue-admin",
@@ -9,12 +9,13 @@
     "vue-mpa",
     "vue-element-admin"
   ],
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
     "build:prod": "vue-cli-service build --mode production",
     "build:stage": "vue-cli-service build --mode staging",
+    "build:test": "vue-cli-service build --mode development",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint"

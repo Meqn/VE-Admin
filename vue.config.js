@@ -64,8 +64,6 @@ if (Object.keys(pages).length === 0) {
 
 module.exports = {
   pages,
-  outputDir: 'dist',
-  assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   configureWebpack: {

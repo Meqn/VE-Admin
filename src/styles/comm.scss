@@ -1,0 +1,161 @@
+
+// Font Family
+$font-family-base: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+$font-family-en: Helvetica Neue, Arial, sans-serif;
+
+.font-en{
+  font-family: $font-family-en;
+}
+
+// font 大小
+$fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
+@each $s in $fonts {
+  .font-#{$s}{
+    font-size: $s + px;
+  }
+}
+
+.blue{ color: $--color-blue; }
+.green{ color: $--color-green; }
+.red{ color: $--color-red; }
+.yellow{ color: $--color-yellow; }
+.gray{ color: $--color-gray; }
+
+// font位置
+.tal{
+  text-align: left;
+}
+.tac{
+  text-align: center;
+}
+.tar{
+  text-align: right;
+}
+.taj{
+  text-align: justify;
+}
+.vat{
+  vertical-align: top;
+}
+.vam{
+  vertical-align: middle;
+}
+.vab{
+  vertical-align: bottom;
+}
+
+// font weight
+.fwn {
+  font-weight: normal;
+}
+.fwb {
+  font-weight: bold;
+}
+.fsi {
+  font-style: italic;
+}
+
+/* 换行 */
+.norwap{
+  white-space: nowrap;
+}
+.break{
+  word-break: break-all;
+  word-wrap: break-word;
+}
+
+// 文字过长省略
+.ellipsis{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+%multi-line-clamp{
+  display: -webkit-box;
+  // -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ellipsis-2{
+  @extend %multi-line-clamp;
+  -webkit-line-clamp: 2;
+}
+.ellipsis-3{
+  @extend %multi-line-clamp;
+  -webkit-line-clamp: 3;
+}
+.ellipsis-4{
+  @extend %multi-line-clamp;
+  -webkit-line-clamp: 4;
+}
+.ellipsis-5{
+  @extend %multi-line-clamp;
+  -webkit-line-clamp: 5;
+}
+
+.none{
+  display: none;
+}
+.block{
+  display: block;
+}
+.hidden{
+  visibility: hidden;
+}
+.visible{
+  visibility: visible;
+}
+
+$gaps: 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56;
+@each $g in $gaps {
+  .mt-#{$g} {
+    margin-top: $g + px !important;
+  }
+  .mr-#{$g} {
+    margin-right: $g + px !important;
+  }
+  .mb-#{$g} {
+    margin-bottom: $g + px !important;
+  }
+  .ml-#{$g} {
+    margin-left: $g + px !important;
+  }
+  .pt-#{$g} {
+    padding-top: $g + px !important;
+  }
+  .pr-#{$g} {
+    padding-right: $g + px !important;
+  }
+  .pb-#{$g} {
+    padding-bottom: $g + px !important;
+  }
+  .pl-#{$g} {
+    padding-left: $g + px !important;
+  }
+  // 水平方向
+  .ph-#{$g} {
+    padding-left: $g + px !important;
+    padding-right: $g + px !important;
+  }
+  .mh-#{$g} {
+    margin-left: $g + px !important;
+    margin-right: $g + px !important;
+  }
+  // 垂直方向
+  .pv-#{$g} {
+    padding-top: $g + px !important;
+    padding-bottom: $g + px !important;
+  }
+  .mv-#{$g} {
+    margin-top: $g + px !important;
+    margin-bottom: $g + px !important;
+  }
+  // 垂直、水平方向
+  .pa-#{$g} {
+    padding: $g + px !important;
+  }
+  .ma-#{$g} {
+    margin: $g + px !important;
+  }  
+}

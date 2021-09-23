@@ -1,11 +1,15 @@
 /* theme color */
-$--color-primary: #1890ff;
-$--color-success: #13ce66;
-$--color-warning: #ffba00;
-$--color-danger: #ff4949;
+$--color-primary: #598CFF;
+$--color-success: #0BCD74;
+$--color-warning: #F5A623;
+$--color-danger: #FF3333;
 // $--color-info: #1E1E1E;
 
 $--button-font-weight: 400;
+
+// table
+$--table-header-background-color: #fafafa;
+$--table-header-font-color: $--color-text-primary;
 
 /* icon font path, required */
 $--font-path: '~element-ui/lib/theme-chalk/fonts';

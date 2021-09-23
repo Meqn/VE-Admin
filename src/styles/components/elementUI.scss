@@ -1,0 +1,19 @@
+// 日历弹窗
+.el-date-table td{
+  text-align: center !important;
+}
+.el-date-editor .el-range-separator{
+  width: 32px;
+}
+
+// form
+// input
+.ve-icon.el-input__icon{
+  height: 100%;
+  width: 25px;
+  font-size: 14px;
+  text-align: center;
+  transition: all .3s;
+  line-height: 40px;
+}
+

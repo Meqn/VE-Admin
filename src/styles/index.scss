@@ -1,6 +1,10 @@
 @import './variables.scss';
 @import './normalize.css';
 @import './transition.scss';
+@import './comm.scss';
+
+@import './components/nprogress.scss';
+@import './components/elementUI.scss';
 
 body{
   color: $--color-text-primary;
@@ -17,7 +21,7 @@ html, body, #app{
 }
 
 a, a:active, a:visited{
-  color: $--color-primary;
+  color: $--color-text-link;
   background-color: transparent;
   text-decoration: none;
   outline: none;
@@ -25,5 +29,5 @@ a, a:active, a:visited{
   transition: color .3s;
 }
 a:hover{
-  color: #598cff;
+  color: $--color-text-hover;
 }

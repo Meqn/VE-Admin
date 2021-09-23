@@ -23,7 +23,21 @@ $--background-color-base: #F5F7FA !default;
 /********************************************************************* custom style
 */
 
+$--color-text-link: $--color-primary; // #598CFF
+$--color-text-hover: mix($--color-primary, #fff, 86%); // #709cff
+$--color-text-active: mix($--color-primary, #000, 86%); // #4d78db
+
 $--background-color: #f0f2f5;
+
+$--color-blue: #409EFF;
+$--color-green: $--color-success;
+$--color-red: $--color-danger;
+$--color-yellow: $--color-warning;
+$--color-gray: $--color-info;
 
 // layout
 $--layout-header-background-color: #001529;
+$--layout-aside-background-color: #fff;
+$--layout-aside-text-color: #606266;
+$--layout-aside-active-text-color: #598CFF;
+$--layout-aside-active-background-color: #EFF7FF;

@@ -1,3 +1,3 @@
-export { default as AppHeader } from './header'
-export { default as AppSide } from './sidebar'
-export { default as AppMain } from './AppMain'
+export { default as VeHeader } from './header'
+export { default as VeSide } from './sidebar'
+export { default as VeMain } from './Main'

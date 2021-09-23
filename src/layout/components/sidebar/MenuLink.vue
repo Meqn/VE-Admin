@@ -1,41 +1,20 @@
-<template>
-  <component :is="type" v-bind="linkProps(to)">
-    <slot />
-  </component>
-</template>
-
 <script>
 import { isExternal } from '@/utils/validate'
 export default {
-  name: 'menu-link',
+  name: 'MenuLink',
   props: {
     to: {
       type: String,
       required: true
     }
   },
-  computed: {
-    isExternal() {
-      return isExternal(this.to)
-    },
-    type() {
-      if (this.isExternal) {
-        return 'a'
-      }
-      return 'router-link'
-    }
-  },
-  methods: {
-    linkProps(to) {
-      if (this.isExternal) {
-        return {
-          href: to,
-          target: '_blank'
-        }
-      }
-      return {
-        to: to
-      }
+  render() {
+    const { to } = this
+    const $slot = this.$slots.default
+    if (isExternal(to)) {
+      return <a href={to} target="_blank">{$slot}</a>
+    } else {
+      return <router-link to={to}>{$slot}</router-link>
     }
   }
 }

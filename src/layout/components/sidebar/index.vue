@@ -1,6 +1,6 @@
 <template>
-  <aside :class="['app-layout-aside sidebar-dark', { 'is-fixed': isFixed }, { 'is-collapse': isCollapse }]">
-    <el-scrollbar class="scrollbar-wrapper">
+  <aside :class="['ve-layout-aside sidebar-dark', { 'is-fixed': isFixed }, { 'is-collapse': isCollapse }]">
+    <el-scrollbar class="sidebar-scrollbar" wrap-class="sidebar-scrollbar-wrap">
       <el-menu
         class="sidebar-menu"
         :default-active="activeMenu"
@@ -10,7 +10,6 @@
           v-for="item in menus"
           :key="item.path"
           :item="item"
-          :base-path="item.path"
         />
       </el-menu>
     </el-scrollbar>
@@ -29,7 +28,7 @@ import SidebarItem from './SidebarItem.vue'
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'app-layout-aside',
+  name: 'VeLayoutAside',
   components: {
     SidebarItem
   },

@@ -1,5 +1,5 @@
 <template>
-  <main class="app-layout-main">
+  <main class="ve-layout-main">
     <transition name="fade-transform" mode="out-in">
       <keep-alive :include="cachedViews">
         <router-view :key="key" />
@@ -10,11 +10,10 @@
 
 <script>
 export default {
-  name: 'app-layout-main',
+  name: 'VeLayoutMain',
   computed: {
     cachedViews() {
-      // return this.$store.state.tagsView.cachedViews
-      return []
+      return this.$store.state.permission.cachedViews
     },
     key() {
       return this.$route.path

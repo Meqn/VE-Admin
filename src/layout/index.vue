@@ -1,24 +1,24 @@
 <template>
-<section class="app-layout-wrapper">
+<section class="ve-layout-wrapper">
   <div v-if="false" class="drawer-mask" />
-  <app-header />
-  <section class="app-layout-body">
-    <app-side />
-    <app-main />
+  <VeHeader />
+  <section class="ve-layout-body">
+    <VeSide />
+    <VeMain />
   </section>
 </section>
 </template>
 
 <script>
 import './layout.scss'
-import { AppHeader, AppSide, AppMain } from './components'
+import { VeHeader, VeSide, VeMain } from './components'
 
 export default {
-  name: 'app-layout',
+  name: 've-layout',
   components: {
-    AppHeader,
-    AppSide,
-    AppMain
+    VeHeader,
+    VeSide,
+    VeMain
   }
 }
 </script>

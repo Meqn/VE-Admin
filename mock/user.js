@@ -62,10 +62,6 @@ const menus = {
                 {
                   name: 'list_search_goods_office',
                   title: '办公区'
-                },
-                {
-                  name: 'list_search_goods_articles',
-                  title: '其他区'
                 }
               ]
             },

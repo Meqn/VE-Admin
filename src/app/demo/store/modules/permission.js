@@ -1,18 +1,45 @@
 import { getRoleMenus } from '@/api/user'
-import {
-  constantRoutes,
-  exceptionRoutes,
-  formRoutes,
-  listRoutes,
-  profileRoutes,
-  resultRoutes,
-  accountRoutes,
-  extentRoutes,
-  notFoundRoute
-} from '@demo/router/routes'
+import { constantRoutes, asyncRoutes, notFoundRoute } from '@demo/router/routes'
 
-// 异步路由
-const asyncRoutes = [].concat(formRoutes, listRoutes, profileRoutes, exceptionRoutes, resultRoutes, accountRoutes, extentRoutes)
+/**
+ * 查找所有父节点
+ * @param {*} name 
+ * @param {*} nodes 
+ * @returns 
+ */
+function findAllParent(name, nodes) {
+  for (const node of nodes) {
+    if (name === node.name) {
+      return [node.name]
+    }
+    if (node.children) {
+      const result = findAllParent(name, node.children)
+      if (result) {
+        return result.concat(node.name)
+      }
+    }
+  }
+}
+
+/**
+ * 需要遍历的路由
+ * @param {*} routes 
+ * @returns 
+ */
+function findCachedViews(routes) {
+  let views = []
+  ;(function query(list) {
+    list.forEach(route => {
+      if (route.meta?.cache) {
+        views = views.concat(findAllParent(route.name, routes))
+      }
+      if (route.children) {
+        query(route.children)
+      }
+    })
+  })(routes)
+  return Array.from(new Set(views))
+}
 
 /**
  * 递归过滤 route
@@ -57,25 +84,35 @@ function flatMenus(menus) {
 
 const state = {
   routes: [],
-  addRoutes: []
+  addRoutes: [],
+  cachedViews: []
 }
 
 const mutations = {
-  SET_ROUTES: (state, routes) => {
+  SET_ROUTES(state, routes) {
     state.addRoutes = routes
     state.routes = constantRoutes.concat(routes)
+  },
+  SET_CACHE_VIEWS(state, views) {
+    state.cachedViews = views
   }
 }
 
 const actions = {
-  async generateRoutes({ commit, rootGetters }) {
+  async generateRoutes({ commit, dispatch, rootGetters }) {
     const { data } = await getRoleMenus(rootGetters.role)
     const menus = flatMenus(data)
     const accessedRoutes = filterRoutes(asyncRoutes, menus)
     // 末尾插入 notFoundRoute
     accessedRoutes.push(notFoundRoute)
     commit('SET_ROUTES', accessedRoutes)
+    setTimeout(() => {
+      dispatch('setCacheViews')
+    }, 10)
     return accessedRoutes
+  },
+  setCacheViews({ commit, state }) {
+    commit('SET_CACHE_VIEWS', findCachedViews(state.routes))
   }
 }
 

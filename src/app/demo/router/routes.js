@@ -1,6 +1,15 @@
 import Layout from '@/layout'
 import Redirect from '@demo/views/redirect'
 
+import exceptionRoutes from './modules/exception'
+import formRoutes from './modules/form'
+import listRoutes from './modules/list'
+import profileRoutes from './modules/profile'
+import resultRoutes from './modules/result'
+import accountRoutes from './modules/account'
+// 外链
+import externalRoutes from './modules/external'
+
 // 基础路由
 export const constantRoutes = [
   {
@@ -35,7 +44,7 @@ export const constantRoutes = [
         path: 'dashboard',
         component: () => import('@demo/views/dashboard'),
         name: 'dashboard',
-        meta: { title: '首页', icon: 'el-icon-s-operation' }
+        meta: { title: 'dashboard', icon: 'el-icon-s-operation' }
       }
     ]
   }
@@ -45,14 +54,8 @@ export const constantRoutes = [
   { path: '*', redirect: '/404', hidden: true } */
 ]
 
+// 异步路由
+export const asyncRoutes = [].concat(formRoutes, listRoutes, profileRoutes, exceptionRoutes, resultRoutes, accountRoutes, externalRoutes)
+
 // 未找到页面路由
 export const notFoundRoute = { path: '*', redirect: '/404', hidden: true }
-
-// 其他路由模块
-export { default as exceptionRoutes } from './modules/exception'
-export { default as formRoutes } from './modules/form'
-export { default as listRoutes } from './modules/list'
-export { default as profileRoutes } from './modules/profile'
-export { default as resultRoutes } from './modules/result'
-export { default as accountRoutes } from './modules/account'
-export { default as extentRoutes } from './modules/extent'

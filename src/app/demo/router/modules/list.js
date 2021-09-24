@@ -18,7 +18,34 @@ export default [
         path: 'table',
         component: () => import('@demo/views/form/basic'),
         name: 'list_table',
-        meta: { title: '表格列表' }
+        redirect: '/list/table/list',
+        meta: { title: '表格列表', asMenu: true },
+        children: [
+          {
+            path: 'list',
+            component: () => import('@demo/views/form/basic'),
+            name: 'ListTableList',
+            meta: { hidden: true, title: '表格列表', automount: true, activeMenu: '/list/table', cache: true }
+          },
+          {
+            path: 'create',
+            component: () => import('@demo/views/form/basic'),
+            name: 'ListTableCreate',
+            meta: { hidden: true, title: '创建表格', automount: true, activeMenu: '/list/table' }
+          },
+          {
+            path: 'detail',
+            component: () => import('@demo/views/form/basic'),
+            name: 'ListTableDetail',
+            meta: { hidden: true, title: '数据详情', automount: true, activeMenu: '/list/table' }
+          },
+          {
+            path: 'edit',
+            component: () => import('@demo/views/form/basic'),
+            name: 'ListTableEdit',
+            meta: { hidden: true, automount: true, activeMenu: '/list/table' }
+          }
+        ]
       },
       {
         path: 'search',
@@ -33,9 +60,16 @@ export default [
             meta: { title: '文章列表搜索' }
           },
           {
+            path: 'applications',
+            component: () => import('@demo/views/form/basic'),
+            name: 'list_search_applications',
+            meta: { title: '应用列表搜索' }
+          },
+          {
             path: 'goods',
             component: () => import('@demo/views/form/basic'),
             name: 'list_search_goods',
+            redirect: '/list/search/goods/daily',
             meta: { title: '商品列表搜索' },
             children: [
               {
@@ -49,20 +83,8 @@ export default [
                 component: () => import('@demo/views/form/basic'),
                 name: 'list_search_goods_office',
                 meta: { title: '办公区' }
-              },
-              {
-                path: '/list/search/articles',
-                component: () => import('@demo/views/form/basic'),
-                name: 'list_search_goods_articles',
-                meta: { title: '其他区' }
               }
             ]
-          },
-          {
-            path: 'applications',
-            component: () => import('@demo/views/form/basic'),
-            name: 'list_search_applications',
-            meta: { title: '应用列表搜索' }
           }
         ]
       }

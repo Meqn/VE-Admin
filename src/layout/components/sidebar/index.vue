@@ -65,29 +65,30 @@ export default {
     },
     filterRoutes(routes, basePath = '/') {
       const res = []
+      if (Array.isArray(routes) && routes.length > 0) {
+        for (let route of routes) {
+          // skip some route
+          if (route.hidden || route.meta?.hidden) { continue }
 
-      for (let route of routes) {
-        // skip some route
-        if (route.hidden || route.meta?.hidden) { continue }
+          const onlyOneShowingChild = this.onlyOneShowingChild(route.children, route)
 
-        const onlyOneShowingChild = this.onlyOneShowingChild(route.children, route)
+          if (route.children && onlyOneShowingChild && !route.meta?.asMenu) {
+            route = onlyOneShowingChild
+          }
 
-        if (route.children && onlyOneShowingChild && !route.meta?.asMenu) {
-          route = onlyOneShowingChild
+          const data = {
+            path: this.resolvePath(basePath, route.path),
+            title: route.meta?.title,
+            icon: route.meta?.icon,
+            asMenu: route.meta?.asMenu
+          }
+
+          // recursive child routes
+          if (route.children) {
+            data.children = this.filterRoutes(route.children, data.path)
+          }
+          res.push(data)
         }
-
-        const data = {
-          path: this.resolvePath(basePath, route.path),
-          title: route.meta?.title,
-          icon: route.meta?.icon,
-          asMenu: route.meta?.asMenu
-        }
-
-        // recursive child routes
-        if (route.children) {
-          data.children = this.filterRoutes(route.children, data.path)
-        }
-        res.push(data)
       }
       return res
     },

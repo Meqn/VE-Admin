@@ -4,6 +4,7 @@ const path = require('path')
 const fs = require('fs')
 
 const resolve = dir => path.join(__dirname, dir)
+const isProd = process.env.NODE_ENV === 'production'
 
 // 设置app别名, `@app`
 const appAlias = {}
@@ -62,8 +63,36 @@ if (Object.keys(pages).length === 0) {
   process.exit(1)
 }
 
+const assetsCDN = {
+  // webpack build externals
+  externals: {
+    vue: 'Vue',
+    'vue-router': 'VueRouter',
+    vuex: 'Vuex',
+    axios: 'axios',
+    'element-ui': 'ELEMENT',
+    nprogress: 'NProgress',
+    'js-cookie': 'Cookies',
+    echarts: 'echarts'
+  },
+  css: [],
+  js: [
+    '//cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js',
+    '//cdn.jsdelivr.net/npm/vue-router@3.5.2/dist/vue-router.min.js',
+    '//cdn.jsdelivr.net/npm/vuex@3.6.2/dist/vuex.min.js',
+    '//cdn.jsdelivr.net/npm/element-ui@2.15.6/lib/index.js',
+    '//cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js',
+    '//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js',
+    '//cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js',
+    '//cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js'
+  ]
+}
+
 module.exports = {
   pages,
+  publicPath: '/',
+  outputDir: 'dist',
+  assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   configureWebpack: {
@@ -74,9 +103,11 @@ module.exports = {
         '@root': resolve('.'),
         ...appAlias
       }
-    }
+    },
+    // if prod, add externals
+    externals: isProd ? assetsCDN.externals : {}
   },
-  chainWebpack(config) {
+  chainWebpack: config => {
     // 定义全局变量
     config.plugin('define').tap(definitions => {
       definitions[0]['process.env'] = Object.assign(definitions[0]['process.env'], {
@@ -108,6 +139,17 @@ module.exports = {
         .use('url-loader')
           .loader('url-loader')
           .tap(options => Object.assign(options, { limit: 5120 }))
+    // 防止多页面打包卡顿
+    config => config.plugins.delete('named-chunks')
+    // 生产环境下多页面使用CDN
+    if (isProd && Object.keys(pages).length > 0) {
+      Object.keys(pages).forEach(app => {
+        config.plugin(`html-${app}`).tap(args => {
+          args[0].cdn = assetsCDN
+          return args
+        })
+      })
+    }
   },
   css: {
     loaderOptions: {
@@ -115,17 +157,5 @@ module.exports = {
         prependData: '@import "~@/styles/variables.scss";'
       }
     }
-  },
-  devServer: {
-    // development server port 3000
-    port: 3000,
-    open: true
-    // proxy: {
-    //   '/api': {
-    //     target: 'https://services.mock.com/api',
-    //     ws: false,
-    //     changeOrigin: true
-    //   }
-    // }
   }
 }

@@ -18,7 +18,12 @@ module.exports = {
     'camelcase': 0,
     'dot-notation': 0,
     'no-trailing-spaces': 0,
-    'no-unused-vars': 0
+    'no-unused-vars': 0,
+    'handle-callback-err': 0,
+    'no-multiple-empty-lines': 0,
+    'computed-property-spacing': 0,
+    'vue/no-unused-vars': 0,
+    'no-unused-expressions': 0
   },
   overrides: [
     {

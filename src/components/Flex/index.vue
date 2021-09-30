@@ -49,6 +49,7 @@ export default {
 .flex{
   display: flex;
   &-item{
+    min-width: 0;
     flex: 1;
   }
   &--row{

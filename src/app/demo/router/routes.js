@@ -48,10 +48,9 @@ export const constantRoutes = [
       }
     ]
   }
-  /* 
   // ⚠️注： 1. 404页面必须放在末尾 !!!
   //       2. 如果是动态载入路由，必须将不匹配路径(path="*")跳转404 route从初始路由中移除
-  { path: '*', redirect: '/404', hidden: true } */
+  // { path: '*', redirect: '/404', hidden: true }
 ]
 
 // 异步路由

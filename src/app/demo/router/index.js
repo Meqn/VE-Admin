@@ -64,8 +64,8 @@ router.beforeEach(async (to, from, next) => {
       } catch (error) {
         await store.dispatch('user/removeToken')
         Message.error(error || 'Has Error')
-        // next(`/login?redirect=${to.path}`)
-        window.location.href = `/#/login?redirect=${to.path}`
+        next(`/login?redirect=${to.path}`)
+        // window.location.href = `/#/login?redirect=${to.path}`
         NProgress.done()
       }
     }
@@ -73,8 +73,8 @@ router.beforeEach(async (to, from, next) => {
     // 验证授权route，否则跳转到登录页
     const matched = to.matched
     if (matched.length === 0 || matched.some(record => !record.meta.noRequiresAuth)) {
-      next(`/login?redirect=${to.path}`) // ⚠️ location.href 跳转不加载
-      window.location.href = `/#/login?redirect=${encodeURIComponent(to.path)}`
+      next(`/login?redirect=${to.path}`)
+      // window.location.href = `/#/login?redirect=${encodeURIComponent(to.path)}`
       NProgress.done()
     } else {
       // 无需授权

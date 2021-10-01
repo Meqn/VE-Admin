@@ -22,8 +22,7 @@
 </template>
 
 <script>
-import { resolve } from 'path'
-import { isExternal } from '@/utils/validate'
+import { resolvePath } from '@/utils'
 import SidebarItem from './SidebarItem.vue'
 import { mapGetters } from 'vuex'
 
@@ -40,13 +39,13 @@ export default {
   computed: {
     ...mapGetters([
       'sidebar',
-      'permission_routes'
+      'permissionRoutes'
     ]),
     isCollapse() {
       return this.sidebar.opened
     },
     menus() {
-      return this.filterRoutes(this.permission_routes)
+      return this.filterRoutes(this.permissionRoutes)
     },
     activeMenu() {
       const { meta, path } = this.$route
@@ -59,9 +58,6 @@ export default {
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
-    },
-    resolvePath(base, path) {
-      return isExternal(path) ? path : resolve(base, path)
     },
     filterRoutes(routes, basePath = '/') {
       const res = []
@@ -77,7 +73,7 @@ export default {
           }
 
           const data = {
-            path: this.resolvePath(basePath, route.path),
+            path: resolvePath(basePath, route.path),
             title: route.meta?.title,
             icon: route.meta?.icon,
             asMenu: route.meta?.asMenu
@@ -99,7 +95,7 @@ export default {
       // When there is only one child route, the child route is displayed by default
       if (showingChildren.length === 1) {
         onlyOneChild = showingChildren[0]
-        onlyOneChild.path = this.resolvePath(parent.path, onlyOneChild.path)
+        onlyOneChild.path = resolvePath(parent.path, onlyOneChild.path)
         return onlyOneChild
       }
 

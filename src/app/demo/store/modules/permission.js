@@ -1,5 +1,6 @@
 import { getRoleMenus } from '@/api/user'
 import { constantRoutes, asyncRoutes, notFoundRoute } from '@demo/router/routes'
+import { flatMapDeep } from '@/utils'
 
 /**
  * 查找所有父节点
@@ -100,8 +101,10 @@ const mutations = {
 
 const actions = {
   async generateRoutes({ commit, dispatch, rootGetters }) {
+    // 获取所有菜单
     const { data } = await getRoleMenus(rootGetters.role)
-    const menus = flatMenus(data)
+    // 扁平化嵌套菜单
+    const menus = flatMapDeep(data, 'children', item => item.name)
     const accessedRoutes = filterRoutes(asyncRoutes, menus)
     // 末尾插入 notFoundRoute
     accessedRoutes.push(notFoundRoute)

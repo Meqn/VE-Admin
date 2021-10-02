@@ -11,9 +11,7 @@
   </div>
   <div class="header-center"></div>
   <div class="header-right">
-    <span class="header-item">
-      <VeIcon name="el-icon-search" :size="20" />
-    </span>
+    <Search class="header-item" />
     <span class="header-item">
       <VeIcon name="el-icon-bell" :size="20" />
     </span>
@@ -34,9 +32,13 @@
 </template>
 
 <script>
+import Search from './Search'
 import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'VeLayoutHeader',
+  components: {
+    Search
+  },
   computed: {
     ...mapGetters(['logo', 'user'])
   },

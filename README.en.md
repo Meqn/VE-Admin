@@ -1,4 +1,4 @@
-# vue-element-admin
+# ve-admin
 
 #### Description
 # 基于Element-UI的企业管理后台

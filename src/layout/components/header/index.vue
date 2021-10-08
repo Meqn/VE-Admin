@@ -12,47 +12,26 @@
   <div class="header-center"></div>
   <div class="header-right">
     <Search class="header-item" />
-    <span class="header-item">
-      <VeIcon name="el-icon-bell" :size="20" />
-    </span>
-    <el-dropdown class="header-item" @command="userCommand">
-      <VeFlex align="middle">
-        <el-avatar :size="24" :src="user.avatar"></el-avatar>
-        <span class="ml-8">{{ user.nickname }}</span>
-      </VeFlex>
-      <el-dropdown-menu slot="dropdown">
-        <!-- <el-dropdown-item icon="el-icon-user" command="center">个人中心</el-dropdown-item> -->
-        <el-dropdown-item icon="el-icon-user" command="setting">账户设置</el-dropdown-item>
-        <el-dropdown-item icon="el-icon-switch-button" divided command="logout">退出登录</el-dropdown-item>
-      </el-dropdown-menu>
-    </el-dropdown>
-    
+    <Notice class="header-item" />
+    <Account class="header-item" />
   </div>
 </header>
 </template>
 
 <script>
 import Search from './Search'
-import { mapGetters, mapActions } from 'vuex'
+import Notice from './Notice'
+import Account from './Account.vue'
 export default {
   name: 'VeLayoutHeader',
   components: {
-    Search
+    Search,
+    Notice,
+    Account
   },
   computed: {
-    ...mapGetters(['logo', 'user'])
-  },
-  methods: {
-    ...mapActions('user', ['logout']),
-    userCommand(command) {
-      if (command === 'logout') {
-        this.logout().then(() => {
-          window.location.href = '/#/login'
-        })
-      }
-      if (command === 'setting') {
-        this.$router.push('/password')
-      }
+    logo() {
+      return this.$store.getters.logo
     }
   }
 }

@@ -7,7 +7,7 @@
     v-model="value"
     :fetch-suggestions="querySearch"
     value-key="label"
-    placeholder="导航搜索"
+    placeholder="快速导航"
     @select="handleSelect"
     @blur="leaveSearchMode"
   />

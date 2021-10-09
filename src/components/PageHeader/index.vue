@@ -39,7 +39,7 @@
 <script>
 import VeFlex from '../Flex'
 export default {
-  name: 'AppPageHeader',
+  name: 'VePageHeader',
   components: {
     VeFlex
   },

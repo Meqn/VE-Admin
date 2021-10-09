@@ -1,9 +1,15 @@
 import Flex from './Flex'
 import Icon from './Icon'
+import Container from './Container'
+import PageHeader from './PageHeader'
+import Table from './Table'
 
 const components = [
   Flex,
-  Icon
+  Icon,
+  Container,
+  PageHeader,
+  Table
 ]
 
 const install = function(Vue) {

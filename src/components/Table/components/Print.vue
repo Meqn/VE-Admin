@@ -1,0 +1,29 @@
+<template>
+<el-tooltip :content="tooltip" placement="top">
+  <i title="打印" class="toolbar-icon" @click="onClick">
+    <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M37 32H11v12h26V32z" stroke="currentColor" stroke-width="4" stroke-linejoin="round" />
+      <path clip-rule="evenodd" d="M4 20h40v18h-6.983v-6H10.98v6H4V20z" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M38 4H10v16h28V4z" stroke="currentColor" stroke-width="4" stroke-linejoin="round" />
+    </svg>
+  </i>
+</el-tooltip>
+</template>
+
+<script>
+export default {
+  name: 'table-print',
+  props: {
+    tooltip: {
+      type: String,
+      default: '打印'
+    }
+  },
+  inject: ['top'],
+  methods: {
+    onClick() {
+      this.top.print()
+    }
+  }
+}
+</script>

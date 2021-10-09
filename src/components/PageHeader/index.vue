@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import VeFlex from '../Flex'
+import VeFlex from '@/components/Flex'
 export default {
   name: 'VePageHeader',
   components: {

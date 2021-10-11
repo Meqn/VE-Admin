@@ -159,38 +159,6 @@ export function objectMerge(target, source) {
 }
 
 /**
- * @param {HTMLElement} element
- * @param {string} className
- */
-export function toggleClass(element, className) {
-  if (!element || !className) {
-    return
-  }
-  let classString = element.className
-  const nameIndex = classString.indexOf(className)
-  if (nameIndex === -1) {
-    classString += '' + className
-  } else {
-    classString =
-      classString.substr(0, nameIndex) +
-      classString.substr(nameIndex + className.length)
-  }
-  element.className = classString
-}
-
-/**
- * @param {string} type
- * @returns {Date}
- */
-export function getTime(type) {
-  if (type === 'start') {
-    return new Date().getTime() - 3600 * 1000 * 24 * 90
-  } else {
-    return new Date(new Date().toDateString())
-  }
-}
-
-/**
  * @param {Function} func
  * @param {number} wait
  * @param {boolean} immediate
@@ -254,6 +222,7 @@ export function deepClone(source) {
 }
 
 /**
+ * 数组去重
  * @param {Array} arr
  * @returns {Array}
  */
@@ -261,68 +230,6 @@ export function uniqueArr(arr) {
   return Array.from(new Set(arr))
 }
 
-/**
- * @returns {string}
- */
-export function createUniqueString() {
-  const timestamp = +new Date() + ''
-  const randomNum = parseInt((1 + Math.random()) * 65536) + ''
-  return (+(randomNum + timestamp)).toString(32)
-}
-
-/**
- * Check if an element has a class
- * @param {HTMLElement} elm
- * @param {string} cls
- * @returns {boolean}
- */
-export function hasClass(ele, cls) {
-  return !!ele.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'))
-}
-
-/**
- * Add class to element
- * @param {HTMLElement} elm
- * @param {string} cls
- */
-export function addClass(ele, cls) {
-  if (!hasClass(ele, cls)) ele.className += ' ' + cls
-}
-
-/**
- * Remove class from element
- * @param {HTMLElement} elm
- * @param {string} cls
- */
-export function removeClass(ele, cls) {
-  if (hasClass(ele, cls)) {
-    const reg = new RegExp('(\\s|^)' + cls + '(\\s|$)')
-    ele.className = ele.className.replace(reg, ' ')
-  }
-}
-
-
-/**
- * 图片加载
- * @param {*} path 
- * @param {*} callback 
- */
-export function imageLoad(path, callback) {
-  var img = new Image()
-  img.onerror = function (error) {
-    callback && callback(error)
-    img.onerror = img = null
-  }
-  img.onload = function () {
-    callback && callback(null, img)
-    img.onload = img = null
-  }
-  img.src = path
-  if (img.complete) {
-    callback && callback(null, img)
-    img.onerror = img.onload = img = null
-  }
-}
 
 /**
  * css单位
@@ -373,13 +280,24 @@ export function fileType(fileSrc) {
   return _type || _fileSuffix
 }
 
-// 获取指定范围内的随机数
+/**
+ * 获取指定数字范围内的随机数
+ * @param {Number} min 
+ * @param {Number} max 
+ * @returns 
+ */
 export const randomNum = (min, max) => Math.round(Math.random() * (max - min)) + min
 
-// 随机字符串
+/**
+ * 随机生成8位字符串
+ * @returns 
+ */
 export const randomStr = () => Math.floor(Math.random() * Date.now()).toString(36)
 
-// 获取UUID
+/**
+ * 生成UUID
+ * @returns 
+ */
 export function generateUUID () {
   let d = new Date().getTime()
   const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -390,26 +308,19 @@ export function generateUUID () {
   return uuid
 }
 
-// 千分位
-export function toThousands (num) {
-  return num && num.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-}
-
-export function pageJump(url, router) {
-  if (!url || typeof url !== 'string') return false
-  if (!(/^https?:/.test(url) || url.includes('/#/')) && router) {
-    router.push(url)
-  } else {
-    window.location.href = url
-  }
-}
+/**
+ * 数字转千分位
+ * @param {*} num 
+ * @returns 
+ */
+export const toThousands = num => (num && num.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,'))
 
 /**
  * 递归方式扁平化集合
  * @param {Array} collection 数据集合
  * @param {String} childProp 子元素name
  * @param {Function} handler 当前项返回值的处理函数
- * @param {any} currentValue 当前项的返回值
+ * @param {any} currentValue 当前项的返回值 (用于handler中存在数据依赖)
  * @returns 
  */
 export function flatMapDeep(collection, childProp = 'children', handler, currentValue) {
@@ -441,4 +352,29 @@ export function resolvePath(base, path) {
   } catch (error) {
     console.error(error)
   }
+}
+
+/**
+ * 将连接线命名规则转成驼峰
+ * @param {*} name 待转换的字符串
+ * @param {*} hyphen 连接符
+ * @returns 
+ */
+export function camelCase(name, hyphen = '-') {
+  const regx = new RegExp(hyphen + '([a-z])', 'g')
+  return name.replace(regx, (match, letter) => {
+    return letter.toUpperCase()
+  })
+}
+
+/**
+ * 将骆驼命名规则转成连接线方式
+ * @param {*} name 待转换的字符串
+ * @param {*} hyphen 连接符
+ * @returns 
+ */
+export function kebabCase(name, hyphen = '-') {
+  return name.replace(/[A-Z]/g, (match) => {
+    return hyphen + match.toLowerCase()
+  })
 }

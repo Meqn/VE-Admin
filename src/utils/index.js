@@ -357,11 +357,11 @@ export function resolvePath(base, path) {
 /**
  * 将连接线命名规则转成驼峰
  * @param {*} name 待转换的字符串
- * @param {*} hyphen 连接符
+ * @param {*} separator 连接符
  * @returns 
  */
-export function camelCase(name, hyphen = '-') {
-  const regx = new RegExp(hyphen + '([a-z])', 'g')
+export function camelCase(name, separator = '-') {
+  const regx = new RegExp(separator + '([a-z])', 'g')
   return name.replace(regx, (match, letter) => {
     return letter.toUpperCase()
   })
@@ -370,11 +370,10 @@ export function camelCase(name, hyphen = '-') {
 /**
  * 将骆驼命名规则转成连接线方式
  * @param {*} name 待转换的字符串
- * @param {*} hyphen 连接符
+ * @param {*} separator 连接符
  * @returns 
  */
-export function kebabCase(name, hyphen = '-') {
-  return name.replace(/[A-Z]/g, (match) => {
-    return hyphen + match.toLowerCase()
-  })
+export function kebabCase(str, separator = '-') {
+  const regx = /([^-])([A-Z])/g
+  return str.replace(regx, `$1${separator}$2`).toLowerCase()
 }

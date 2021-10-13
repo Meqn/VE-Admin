@@ -1,22 +1,99 @@
+/**
+ * 绑定事件
+ * @param {*} element 元素
+ * @param {*} event 事件类型
+ * @param {*} handler 事件方法
+ */
+export const on = (function() {
+  if (document.addEventListener) {
+    return function(element, event, handler) {
+      if (element && event && handler) {
+        element.addEventListener(event, handler, false)
+      }
+    }
+  } else if (document.attachEvent) {
+    return function(element, event, handler) {
+      if (element && event && handler) {
+        element.attachEvent('on' + event, handler)
+      }
+    }
+  } else {
+    return function(element, event, handler) {
+      if (element && event && handler) {
+        element['on' + event] = handler
+      }
+    }
+  }
+})();
 
+/**
+ * 解绑事件
+ * @param {*} element 
+ * @param {*} event 
+ * @param {*} handler 
+ */
+export const off = (function() {
+  if (document.removeEventListener) {
+    return function(element, event, handler) {
+      if (element && event) {
+        element.removeEventListener(event, handler, false)
+      }
+    }
+  } else if (document.detachEvent) {
+    return function(element, event, handler) {
+      if (element && event) {
+        element.detachEvent('on' + event, handler)
+      }
+    }
+  } else {
+    return function(element, event, handler) {
+      if (element && event) {
+        element['on' + event] = null
+      }
+    }
+  }
+})();
+
+/**
+ * 执行一次绑定事件
+ * @param {*} element 
+ * @param {*} event 
+ * @param {*} handler 
+ */
+export const once = function(element, event, handler) {
+  const listener = function() {
+    if (handler) {
+      handler.apply(this, arguments)
+    }
+    off(element, event, listener)
+  }
+  on(element, event, listener)
+}
 
 /**
  * Check if an element has a class
- * @param {HTMLElement} elm
+ * @param {HTMLElement} el
  * @param {string} cls
  * @returns {boolean}
  */
-export function hasClass(ele, cls) {
-  return !!ele.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'))
+export function hasClass(el, cls) {
+  if (!el || !cls) return false
+  if (el.classList) {
+    return el.classList.contains(cls)
+  } else {
+    return (` ${el.className} `).indexOf(` ${cls} `) > -1
+    // return !!el.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'))
+  }
 }
 
 /**
  * Add class to element
- * @param {HTMLElement} elm
+ * @param {HTMLElement} el
  * @param {string} cls
  */
-export function addClass(ele, cls) {
-  if (!hasClass(ele, cls)) ele.className += ' ' + cls
+export function addClass(el, cls) {
+  // el.classList.add不能有空格
+  if (!hasClass(el, cls)) el.className += ' ' + cls
 }
 
 /**
@@ -24,31 +101,30 @@ export function addClass(ele, cls) {
  * @param {HTMLElement} elm
  * @param {string} cls
  */
-export function removeClass(ele, cls) {
-  if (hasClass(ele, cls)) {
+export function removeClass(el, cls) {
+  if (hasClass(el, cls)) {
+    // el.className = ` ${el.className} `.replace(` ${cls} `, ' ')
     const reg = new RegExp('(\\s|^)' + cls + '(\\s|$)')
-    ele.className = ele.className.replace(reg, ' ')
+    el.className = el.className.replace(reg, ' ')
   }
 }
 
 /**
- * @param {HTMLElement} element
- * @param {string} className
+ * @param {HTMLElement} el
+ * @param {string} cls
  */
-export function toggleClass(element, className) {
-  if (!element || !className) {
-    return
-  }
-  let classString = element.className
-  const nameIndex = classString.indexOf(className)
+export function toggleClass(el, cls) {
+  if (!el || !cls) return
+  let classStr = el.className
+  const nameIndex = classStr.indexOf(cls)
   if (nameIndex === -1) {
-    classString += '' + className
+    classStr += ' ' + cls
   } else {
-    classString =
-      classString.substr(0, nameIndex) +
-      classString.substr(nameIndex + className.length)
+    classStr =
+      classStr.substr(0, nameIndex) +
+      classStr.substr(nameIndex + cls.length)
   }
-  element.className = classString
+  el.className = classStr
 }
 
 /**

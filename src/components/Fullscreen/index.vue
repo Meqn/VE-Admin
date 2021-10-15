@@ -13,7 +13,7 @@
 export default {
   name: 'VeFullscreen',
   props: {
-    element: [String, Object, HTMLElement]
+    element: [String, Object, Element]
   },
   data() {
     return {
@@ -24,7 +24,7 @@ export default {
     el() {
       const { element } = this
       if (element) {
-        if (element instanceof HTMLElement) {
+        if (element instanceof Element) {
           return element
         }
         if (typeof element === 'string') {

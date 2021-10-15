@@ -214,7 +214,9 @@ $toolbarSize: 20px;
     margin-right: 16px;
   }
   &-toolbar{
+    height: $toolbarSize;
     margin-left: 24px;
+    
     .toolbar-item{
       display: inline-block;
       height: $toolbarSize;

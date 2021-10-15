@@ -14,7 +14,7 @@
 - `pagination: object`: el-pagination分页属性(包含下列属性)
   - `align: String`: 分页水平位置 `[left, center, right]`
   - `style: Object|String`: 样式
-- `fullElement: String | HTMLElement`: 全屏元素
+- `fullElement: String | Element`: 全屏元素
 - `loading: Boolean`:
 - `loadingText: String`:
 - `reload`:
@@ -60,6 +60,3 @@ https://github.com/SheetJS/printj
 # 改进
 
 1. 可编辑
-
-2. 带搜索slot
-

@@ -2,10 +2,12 @@
 */
 $--color-primary: #409EFF !default;
 
-$--color-success: #67C23A !default;
-$--color-warning: #E6A23C !default;
-$--color-danger: #F56C6C !default;
+$--color-success: #0BCD74 !default;
+$--color-warning: #F5A623 !default;
+$--color-danger: #FF3333 !default;
 $--color-info: #909399 !default;
+$--color-white: white !default;
+$--color-black: black !default;
 
 $--color-text-primary: #303133 !default;
 $--color-text-regular: #606266 !default;
@@ -23,21 +25,23 @@ $--background-color-base: #F5F7FA !default;
 /********************************************************************* custom style
 */
 
-$--color-text-link: $--color-primary; // #598CFF
-$--color-text-hover: mix($--color-primary, #fff, 86%); // #709cff
-$--color-text-active: mix($--color-primary, #000, 86%); // #4d78db
-
-$--background-color: #f0f2f5;
-
+// colors
 $--color-blue: #409EFF;
 $--color-green: $--color-success;
 $--color-red: $--color-danger;
-$--color-yellow: $--color-warning;
+$--color-orange: $--color-warning;
 $--color-gray: $--color-info;
+
+// text、border、background
+$--color-text-link: $--color-primary;
+$--color-text-hover: mix($--color-primary, #fff, 86%);
+$--color-text-active: mix($--color-primary, #000, 86%);
+
+$--background-color: #f0f2f5;
 
 // layout
 $--layout-header-background-color: #001529;
 $--layout-aside-background-color: #fff;
 $--layout-aside-text-color: #606266;
-$--layout-aside-active-text-color: #598CFF;
+$--layout-aside-active-text-color: #409EFF;
 $--layout-aside-active-background-color: #EFF7FF;

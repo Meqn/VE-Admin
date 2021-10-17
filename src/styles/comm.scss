@@ -18,7 +18,7 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
 .blue{ color: $--color-blue; }
 .green{ color: $--color-green; }
 .red{ color: $--color-red; }
-.yellow{ color: $--color-yellow; }
+.orange{ color: $--color-orange; }
 .gray{ color: $--color-gray; }
 
 // font位置
@@ -54,6 +54,16 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
 .fsi {
   font-style: italic;
 }
+// 文本转换
+.ttc{
+  text-transform: capitalize;
+}
+.ttl{
+  text-transform: lowercase;
+}
+.ttu{
+  text-transform: uppercase;
+}
 
 /* 换行 */
 .norwap{
@@ -88,10 +98,6 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
 .ellipsis-4{
   @extend %multi-line-clamp;
   -webkit-line-clamp: 4;
-}
-.ellipsis-5{
-  @extend %multi-line-clamp;
-  -webkit-line-clamp: 5;
 }
 
 .none{

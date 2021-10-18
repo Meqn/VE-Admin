@@ -7,9 +7,18 @@ export default class Resize {
   width = 0
   height = 0
   
+  /**
+   * constructor
+   * @param {HTMLElement} el 目标元素
+   * @param {Object} options 选项
+   * @param {Boolean} options.disabled 是否可用
+   * @param {String} options.limiter 限制resize事件速率
+   * @param {Number} options.wait 限制等待时间
+   * @param {Function} options.resize resize回调函数
+   */
   constructor(el, options = {}) {
     this.options = Object.assign({
-      rateDelay: 150 // The rate limit wait time
+      wait: 150 // The rate limit wait time
     }, options)
 
     this.init(el)
@@ -32,10 +41,10 @@ export default class Resize {
   }
 
   _onResize() {
-    const { rateLimiter, rateDelay } = this.options
-    if (rateLimiter) {
+    const { limiter, wait } = this.options
+    if (limiter) {
       const limiter = { debounce, throttle }
-      return limiter[rateLimiter](this._handleResize.bind(this), rateDelay)
+      return limiter[limiter](this._handleResize.bind(this), wait)
     }
     return this._handleResize.bind(this)
   }

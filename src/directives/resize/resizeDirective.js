@@ -1,4 +1,4 @@
-import Resize from './ResizeObserver'
+import ResizeObserver from './ResizeObserver'
 
 function getOptions({ value, arg, modifiers }) {
   const options = {}
@@ -10,14 +10,14 @@ function getOptions({ value, arg, modifiers }) {
   
   // Limit the rate of size change events
   if (arg) {
-    if (arg === 'debounce') options['rateLimiter'] = 'debounce'
-    else if (arg === 'throttle') options['rateLimiter'] = 'throttle'
+    if (arg === 'debounce') options['limiter'] = 'debounce'
+    else if (arg === 'throttle') options['limiter'] = 'throttle'
   }
 
   // The rate limit wait time
   if (modifiers) {
-    const delay = Object.keys(modifiers).map(k => parseInt(k)).find(v => !isNaN(v))
-    options['rateDelay'] = delay || 150
+    const wait = Object.keys(modifiers).map(k => parseInt(k)).find(v => !isNaN(v))
+    options['wait'] = wait || 150
   }
 
   return options
@@ -29,11 +29,11 @@ export default {
     if (value && typeof value !== 'function') {
       return console.warn('v-resize should received a function as value')
     }
-    const ro = new Resize(el, getOptions(binding))
-    el.__resize__ = ro
+    const ro = new ResizeObserver(el, getOptions(binding))
+    el.__vue_resize__ = ro
   },
   unbind(el) {
-    const ro = el.__resize__
+    const ro = el.__vue_resize__
     if (ro) {
       ro.destroyObserver()
     }

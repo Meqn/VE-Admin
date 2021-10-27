@@ -4,7 +4,7 @@
       v-bind:class="lightboxClasses"
       v-if="isVisible" 
       ref="coolLightbox"
-      @click="closeModal"
+      @click="handleClickOutside"
       v-bind:style="lightboxStyles">
       <!-- 缩略图列表 -->
       <div v-if="gallery" class="cool-lightbox-thumbs">
@@ -13,14 +13,14 @@
             type="button"
             v-for="(item, itemIndex) in items"
             :key="itemIndex"
-            :class="{ 
+            :class="{
               active: itemIndex === imgIndex,
-              'is-video': ['video', 'webVideo'].includes(getMediaType(itemIndex))
+              'is-video': checkIsVideo(itemIndex)
             }"
             @click="imgIndex = itemIndex"
             class="cool-lightbox__thumb">
 
-            <svg v-if="['video', 'webVideo'].includes(getMediaType(itemIndex))" class="cool-lightbox__thumb__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <svg v-if="checkIsVideo(itemIndex)" class="cool-lightbox__thumb__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path d="M6.5 5.4v13.2l11-6.6z"></path>
             </svg>
 
@@ -40,14 +40,14 @@
         @touchstart="startSwipe"
         @touchmove="continueSwipe"
         @touchend="endSwipe">
-
+        <!-- 自动播放进度条 -->
         <div class="cool-lightbox__progressbar" :style="stylesInterval"></div>
         <!-- 导航 pref/next -->
         <div class="cool-lightbox__navigation">
           <button type="button" class="cool-lightbox-button cool-lightbox-button--prev" title="Previous" :class="buttonsClasses" v-show="(hasPreviousButton || loopData) && items.length > 1" @click="onPrevClick">
             <slot name="icon-previous">
               <div class="cool-lightbox-button__icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.28 15.7l-1.34 1.37L5 12l4.94-5.07 1.34 1.38-2.68 2.72H19v1.94H8.6z"></path></svg>
+                <Icon name="left" />
               </div>
             </slot>
           </button>
@@ -55,7 +55,7 @@
           <button type="button" class="cool-lightbox-button cool-lightbox-button--next" title="Next" :class="buttonsClasses" v-show="(hasNextButton || loopData) && items.length > 1" @click="onNextClick(false)">
             <slot name="icon-next">
               <div class="cool-lightbox-button__icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.4 12.97l-2.68 2.72 1.34 1.38L19 12l-4.94-5.07-1.34 1.38 2.68 2.72H5v1.94z"></path></svg>
+                <Icon name="right" />
               </div>
             </slot>
           </button>
@@ -67,26 +67,10 @@
           <div ref="items" class="cool-lightbox__slide cool-lightbox__slide--current">
             <transition name="cool-lightbox-slide-change" mode="out-in">
               <div v-if="getMediaType(imgIndex) === 'image'" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
-                <transition v-if="!isItemPicture(imgIndex)" name="cool-lightbox-slide-change" mode="out-in">
-                  <img
-                    :src="currentItem.src"
-                    :srcset="currentItem.srcset"
-                    :sizes="currentItem.sizes"
-                    :key="imgIndex"
-                    draggable="false"
-                    :alt="currentItem.alt"
-
-                    @load="imageLoaded"
-                    @click="zoomImage"
-                    @mousedown="handleMouseDown($event)"
-                    @mouseup="handleMouseUp($event)"
-                    @mousemove="handleMouseMove($event)"
-                  />
-                </transition>
-                <transition v-else name="cool-lightbox-slide-change" mode="out-in">
+                <transition v-if="getItemPictures(imgIndex).length > 0" name="cool-lightbox-slide-change" mode="out-in">
                   <picture :key="imgIndex">
                     <source
-                      v-for="(source, sourceIndex) in getPictureSources(imgIndex)"
+                      v-for="(source, sourceIndex) in getItemPictures(imgIndex)"
                       :srcset="source.srcset"
                       :type="source.type"
                       :media="source.media"
@@ -108,7 +92,22 @@
                     />
                   </picture>
                 </transition>
+                <transition v-else name="cool-lightbox-slide-change" mode="out-in">
+                  <img
+                    :src="currentItem.src"
+                    :srcset="currentItem.srcset"
+                    :sizes="currentItem.sizes"
+                    :key="imgIndex"
+                    draggable="false"
+                    :alt="currentItem.alt"
 
+                    @load="imageLoaded"
+                    @click="zoomImage"
+                    @mousedown="handleMouseDown($event)"
+                    @mouseup="handleMouseUp($event)"
+                    @mousemove="handleMouseMove($event)"
+                  />
+                </transition>
                 
                 <div v-show="imageLoading" class="cool-lightbox-loading-wrapper">
                   <slot name="loading">
@@ -131,27 +130,27 @@
                   </iframe>
                   <template v-else>
                     <iframe
+                      v-if="getMediaType(imgIndex) === 'webVideo'"
                       class="cool-lightbox-video" 
                       v-autoplay
                       :data-autoplay="setAutoplay(imgIndex)"
-                      :src="currentItem.src" 
-                      v-if="!checkIsMp4(imgIndex) && getMediaType(imgIndex) === 'video'" 
+                      :src="currentItem.src"
                       :style="aspectRatioVideo" 
                       :key="currentItem.src" 
                       frameborder="0" 
                       allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
                       allowfullscreen>
                     </iframe>
-
-                    <video class="cool-lightbox-video"
-                      v-if="checkIsMp4(imgIndex) || getMediaType(imgIndex) === 'webVideo'" 
+                    <video
+                      v-else
+                      class="cool-lightbox-video"
                       v-autoplay
                       :data-autoplay="setAutoplay(imgIndex)"
-                      :style="aspectRatioVideo" :key="checkIsMp4(imgIndex)" 
-                      controls="" 
-                      controlslist="nodownload" 
-                      poster="">
-                      <source :src="checkIsMp4(imgIndex)" :type="videoSourceType(imgIndex)">
+                      :style="aspectRatioVideo"
+                      :key="currentItem.src"
+                      controls=""
+                      controlslist="nodownload">
+                      <source :src="currentItem.src" :type="videoSourceType(imgIndex)">
                       Sorry, your browser doesn't support embedded videos
                     </video> 
                   </template>
@@ -180,41 +179,28 @@
         </transition>
         <!-- 工具栏 -->
         <div class="cool-lightbox-toolbar" :class="buttonsClasses">
-          
           <button type="button" v-if="this.slideshow && items.length > 1" title="Play slideshow" class="cool-lightbox-toolbar__btn" @click="togglePlaySlideshow">
-            <svg xmlns="http://www.w3.org/2000/svg" v-if="!isPlayingSlideShow" viewBox="0 0 24 24">
-              <path d="M6.5 5.4v13.2l11-6.6z"></path>
-            </svg>
-
-            <svg v-else xmlns="http://www.w3.org/2000/svg">
-              <g>
-                <rect id="svg_4" height="11.97529" width="11.728392" y="6.030873" x="6.259265" stroke-width="1.5" stroke="#000" fill="#000000"/>
-              </g>
-            </svg>
+            <Icon :name="!isPlayingSlideShow ? 'play' : 'pause'" />
           </button>
 
-          <button type="button" @click="showThumbs = !showThumbs" title="Show thumbnails" v-if="items.length > 1 && gallery" class="cool-lightbox-toolbar__btn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path d="M14.59 14.59h3.76v3.76h-3.76v-3.76zm-4.47 
-              0h3.76v3.76h-3.76v-3.76zm-4.47 0h3.76v3.76H5.65v-3.76zm8.94-4.47h3.76v3.76h-3.76v-3.76zm-4.47 
-              0h3.76v3.76h-3.76v-3.76zm-4.47 0h3.76v3.76H5.65v-3.76zm8.94-4.47h3.76v3.76h-3.76V5.65zm-4.47 
-              0h3.76v3.76h-3.76V5.65zm-4.47 0h3.76v3.76H5.65V5.65z">
-              </path>
-            </svg>
+          <button type="button" title="rotate-left" class="cool-lightbox-toolbar__btn">
+            <Icon name="rotate-left" />
+          </button>
+
+          <button type="button" title="rotate-right" class="cool-lightbox-toolbar__btn">
+            <Icon name="rotate-right" />
           </button>
           
-          <button type="button" v-if="fullScreen" @click="toggleFullScreenMode" class="cool-lightbox-toolbar__btn" title="Fullscreen">
-            <svg width="20px" height="20px" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4.5 11H3v4h4v-1.5H4.5V11zM3 7h1.5V4.5H7V3H3v4zm10.5 6.5H11V15h4v-4h-1.5v2.5zM11 3v1.5h2.5V7H15V3h-4z"></path>
-            </svg>
+          <button v-if="gallery && items.length > 1" type="button" @click="showThumbs = !showThumbs" title="Show thumbnails" class="cool-lightbox-toolbar__btn">
+            <Icon name="grid" />
+          </button>
+          
+          <button v-if="fullScreen" type="button" @click="toggleFullScreenMode" class="cool-lightbox-toolbar__btn" title="Fullscreen">
+            <Icon name="fullscreen" />
           </button>
 
-          <button type="button" v-if="showCloseButton" class="cool-lightbox-toolbar__btn" title="Close" @click="close">
-            <slot name="close">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M12 10.6L6.6 5.2 5.2 6.6l5.4 5.4-5.4 5.4 1.4 1.4 5.4-5.4 5.4 5.4 1.4-1.4-5.4-5.4 5.4-5.4-1.4-1.4-5.4 5.4z"></path>
-              </svg>
-            </slot>
+          <button v-if="showCloseButton" type="button" class="cool-lightbox-toolbar__btn" title="Close" @click="clearData">
+            <Icon name="close" />
           </button>
         </div>
         <!--/cool-lightbox--toolbar-->
@@ -227,7 +213,7 @@
           <svg height="469pt" class="cool-lightbox-zoom__icon" viewBox="0 -192 469.33333 469" width="469pt" 
             xmlns="http://www.w3.org/2000/svg"><path d="m437.332031.167969h-405.332031c-17.664062 
             0-32 14.335937-32 32v21.332031c0 17.664062 14.335938 32 32 32h405.332031c17.664063 0 32-14.335938 
-            32-32v-21.332031c0-17.664063-14.335937-32-32-32zm0 0"/>
+            32-32v-21.332031c0-17.664063-14.335937-32-32-32zm0 0" fill="currentColor" />
           </svg>
           <input type="range" v-model="zoomBar" name="points" min="0" max="50" />
           <svg height="426.66667pt" class="cool-lightbox-zoom__icon" viewBox="0 0 426.66667 426.66667" width="426.66667pt" xmlns="http://www.w3.org/2000/svg">
@@ -235,7 +221,7 @@
             9.558594-21.332031 21.332031v170.667969h-170.667969c-11.773437 0-21.332031 9.558594-21.332031 21.332031 0 
             11.777344 9.558594 21.335938 21.332031 21.335938h170.667969v170.664062c0 11.777344 9.558594 21.335938 21.332031 
             21.335938 11.777344 0 21.335938-9.558594 21.335938-21.335938v-170.664062h170.664062c11.777344 0 21.335938-9.558594 
-            21.335938-21.335938 0-11.773437-9.558594-21.332031-21.335938-21.332031zm0 0"/>
+            21.335938-21.335938 0-11.773437-9.558594-21.332031-21.335938-21.332031zm0 0" fill="currentColor" />
           </svg>
         </div>
       </transition>
@@ -247,14 +233,17 @@
 </template>
 
 <script>
-// import './index.scss'
+import './index.scss'
 /* eslint-disable */
 import AutoplayVideo from "./autoplay";
+import Icon from './Icon.vue'
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 import {
   fullScreenMode,
   closeFullscreen,
   isObject,
+  isNumber,
+  isMp4,
   isVideo,
   isYoutube,
   isVimeo,
@@ -266,6 +255,9 @@ import {
 } from './utils'
 
 export default {
+  components: {
+    Icon
+  },
   directives: {
     autoplay: AutoplayVideo,
   },
@@ -285,31 +277,19 @@ export default {
       type: Boolean,
       default: true,
     },
-    slideshowColorBar: {
+    slideBarColor: {
       type: String,
       default: '#fa4242',
     },
-    slideshowDuration: {
+    slideDuration: {
       type: Number,
       default: 3000,
     },
     useZoomBar: Boolean,
     closeOnClickOutsideMobile: Boolean,
-    srcName: {
-      type: String,
-      default: 'src',
-    },
-    srcThumb: {
-      type: String,
-      default: 'thumb',
-    },
-    srcMediaType: {
-      type: String,
-      default: 'type',
-    },
     overlayColor: {
       type: String,
-      default: 'rgba(30, 30, 30, .79)'
+      default: 'rgba(30, 30, 30, .9)'
     },
     zIndex: {
       type: Number,
@@ -466,7 +446,8 @@ export default {
     zoomBar(newVal, prevVal) {
       let item;
       if(this.isZooming) {
-        item = this.$refs.items.childNodes[0]
+        const $items = this.$refs.items
+        item = $items && $items.childNodes[0]
 
         const newZoom = 1.6 + newVal/10;
         item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+newZoom+', '+newZoom+', '+newZoom+')';
@@ -499,107 +480,115 @@ export default {
       }, 300)
     },
 
-    index(prev, val) {
-      const self = this
-      
-      if(prev !== null) {
-        // swipe type
-        this.swipeType = null
-        this.initialMouseY = 0
-        this.ySwipeWrapper = 0
+    index: {
+      immediate: true, // 第一次立即执行，index的前一个值为 undefined
+      handler(prev, val) {
+        const self = this
         
-        // set loop from data
-        this.loopData = this.loop
+        if(prev !== null) { // open 打开预览
+          console.log('init : prev !== null', prev, val, this.imgIndex)
+          // swipe type
+          this.swipeType = null
+          this.initialMouseY = 0
+          this.ySwipeWrapper = 0
+          
+          // set loop from data
+          this.loopData = this.loop
 
-        // add img index
-        this.imgIndex = prev
-        this.isVisible = true
+          // add img index
+          this.imgIndex = prev
+          this.isVisible = true
 
-        // add events listener
-        window.addEventListener('keydown', this.eventListener)
+          // add events listener
+          window.addEventListener('keydown', this.eventListener)
 
-        // add wheel event
-        if(this.enableWheelEvent) {
-          window.addEventListener('wheel', this.wheelEvent)
-        }
-        
-        // only in mobile
-        if(window.innerWidth < 700) {
+          // add wheel event
+          if(this.enableWheelEvent) {
+            window.addEventListener('wheel', this.wheelEvent)
+          }
+          
+          // only in mobile
+          if(window.innerWidth < 700) {
 
-          // add click event
-          setTimeout(function() {
-            window.addEventListener('click', self.showButtons)
-          }, 200)
-        }
+            // add click event
+            setTimeout(function() {
+              window.addEventListener('click', self.showButtons)
+            }, 200)
+          }
 
-        if (this.enableScrollLock) {
-          setTimeout(function() {
-            self.setCompensateForScrollbar();
-            disableBodyScroll(self.$refs.coolLightbox);
-          }, 50);
-        }
+          if (this.enableScrollLock) {
+            setTimeout(function() {
+              self.setCompensateForScrollbar();
+              disableBodyScroll(self.$refs.coolLightbox);
+            }, 50)
+          }
+          // 立即初始化调用
+          if (val === undefined) {
+            this.$emit('open', prev)
+          }
 
-      } else {
+        } else if (val !== undefined) { // close 关闭预览，排除掉第一次立即初始化操作(index == null)
+          console.log('init : prev === null', prev, val, this.imgIndex)
+          console.log('close index ', prev, val)
+          // hide and stop slideshow
+          this.isVisible = false
+          this.stopSlideShow()
 
-        // hide and stop slideshow
-        this.isVisible = false
-        this.stopSlideShow()
+          // set starts X to 0
+          this.startsX = 0
+          this.initialMouseY = 0
+          this.swipeType = null
 
-        // set starts X to 0
-        this.startsX = 0
-        this.initialMouseY = 0
-        this.swipeType = null
+          // clear interval
+          clearInterval(this.swipeInterval)
+          this.swipeAnimation = null
 
-        // clear interval
-        clearInterval(this.swipeInterval)
-        this.swipeAnimation = null
+          // finish swipe
+          this.isDraggingSwipe = false
+          this.isZooming = true
 
-        // finish swipe
-        this.isDraggingSwipe = false
-        this.isZooming = true
+          // remove events listener
+          window.removeEventListener('keydown', this.eventListener)
 
-        // remove events listener
-        window.removeEventListener('keydown', this.eventListener)
+          if (this.enableScrollLock) {
+            self.removeCompensateForScrollbar();
+            enableBodyScroll(self.$refs.coolLightbox);
+          }
 
-        if (this.enableScrollLock) {
-          self.removeCompensateForScrollbar();
-          enableBodyScroll(self.$refs.coolLightbox);
-        }
+          // remove click event
+          window.removeEventListener('click', this.showButtons)
 
-        // remove click event
-        window.removeEventListener('click', this.showButtons)
-
-        // remove resize event
-        window.removeEventListener('resize', this.xPositionOnResize)
-        
-        // remove wheel event
-        if(this.enableWheelEvent) {
-          window.removeEventListener('wheel', this.wheelEvent)
+          // remove resize event
+          window.removeEventListener('resize', this.xPositionOnResize)
+          
+          // remove wheel event
+          if(this.enableWheelEvent) {
+            window.removeEventListener('wheel', this.wheelEvent)
+          }
         }
       }
-
     }, 
     
     imgIndex(prev, val) {
-      const thisContext = this
-      
+      console.log('imgIndex ', prev, val)
       // when animation is loaded
       this.$nextTick(() => {
+        // 打开预览操作
         if(prev !== null & val === null) {
-          this.$emit("on-open", prev);
+          this.$emit('open', prev)
         }
-
+        // 打开&切换预览操作
         if(prev !== null) {
           if(prev !== val) {
-            const prevSrc = this.getItemSrc(prev)
+            const prevSrc = this.getItem(prev).src
             if (!isYoutube(prevSrc) && !isVimeo(prevSrc)) {
               this.stopVideos()
             }
           }
 
           // if is an image change imageLoading to true
-          if(!this.getVideoUrl(prev)) {
-            if(!this.is_cached(this.getItemSrc(prev))) {
+          if(!this.checkIsVideo(prev)) {
+            if(!this.is_cached(this.getItem(prev).src)) {
               this.imageLoading = true
             }
           }
@@ -607,7 +596,7 @@ export default {
           // add caption padding to Lightbox wrapper
           this.addCaptionPadding()
           
-          if(this.getVideoUrl(prev)) {
+          if(this.checkIsVideo(prev)) {
             this.setAspectRatioVideo();
           }
         }
@@ -821,7 +810,7 @@ export default {
 
         // diff Y
         if(diffY >= 90) {
-          this.close()
+          this.clearData()
         } else {
           this.ySwipeWrapper = 0
         }
@@ -892,12 +881,12 @@ export default {
     move() {
       const self = this
       this.progressWidth = 100;
-      this.intervalProgress = setInterval(frame, this.slideshowDuration + 90);
+      this.intervalProgress = setInterval(frame, this.slideDuration + 90);
       
       self.stylesInterval = {
         'transform': 'scaleX(1)',
-        'background': this.slideshowColorBar,
-        'transition-duration': this.slideshowDuration+'ms',
+        'background': this.slideBarColor,
+        'transition-duration': this.slideDuration+'ms',
       }
       function frame() {
         self.stylesInterval = {
@@ -917,8 +906,8 @@ export default {
           setTimeout(function() {
             self.stylesInterval = {
               'transform': 'scaleX(1)',
-              'background': self.slideshowColorBar,
-              'transition-duration': self.slideshowDuration+'ms',
+              'background': self.slideBarColor,
+              'transition-duration': self.slideDuration+'ms',
             }
           }, 50)
         }
@@ -1169,18 +1158,33 @@ export default {
         this.paddingBottom = 60
       }
     },
-
-    // close event
-    close() {
+    play(index) {
+      if (this.isVisible) {
+        this.imgIndex = index
+      }
+    },
+    // ======================================================= close start
+    /**
+     * 关闭窗口的两步操作:
+     * 1.清除数据
+     * 2.关闭预览窗口
+     */
+    close() {},
+    // 清除数据，并未关闭预览窗口
+    clearData() {
       this.stopSlideShow()
+      this.resetZoom()
+      // reset swipe type
       this.swipeType = null
+      this.ySwipeWrapper = 0
       this.$emit("close", this.imgIndex)
       this.showThumbs = false
       this.imgIndex = null
     },
-
+    closeModal() {
+    },
     // close event click outside
-    closeModal(event) {
+    handleClickOutside(event) {
       if(!this.closeOnClickOutsideMobile) {
         if(window.innerWidth < 700) {
           return false;
@@ -1193,7 +1197,7 @@ export default {
 
       var elements = '.cool-lightbox__iframe, .cool-lightbox__iframe *, .cool-lightbox-zoom, .cool-lightbox-zoom *, .cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
       if (!event.target.matches(elements)) {
-        this.close()
+        this.clearData()
       }
     },
 
@@ -1252,22 +1256,19 @@ export default {
     },
     // index change
     onIndexChange(index) {
-      const self = this;
-      this.imgIndex = index;
-      this.$emit('on-change', index);
+      this.imgIndex = index
+      this.$emit('change', index)
 
-      setTimeout(function() {
-        self.$emit('on-change-end', index);
-      }, 400);
+      setTimeout(() => {
+        this.$emit('change-end', index)
+      }, 400)
     },
     // check if the image is cached
     is_cached(src) {
-      var image = new Image();
-      image.src = src;
-
-      return image.complete;
+      var image = new Image()
+      image.src = src
+      return image.complete
     },
-
     // image loaded event
     imageLoaded() {
       this.imageLoading = false
@@ -1278,57 +1279,61 @@ export default {
         if (item) {
           return isObject(item) ? item : { src: item }
         }
-        return null
+        return {}
       } catch (error) {
-        return null
+        return {}
       }
+    },
+    // check if video is mp4
+    checkIsMp4(index) {
+      const itemSrc = this.getItem(index).src
+      return isMp4(itemSrc)
     },
     checkIsVideo(index) {
       const item = this.getItem(index)
-      if (item) {
-        const { mediaType, src } = item
-        return mediaType ? ['video', 'webVideo'].includes(mediaType) : isVideo(src)
-      }
-      return false
+      const { mediaType, src } = item
+      return mediaType ? ['video', 'webVideo'].includes(mediaType) : isVideo(src)
     },
-    // get item src
-    getItemSrc(index) {
-      const item = this.getItem(index)
-      return item ? (item.src || item) : null
-    },
-    // get item thumbnail
-    getItemThumb(index) {
-      const item = this.getItem(index)
-      if (item) {
-        const { src, thumb } = item
-        if (thumb) {
-          return thumb
-        } else if (isYoutube(src)) {
-          return getYoutubeThumb(src) || src
-        } else {
-          return src
-        }
+    checkIsIframe(index) {
+      let src = null
+      if (isObject(index)) { // 文件item
+        if (index.mediaType === 'iframe') return true
+        else src = index.src
+      } else if (isNumber(index)) { // 文件索引
+        const item = this.getItem(index)
+        if (item.mediaType === 'iframe') return true
+        else src = item.src
+      } else if (typeof index === 'string') { // 文件url
+        src = index
       }
-      return ''
+      return ['pdf'].includes(fileSuffix(src))
     },
     // get item media type
     getMediaType(index) {
       const item = this.getItem(index)
-      if (item) {
-        const { mediaType } = item
-        return mediaType ? mediaType : this.checkIsVideo(index) ? 'video' : 'image'
-      }
+      const { mediaType, src } = item
+      if (mediaType) return mediaType
+      if (isYoutube(src) || isVimeo(src)) return 'webVideo'
+      if (isMp4(src)) return 'video'
+      if (this.checkIsIframe(src)) return 'iframe'
       return 'image'
     },
-    isItemPicture(index) {
+    // get item thumbnail
+    getItemThumb(index) {
       const item = this.getItem(index)
-      return item ? !!item.picture : false
+      const { src, thumb } = item
+      if (thumb) {
+        return thumb
+      } else if (isYoutube(src)) {
+        return getYoutubeThumb(src) || src
+      } else {
+        return src
+      }
     },
-    getPictureSources(index) {
+    getItemPictures(index) {
       const item = this.getItem(index)
-      return !item ? [] : (item.picture || [])
+      return Array.isArray(item.picture) ? item.picture : []
     },
-    
     getVideoUrl(index) {
       const item = this.getItem(index)
       if (item && this.checkIsVideo(index)) {
@@ -1341,15 +1346,6 @@ export default {
         if (vimeoUrl) return vimeoUrl
 
         return src
-      }
-      return null
-    },
-    // check if video is mp4
-    checkIsMp4(itemIndex) {
-      const itemSrc = this.getItemSrc(itemIndex)
-      const suffix = fileSuffix(itemSrc)
-      if (['mp4', 'mov', 'webm', 'ogg', 'avi'].includes(suffix)) {
-        return itemSrc
       }
       return null
     },
@@ -1375,17 +1371,8 @@ export default {
         case ' ':
           return e.preventDefault()
         case 27:
-          return this.close()
+          return this.clearData()
       }
-    },
-    iframeLoaded(e) {
-      console.log('iframe loaded ', e)
-    },
-    iframeDOMContentLoaded(e) {
-      console.log('iframeDOMContentLoaded', e)
-    },
-    iframeReadystatechange(e) {
-      console.log('iframeReadystatechange', e)
     }
   }
 }

@@ -1,10 +1,9 @@
 <template>
   <transition name="cool-lightbox-modal">
-    <div class="cool-lightbox" 
+    <div class="cool-lightbox"
       v-bind:class="lightboxClasses"
-      v-if="isVisible" 
       ref="coolLightbox"
-      @click="handleClickOutside"
+      @click="closeModal"
       v-bind:style="lightboxStyles">
       <!-- 缩略图列表 -->
       <div v-if="gallery" class="cool-lightbox-thumbs">
@@ -33,7 +32,6 @@
       <div 
         class="cool-lightbox__inner" 
         :style="innerStyles"
-
         @mousedown="startSwipe" 
         @mousemove="continueSwipe"
         @mouseup="endSwipe"
@@ -121,7 +119,7 @@
               <div v-else key="video" class="cool-lightbox__iframe">
                 <transition name="cool-lightbox-slide-change" mode="out-in">
                   <iframe
-                    v-if="(getMediaType(imgIndex) === 'iframe')"
+                    v-if="getMediaType(imgIndex) === 'iframe'"
                     class="cool-lightbox-pdf" 
                     :src="currentItem.src"
                     :key="currentItem.src" 
@@ -199,7 +197,7 @@
             <Icon name="fullscreen" />
           </button>
 
-          <button v-if="showCloseButton" type="button" class="cool-lightbox-toolbar__btn" title="Close" @click="clearData">
+          <button v-if="showCloseButton" type="button" class="cool-lightbox-toolbar__btn" title="Close" @click="close">
             <Icon name="close" />
           </button>
         </div>
@@ -235,12 +233,13 @@
 <script>
 import './index.scss'
 /* eslint-disable */
-import AutoplayVideo from "./autoplay";
+import AutoplayVideo from "./autoplay"
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock'
 import Icon from './Icon.vue'
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 import {
   fullScreenMode,
   closeFullscreen,
+  randomStr,
   isObject,
   isNumber,
   isMp4,
@@ -263,7 +262,8 @@ export default {
   },
   props: {
     index: {
-      required: true
+      type: Number,
+      default: 0
     },
     items: {
       type: Array,
@@ -339,7 +339,6 @@ export default {
 
       // styles data
       imgIndex: this.index,
-      isVisible: false,
       paddingBottom: false,
       imageLoading: false,
       showThumbs: false,
@@ -370,7 +369,9 @@ export default {
       loopData: false,
       stylesInterval: {
         'display': 'block'
-      }
+      },
+      // id
+      viewerStyleId: 'cool-style-' + randomStr()
     };
   },
   computed: {
@@ -412,8 +413,7 @@ export default {
         { 'cool-lightbox--is-zooming': this.isZooming },
         { 'cool-lightbox--show-thumbs': this.showThumbs },
         { 'cool-lightbox--is-swipping': this.isDraggingSwipe }
-      ];
-
+      ]
       let classString = 'cool-lightbox--thumbs-'+this.thumbsPosition
       classesReturn.push(classString)
 
@@ -453,7 +453,6 @@ export default {
         item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+newZoom+', '+newZoom+', '+newZoom+')';
       }
     },
-
     showThumbs(prev, val) {
       let widthGalleryBlock = 212;
       let swipeAnimation = 'all .3s ease'
@@ -479,104 +478,10 @@ export default {
         self.swipeAnimation = null
       }, 300)
     },
-
-    index: {
-      immediate: true, // 第一次立即执行，index的前一个值为 undefined
-      handler(prev, val) {
-        const self = this
-        
-        if(prev !== null) { // open 打开预览
-          console.log('init : prev !== null', prev, val, this.imgIndex)
-          // swipe type
-          this.swipeType = null
-          this.initialMouseY = 0
-          this.ySwipeWrapper = 0
-          
-          // set loop from data
-          this.loopData = this.loop
-
-          // add img index
-          this.imgIndex = prev
-          this.isVisible = true
-
-          // add events listener
-          window.addEventListener('keydown', this.eventListener)
-
-          // add wheel event
-          if(this.enableWheelEvent) {
-            window.addEventListener('wheel', this.wheelEvent)
-          }
-          
-          // only in mobile
-          if(window.innerWidth < 700) {
-
-            // add click event
-            setTimeout(function() {
-              window.addEventListener('click', self.showButtons)
-            }, 200)
-          }
-
-          if (this.enableScrollLock) {
-            setTimeout(function() {
-              self.setCompensateForScrollbar();
-              disableBodyScroll(self.$refs.coolLightbox);
-            }, 50)
-          }
-          // 立即初始化调用
-          if (val === undefined) {
-            this.$emit('open', prev)
-          }
-
-        } else if (val !== undefined) { // close 关闭预览，排除掉第一次立即初始化操作(index == null)
-          console.log('init : prev === null', prev, val, this.imgIndex)
-          console.log('close index ', prev, val)
-          // hide and stop slideshow
-          this.isVisible = false
-          this.stopSlideShow()
-
-          // set starts X to 0
-          this.startsX = 0
-          this.initialMouseY = 0
-          this.swipeType = null
-
-          // clear interval
-          clearInterval(this.swipeInterval)
-          this.swipeAnimation = null
-
-          // finish swipe
-          this.isDraggingSwipe = false
-          this.isZooming = true
-
-          // remove events listener
-          window.removeEventListener('keydown', this.eventListener)
-
-          if (this.enableScrollLock) {
-            self.removeCompensateForScrollbar();
-            enableBodyScroll(self.$refs.coolLightbox);
-          }
-
-          // remove click event
-          window.removeEventListener('click', this.showButtons)
-
-          // remove resize event
-          window.removeEventListener('resize', this.xPositionOnResize)
-          
-          // remove wheel event
-          if(this.enableWheelEvent) {
-            window.removeEventListener('wheel', this.wheelEvent)
-          }
-        }
-      }
-    }, 
-    
     imgIndex(prev, val) {
       console.log('imgIndex ', prev, val)
       // when animation is loaded
       this.$nextTick(() => {
-        // 打开预览操作
-        if(prev !== null & val === null) {
-          this.$emit('open', prev)
-        }
         // 打开&切换预览操作
         if(prev !== null) {
           if(prev !== val) {
@@ -586,18 +491,15 @@ export default {
             }
           }
 
-          // if is an image change imageLoading to true
-          if(!this.checkIsVideo(prev)) {
-            if(!this.is_cached(this.getItem(prev).src)) {
-              this.imageLoading = true
-            }
-          }
-
           // add caption padding to Lightbox wrapper
           this.addCaptionPadding()
           
           if(this.checkIsVideo(prev)) {
-            this.setAspectRatioVideo();
+            this.setAspectRatioVideo()
+          } else {
+            if(!this.is_cached(this.getItem(prev).src)) {
+              this.imageLoading = true
+            }
           }
         }
 
@@ -611,20 +513,25 @@ export default {
       })
     }, 
   },
-
+  mounted() {
+    console.log('view mounted ...')
+    // document.body.appendChild(this.$el)
+    this.initial()
+  },
   beforeDestroy () {
+    console.log('view beforeDestroy ...')
     if (this.enableScrollLock) {
-      this.removeCompensateForScrollbar();
+      this.removeCompensateForScrollbar()
       const $coolLightbox = this.$refs.coolLightbox
       if($coolLightbox) {
-        enableBodyScroll($coolLightbox);
+        enableBodyScroll($coolLightbox)
       }
     }
   },
 
   methods: {
     stopVideos() {
-      const videos = document.getElementsByClassName("cool-lightbox-video")
+      const videos = this.$el.getElementsByClassName("cool-lightbox-video")
       const isVideoPlaying = video => !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2)
       if(videos.length > 0) {
         Array.prototype.forEach.call(videos, video => {
@@ -648,9 +555,9 @@ export default {
     },
     removeCompensateForScrollbar() {
       document.body.classList.remove("compensate-for-scrollbar");
-      const noscrollStyle = document.getElementById("coollightbox-style-noscroll");
+      const noscrollStyle = document.getElementById(this.viewerStyleId);
       if(noscrollStyle !== null) {
-        document.getElementById("coollightbox-style-noscroll").remove();
+        document.getElementById(this.viewerStyleId).remove();
       }
     },
     setCompensateForScrollbar() {
@@ -658,7 +565,7 @@ export default {
 
       if (!isMobile && document.body.scrollHeight > window.innerHeight) {
         document.getElementsByTagName('head')[0].insertAdjacentHTML('beforeend',
-          '<style id="coollightbox-style-noscroll" type="text/css">.compensate-for-scrollbar{margin-right:' +
+          '<style id='+ this.viewerStyleId +' type="text/css">.compensate-for-scrollbar{margin-right:' +
             (window.innerWidth - document.documentElement.clientWidth) +
           "px;}</style>"
         )
@@ -810,7 +717,7 @@ export default {
 
         // diff Y
         if(diffY >= 90) {
-          this.clearData()
+          this.close()
         } else {
           this.ySwipeWrapper = 0
         }
@@ -893,12 +800,7 @@ export default {
           'transform': 'scaleX(0)',
           'transition': 'none',
         }
-        
-        if(self.dir === 'rtl') {
-          self.onPrevClick(true)
-        } else {
-          self.onNextClick(true)
-        }
+        self.onNextClick(true)
 
         if(!self.hasNext && !self.loopData) {
           self.stopSlideShow()
@@ -973,31 +875,16 @@ export default {
     },
 
     // zoom image event
-    zoomImage(indexImage) {
-      if(this.disableZoom) {
-        return false
-      }
-
-      if(window.innerWidth < 700) {
-        return false
-      }
-
-      if(!this.canZoom) {
-        return false
-      }
-
-      if(this.IsSwipping) {
-        return false
-      }
+    zoomImage() {
+      if(this.disableZoom) return false
+      if(window.innerWidth < 700) return false
+      if(!this.canZoom) return false
+      if(this.IsSwipping) return false
 
       // item zoom
-      let item;
-      item = this.$refs.items.childNodes[0]
-      
+      let item = this.$refs.items.childNodes[0]
       // zoom variables
       const isZooming = this.isZooming
-      const thisContext = this
-
       // Is zooming check
       if(isZooming) {
         if(!this.isDraging) { 
@@ -1007,24 +894,18 @@ export default {
       } else {
         this.isZooming = true
       }
-
       // check if is zooming
       if(this.isZooming) {
         this.stopSlideShow()
-
         // add scale
-        item.style.transform  = 'translate3d(calc(-50%), calc(-50%), 0px) scale3d(1.6, 1.6, 1.6)';
-
+        item.style.transform  = 'translate3d(calc(-50%), calc(-50%), 0px) scale3d(1.6, 1.6, 1.6)'
         // hide buttons
         this.buttonsVisible = false
-
         // fix drag transition problems
-        setTimeout(function() {
-          thisContext.transition = 'all .0s ease'
+        setTimeout(() => {
+          this.transition = 'all .0s ease'
         }, 100)
-
       } else {
-
         // show buttons 
         this.buttonsVisible = true
         this.resetZoom()
@@ -1064,8 +945,7 @@ export default {
     // Aspect Ratio responsive video
     setAspectRatioVideo() {
       const thisContext = this
-      let el = document.getElementsByClassName('cool-lightbox__inner');
-      el = el[0]
+      let el = this.$el.querySelector('.cool-lightbox__inner')
 
       let computedStyle = getComputedStyle(el)
       if(window.innerWidth < 1440) {
@@ -1111,8 +991,8 @@ export default {
 
     // set lightbox inner width
     setLightboxInnerWidth() {
-      let el = document.getElementsByClassName('cool-lightbox__inner');
-      let width = el[0].clientWidth
+      let el = this.$el.querySelector('.cool-lightbox__inner');
+      let width = el.clientWidth
       this.lightboxInnerWidth = width
     },
 
@@ -1150,54 +1030,126 @@ export default {
     // caption size 
     addCaptionPadding() {
       if(this.currentItem.title || this.currentItem.descripcion) {
-        const el = document.getElementsByClassName('cool-lightbox-caption');
-        if(el.length > 0) {
-          this.paddingBottom = el[0].offsetHeight
+        const el = this.$el.querySelector('.cool-lightbox-caption');
+        if(el) {
+          this.paddingBottom = el.offsetHeight
         } 
       } else {
         this.paddingBottom = 60
       }
     },
-    play(index) {
-      if (this.isVisible) {
-        this.imgIndex = index
+    initial() {
+      // swipe type
+      this.swipeType = null
+      this.initialMouseY = 0
+      this.ySwipeWrapper = 0
+      
+      // set loop from data
+      this.loopData = this.loop
+      
+      // add events listener
+      window.addEventListener('keydown', this.eventListener)
+
+      // add wheel event
+      if(this.enableWheelEvent) {
+        window.addEventListener('wheel', this.wheelEvent)
       }
+      
+      // only in mobile
+      if(window.innerWidth < 700) {
+
+        // add click event
+        setTimeout(() => {
+          window.addEventListener('click', this.showButtons)
+        }, 200)
+      }
+
+      if (this.enableScrollLock) {
+        setTimeout(() => {
+          this.setCompensateForScrollbar();
+          disableBodyScroll(this.$refs.coolLightbox);
+        }, 50)
+      }
+
+      this.$nextTick(() => {
+        // add caption padding to Lightbox wrapper
+        this.addCaptionPadding()
+
+        if (this.checkIsVideo(this.imgIndex)) {
+          this.setAspectRatioVideo()
+        } else {
+          if(!this.is_cached(this.getItem(this.imgIndex).src)) {
+            this.imageLoading = true
+          }
+        }
+        // reset zoom
+        this.resetZoom()
+
+        // reset swipe type
+        this.swipeType = null
+        this.ySwipeWrapper = 0
+
+        this.$emit('open', this.imgIndex)
+      })
     },
     // ======================================================= close start
-    /**
-     * 关闭窗口的两步操作:
-     * 1.清除数据
-     * 2.关闭预览窗口
-     */
-    close() {},
-    // 清除数据，并未关闭预览窗口
-    clearData() {
+    // close event
+    close() {
+      // hide and stop slideshow
       this.stopSlideShow()
       this.resetZoom()
+      this.showThumbs = false
+
+      this.$emit("close", this.imgIndex)
+      this.imgIndex = null // 触发销毁
+
+      // set starts X to 0
+      this.startsX = 0
+      this.initialMouseY = 0
       // reset swipe type
       this.swipeType = null
       this.ySwipeWrapper = 0
-      this.$emit("close", this.imgIndex)
-      this.showThumbs = false
-      this.imgIndex = null
-    },
-    closeModal() {
+
+      // clear interval
+      clearInterval(this.swipeInterval)
+      this.swipeAnimation = null
+
+      // finish swipe
+      this.isDraggingSwipe = false
+      this.isZooming = true
+
+      // remove events listener
+      window.removeEventListener('keydown', this.eventListener)
+
+      if (this.enableScrollLock) {
+        this.removeCompensateForScrollbar();
+        enableBodyScroll(this.$refs.coolLightbox);
+      }
+
+      // remove click event
+      window.removeEventListener('click', this.showButtons)
+
+      // remove resize event
+      window.removeEventListener('resize', this.xPositionOnResize)
+      
+      // remove wheel event
+      if(this.enableWheelEvent) {
+        window.removeEventListener('wheel', this.wheelEvent)
+      }
     },
     // close event click outside
-    handleClickOutside(event) {
+    closeModal(event) {
       if(!this.closeOnClickOutsideMobile) {
         if(window.innerWidth < 700) {
-          return false;
+          return false
         }
       }
-
       if(this.IsSwipping) {
-        return false;
+        return false
       }
-
       var elements = '.cool-lightbox__iframe, .cool-lightbox__iframe *, .cool-lightbox-zoom, .cool-lightbox-zoom *, .cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
       if (!event.target.matches(elements)) {
-        this.clearData()
+        this.close()
       }
     },
 
@@ -1294,17 +1246,11 @@ export default {
       const { mediaType, src } = item
       return mediaType ? ['video', 'webVideo'].includes(mediaType) : isVideo(src)
     },
-    checkIsIframe(index) {
-      let src = null
-      if (isObject(index)) { // 文件item
-        if (index.mediaType === 'iframe') return true
-        else src = index.src
-      } else if (isNumber(index)) { // 文件索引
-        const item = this.getItem(index)
+    checkIsIframe(src) {
+      if (isNumber(src)) { // 文件索引
+        const item = this.getItem(src)
         if (item.mediaType === 'iframe') return true
         else src = item.src
-      } else if (typeof index === 'string') { // 文件url
-        src = index
       }
       return ['pdf'].includes(fileSuffix(src))
     },
@@ -1349,14 +1295,10 @@ export default {
       }
       return null
     },
-
     // if is video get extension
     videoSourceType(index) {
-      const item = this.getItem(index)
-      if (item) {
-        return videoSourceType(item.src, { ext: item.ext })
-      }
-      return ''
+      const { src, ext } = this.getItem(index)
+      return videoSourceType(src, { ext })
     },
 
     // arrows and escape events
@@ -1371,7 +1313,7 @@ export default {
         case ' ':
           return e.preventDefault()
         case 27:
-          return this.clearData()
+          return this.close()
       }
     }
   }

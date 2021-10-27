@@ -7,6 +7,8 @@ export function isObject(arg) {
   return arg !== null && typeof arg === 'object'
 }
 
+export const randomStr = () => Math.floor(Math.random() * Date.now()).toString(36)
+
 export function isMp4(url) {
   if (url && typeof url === 'string') {
     const suffix = fileSuffix(url)

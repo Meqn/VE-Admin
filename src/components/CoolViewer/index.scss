@@ -8,13 +8,10 @@ $breakpoints: (
 
 // Breakpoints SCSS
 @mixin breakpoint($breakpoint) {
-
   // If the breakpoint exists in the map.
 	@if map-has-key($breakpoints, $breakpoint) {
-	
     // Get the breakpoint value.
     $breakpoint-value: map-get($breakpoints, $breakpoint);
-	
 	  //Build the media query
 		@media (min-width: $breakpoint-value) {
 			@content;
@@ -22,26 +19,112 @@ $breakpoints: (
 	} 
 }
 
-.cool-lightbox {
-  position: fixed; 
-  left: 0;
-  bottom: 0;
-  top: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  right: 0;
+.cool-lightbox{
+  position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 9999;
   transition: all .3s ease;
-  .cool-lightbox-zoom {
-    position: absolute;
-    bottom: 15px;
-    left: 50%;
+
+  *{
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+  }
+
+  &-mask{
+    position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+    background-color: rgba(30, 30, 30, .9);
+  }
+  &-progressbar{
+    position: absolute; top: 0; right: 0; left: 0; z-index: 200;
+    height: 2px;
+    transform-origin: 0;
+    transform: scaleX(0);
+    transition: transform 3s linear;
+  }
+  &-navigation{
+    position: absolute; z-index: 100;
+    top: calc(50% - 50px);
+    width: 40px; height: 40px;
+    padding: 8px;
+    color: #ccc;
+    background: rgba(30, 30, 30, .6);
+    cursor: pointer;
+    &.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    &:hover {
+      color: #fff;
+    }
+    @include breakpoint(phone) {
+      width: 56px; height: 56px;
+      padding: 16px;
+    }
+    &.is-prev{
+      left: 8px;
+    }
+    &.is-next{
+      right: 8px;
+    }
+    svg{
+      width: 100%; height: 100%;
+    }
+  }
+  &-toolbar{
+    position: absolute; top: 0; right: 0; left: 0; z-index: 100;
+    opacity: 1;
     display: flex;
-    z-index: 99999;
-    background-color: rgba(15, 15, 15, 0.8);
-    border-radius: 8px;
-    padding: 0px 12px;
+    justify-content: space-between;
     align-items: center;
+    transition: all .3s ease;
+    visibility: visible;
+    color: #ccc;
+    background-color: rgba(30, 30, 30, 0.6);
+    &.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    &__counter{
+      margin-left: 16px;
+      font-size: 16px;
+    }
+    &__buttons{
+      display: flex;
+      i.icon-btn{
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        padding: 10px;
+        transition: color .2s;
+        cursor: pointer;
+        @include breakpoint(phone) {
+          width: 44px;
+          height: 44px;
+          padding: 12px;
+        }
+        > svg {
+          width: 100%;
+          height: 100%;
+        }
+        &:hover {
+          color: #FFFFFF;
+        }
+      }
+    }
+  }
+
+  &-zoom {
+    position: absolute; bottom: 15px; left: 50%; z-index: 100;
+    display: flex;
+    align-items: center;
+    padding: 0px 12px;
+    border-radius: 8px;
+    background-color: rgba(15, 15, 15, 0.8);
     transform: translateX(-50%);
     input[type=range] {
       -webkit-appearance: none;
@@ -143,13 +226,11 @@ $breakpoints: (
       }
     }
   }
-  .cool-lightbox-thumbs {
-    position: absolute;
+  &-thumbs {
+    position: absolute; right: -102px; top: 0;
     height: 100vh;
-    overflow-y: auto;
     width: 102px;
-    right: -102px;
-    top: 0;
+    overflow-y: auto;
     overflow-x: hidden;
     transition: none;
     background-color: #ddd;
@@ -262,30 +343,14 @@ $breakpoints: (
       }
     }
   }
-  .cool-lightbox__inner {
-    padding: 60px 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+  &-inner {
+    padding: 50px 0;
+    position: absolute; top: 0; right: 0; left: 0; bottom: 0;
     overflow: hidden;
     transition: none;
     @include breakpoint(phone) {
       transition: all .3s ease;
     }
-  }
-  .cool-lightbox__progressbar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    z-index: 500;
-    transform-origin: 0;
-    transform: scaleX(0);
-    transition: transform 3s linear;
-    display: block;
   }
   &.cool-lightbox--is-swipping {
     cursor: -webkit-grabbing; 
@@ -297,7 +362,6 @@ $breakpoints: (
       transition: none;
       &.cool-lightbox__slide--hide, &.cool-lightbox__slide--hide {
         display: flex;
-        z-index: 50;
       }
     }
   }
@@ -330,7 +394,7 @@ $breakpoints: (
   }
   &.cool-lightbox--thumbs-right {
     &.cool-lightbox--show-thumbs {
-      .cool-lightbox__inner {
+      .cool-lightbox-inner {
         right: 102px;
         @include breakpoint(phone) {
           right: 212px;
@@ -349,7 +413,8 @@ $breakpoints: (
       top: auto;
       height: 70px;
       bottom: -70px;
-      overflow: auto;
+      overflow-y: hidden;
+      overflow-x: auto;
       @include breakpoint(phone) {
         bottom: -79px;
         height: 79px;
@@ -370,7 +435,7 @@ $breakpoints: (
       }
     }
     &.cool-lightbox--show-thumbs {
-      .cool-lightbox__inner {
+      .cool-lightbox-inner {
         bottom: 70px;
         @include breakpoint(phone) {
           bottom: 79px;
@@ -381,27 +446,18 @@ $breakpoints: (
       }
     }
   }
-  *{
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
-  }
-  button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    outline: none;
+  &-main {
+    width: 100%;
+    height: 100%;
+    position: relative;
   }
   .cool-lightbox-button {
+    position: absolute; z-index: 100;
+    top: calc(50% - 50px);
     margin: 21px 16px 21px 4px;
     width: 40px;
-    // height: 100px;
-    opacity: 1;
-    z-index: 800;
     color: #ccc;
-    transition: all .3s ease;
-    position: absolute;
-    top: calc(50% - 50px);
+    opacity: 1;
     transition: all .3s ease;
     visibility: visible;
     @include breakpoint(phone) {
@@ -443,7 +499,7 @@ $breakpoints: (
   .cool-lightbox-pdf {
     max-width: 100%;
   }
-  .cool-lightbox__iframe {
+  .cool-lightbox-iframe {
     width: 100%;
     display: flex;
     top: 50%;
@@ -462,33 +518,12 @@ $breakpoints: (
       }
     }
   }
-  .cool-lightbox__wrapper {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    &.cool-lightbox__wrapper--swipe {
-      display: flex;
-      align-items: center;
-      .cool-lightbox__slide {
-        flex-shrink: 0;
-        display: flex;
-        position: relative;
-        height: 100%;
-        opacity: 0.4;
-        transition: opacity .3s linear;
-        &.cool-lightbox__slide--current {
-          opacity: 1;
-        }
-      }
-    }
-  }
   .cool-lightbox__slide {
     width: 100%;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 100;
     display: none;
     position: absolute;
     margin-right: 30px;
@@ -515,7 +550,6 @@ $breakpoints: (
       max-width: 100%;
       max-height: 100%;
       margin: auto;
-      z-index: 9999;
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
       -ms-transform: translateZ(0);
@@ -531,120 +565,44 @@ $breakpoints: (
       max-height: 100%;
       height: 100%;
       margin: auto;
-      z-index: 9999;
     }
   }
 }
 
-.cool-lightbox-toolbar {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  opacity: 1;
-  display: flex;
-  justify-content: right;
-  transition: all .3s ease;
-  visibility: visible;
-  background-color: rgba(30, 30, 30, 0.6);
-  &.hidden {
-    opacity: 0;
-    visibility: hidden;
-  }
-  .cool-lightbox-toolbar__btn {
-    // background: rgba(30,30,30,.6);
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-    cursor: pointer;
-    justify-content: center;
-    align-items: center;
-    display: inline-flex;
-    margin: 0;
-    padding: 10px;
-    position: relative;
-    transition: color .2s;
-    vertical-align: top;
-    visibility: inherit;
-    width: 40px;
-    height: 40px;
-    color: #ccc;
-    @include breakpoint(phone) {
-      width: 44px;
-      height: 44px;
-      padding: 12px;
-    }
-    > svg {
-      width: 100%;
-      height: 100%;
-    }
-    &:hover {
-      color: #FFFFFF;
-    }
-  }
-}
 
 .cool-lightbox-caption {
-  bottom: 0;
-  color: #eee;
+  position: absolute; bottom: 0; left: 0; right: 0;
+  z-index: 50;
+  padding: 18px 28px 16px 24px;
+  color: #e0e0e0;
+  text-align: center;
   font-size: 14px;
   font-weight: 400;
-  left: 0;
-  opacity: 1;
   line-height: 1.5;
-  padding: 18px 28px 16px 24px;
-  right: 0;
-  text-align: center;
-  direction: ltr;
-  position: absolute;
-  transition: opacity .25s ease,visibility 0s ease .25s;
-  z-index: 99997;
+  opacity: 1;
+  transition: opacity .25s ease, visibility 0s ease .25s;
   background: linear-gradient(0deg,rgba(0,0,0,.75) 0,rgba(0,0,0,.3) 50%,rgba(0,0,0,.15) 65%,rgba(0,0,0,.075) 75.5%,rgba(0,0,0,.037) 82.85%,rgba(0,0,0,.019) 88%,transparent);
   @include breakpoint(phone) {
     padding: 22px 30px 23px 30px;
   }
-  a {
-    color: #eee;
-    text-decoration: underline;
-  }
-  h6 {
+  .caption-title{
     font-size: 14px;
-    margin: 0 0 6px 0;
-    line-height: 130%;
+    font-weight: bold;
     @include breakpoint(phone) {
       font-size: 16px;
-      margin: 0 0 6px 0;
     }
   }
-  p {
+  .caption-description{
+    margin-top: 6px;
     font-size: 13px;
-    line-height: 130%;
-    color: #ccc;
     @include breakpoint(phone) {
-      font-size: 15px;
-    }
-    a {
-      color: #ccc;
-      &:hover {
-        color: #eee;
-      }
+      font-size: 14px;
     }
   }
-}
-
-.cool-lightbox-modal-enter-active, .cool-lightbox-modal-leave-active {
-  transition: opacity .35s
-}
-.cool-lightbox-modal-enter, .cool-lightbox-modal-leave-to {
-  opacity: 0
-}
-
-.cool-lightbox-slide-change-enter-active, .cool-lightbox-slide-change-leave-active {
-  transition: opacity 0.27s;
-}
-
-.cool-lightbox-slide-change-enter, .cool-lightbox-slide-change-leave-to  {
-  opacity: 0;
+  a {
+    color: #efefef;
+    text-decoration: underline;
+  }
 }
 
 .cool-lightbox-loading-wrapper {
@@ -662,8 +620,23 @@ $breakpoints: (
     opacity: .7;
     padding: 0;
     width: 50px;
-    z-index: 500;
+    z-index: 200;
   }
+}
+
+.cool-lightbox-modal-enter-active, .cool-lightbox-modal-leave-active {
+  transition: opacity .35s
+}
+.cool-lightbox-modal-enter, .cool-lightbox-modal-leave-to {
+  opacity: 0
+}
+
+.cool-lightbox-slide-change-enter-active, .cool-lightbox-slide-change-leave-active {
+  transition: opacity 0.27s;
+}
+
+.cool-lightbox-slide-change-enter, .cool-lightbox-slide-change-leave-to  {
+  opacity: 0;
 }
 
 @keyframes cool-lightbox-rotate {

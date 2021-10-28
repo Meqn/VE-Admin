@@ -1,10 +1,12 @@
 <template>
   <transition name="cool-lightbox-modal">
-    <div class="cool-lightbox"
-      v-bind:class="lightboxClasses"
+    <div
+      v-if="isVisible"
       ref="coolLightbox"
-      @click="closeModal"
-      v-bind:style="lightboxStyles">
+      class="cool-lightbox"
+      :class="lightboxClasses"
+      :style="lightboxStyles">
+      <div class="cool-lightbox-mask" :style="maskStyles"></div>
       <!-- 缩略图列表 -->
       <div v-if="gallery" class="cool-lightbox-thumbs">
         <div class="cool-lightbox-thumbs__list">
@@ -30,38 +32,19 @@
       <!--/cool-lightbox-thumbs-->
 
       <div 
-        class="cool-lightbox__inner" 
-        :style="innerStyles"
-        @mousedown="startSwipe" 
-        @mousemove="continueSwipe"
-        @mouseup="endSwipe"
-        @touchstart="startSwipe"
-        @touchmove="continueSwipe"
-        @touchend="endSwipe">
-        <!-- 自动播放进度条 -->
-        <div class="cool-lightbox__progressbar" :style="stylesInterval"></div>
-        <!-- 导航 pref/next -->
-        <div class="cool-lightbox__navigation">
-          <button type="button" class="cool-lightbox-button cool-lightbox-button--prev" title="Previous" :class="buttonsClasses" v-show="(hasPreviousButton || loopData) && items.length > 1" @click="onPrevClick">
-            <slot name="icon-previous">
-              <div class="cool-lightbox-button__icon">
-                <Icon name="left" />
-              </div>
-            </slot>
-          </button>
-
-          <button type="button" class="cool-lightbox-button cool-lightbox-button--next" title="Next" :class="buttonsClasses" v-show="(hasNextButton || loopData) && items.length > 1" @click="onNextClick(false)">
-            <slot name="icon-next">
-              <div class="cool-lightbox-button__icon">
-                <Icon name="right" />
-              </div>
-            </slot>
-          </button>
-        </div>
-        <!--/cool-lightbox__navigation-->
-
+        class="cool-lightbox-inner" 
+        :style="innerStyles">
         <!-- 主体区域 -->
-        <div class="cool-lightbox__wrapper">
+        <!-- 将点击关闭、滑动等事件绑定在该元素上, click 和 touch不能共存 -->
+        <div
+          class="cool-lightbox-main"
+          @mousedown="startSwipe" 
+          @mousemove="continueSwipe"
+          @mouseup="endSwipe"
+          @touchstart.prevent="startSwipe"
+          @touchmove="continueSwipe"
+          @touchend.prevent="endSwipe"
+          @click="closeModal">
           <div ref="items" class="cool-lightbox__slide cool-lightbox__slide--current">
             <transition name="cool-lightbox-slide-change" mode="out-in">
               <div v-if="getMediaType(imgIndex) === 'image'" key="image" :style="imgWrapperStyle" class="cool-lightbox__slide__img">
@@ -116,7 +99,7 @@
               </div>
               <!--/imgs-slide-->
             
-              <div v-else key="video" class="cool-lightbox__iframe">
+              <div v-else key="video" class="cool-lightbox-iframe">
                 <transition name="cool-lightbox-slide-change" mode="out-in">
                   <iframe
                     v-if="getMediaType(imgIndex) === 'iframe'"
@@ -154,7 +137,7 @@
                   </template>
                 </transition>
               </div>
-              <!--/cool-lightbox__iframe-->
+              <!--/cool-lightbox-iframe-->
 
             </transition>
           </div>
@@ -162,46 +145,72 @@
         </div>
         <!--/cool-lightbox__wrapper-->
 
+        <!-- 自动播放进度条 -->
+        <div class="cool-lightbox-progressbar" :style="stylesInterval"></div>
+
+        <!-- 导航 prev/next -->
+        <template v-if="showNavigator">
+          <div
+            v-show="(hasPreviousButton || loopData) && items.length > 1"
+            class="cool-lightbox-navigation is-prev"
+            :class="buttonsClasses"
+            title="Previous"
+            @click.stop="onPrevClick">
+            <slot name="icon-previous"><Icon name="arrow-left" /></slot>
+          </div>
+          <div
+            v-show="(hasNextButton || loopData) && items.length > 1"
+            class="cool-lightbox-navigation is-next"
+            :class="buttonsClasses"
+            title="Next"
+            @click.stop="onNextClick(false)">
+            <slot name="icon-next"><Icon name="arrow-right" /></slot>
+          </div>
+        </template>
+        <!--/cool-lightbox__navigation-->
+
+        <!-- 工具栏 -->
+        <div class="cool-lightbox-toolbar" :class="buttonsClasses">
+          <div class="cool-lightbox-toolbar__counter">{{ imgIndex + 1 }} / {{ items.length }}</div>
+          <div class="cool-lightbox-toolbar__buttons">
+            <i v-if="this.slideshow && items.length > 1" title="Play slideshow" class="icon-btn" @click.stop="toggleSlide">
+              <Icon :name="!isPlayingSlideShow ? 'play' : 'pause'" />
+            </i>
+            <i title="rotate-left" class="icon-btn" @click.stop="onRotate('left')">
+              <Icon name="rotate-left" />
+            </i>
+            <i title="rotate-right" class="icon-btn" @click.stop="onRotate('right')">
+              <Icon name="rotate-right" />
+            </i>
+            <i v-if="gallery && items.length > 1" @click.stop="showThumbs = !showThumbs" title="Show thumbnails" class="icon-btn">
+              <Icon name="grid" />
+            </i>
+            <i v-if="fullScreen" @click.stop="toggleFullScreenMode" class="icon-btn" title="Fullscreen">
+              <Icon :name="isFullScreenMode ? 'offscreen' : 'fullscreen'" />
+            </i>
+            <i v-if="download" class="icon-btn" title="download" @click.stop="onDownload">
+              <Icon name="download" />
+            </i>
+            <i v-if="showClose" class="icon-btn" title="Close" @click.stop="close">
+              <Icon name="close" />
+            </i>
+          </div>
+        </div>
+        <!--/cool-lightbox--toolbar-->
+
         <!-- 标题/描述 -->
         <transition name="cool-lightbox-modal">
           <div v-show="currentItem.title || currentItem.description" key="caption-block" class="cool-lightbox-caption">
             <transition name="cool-lightbox-slide-change" mode="out-in">
-              <h6 v-if="currentItem.title" key="title" v-html="currentItem.title"></h6>
+              <h6 class="caption-title" v-if="currentItem.title" key="title" v-html="currentItem.title"></h6>
             </transition>
 
             <transition name="cool-lightbox-slide-change" mode="out-in">
-              <p v-if="currentItem.description" key="description" v-html="currentItem.description"></p>
+              <div class="caption-description" v-if="currentItem.description" key="description" v-html="currentItem.description"></div>
             </transition>
           </div>
           <!--/cool-lightbox-caption-->
         </transition>
-        <!-- 工具栏 -->
-        <div class="cool-lightbox-toolbar" :class="buttonsClasses">
-          <button type="button" v-if="this.slideshow && items.length > 1" title="Play slideshow" class="cool-lightbox-toolbar__btn" @click="togglePlaySlideshow">
-            <Icon :name="!isPlayingSlideShow ? 'play' : 'pause'" />
-          </button>
-
-          <button type="button" title="rotate-left" class="cool-lightbox-toolbar__btn">
-            <Icon name="rotate-left" />
-          </button>
-
-          <button type="button" title="rotate-right" class="cool-lightbox-toolbar__btn">
-            <Icon name="rotate-right" />
-          </button>
-          
-          <button v-if="gallery && items.length > 1" type="button" @click="showThumbs = !showThumbs" title="Show thumbnails" class="cool-lightbox-toolbar__btn">
-            <Icon name="grid" />
-          </button>
-          
-          <button v-if="fullScreen" type="button" @click="toggleFullScreenMode" class="cool-lightbox-toolbar__btn" title="Fullscreen">
-            <Icon name="fullscreen" />
-          </button>
-
-          <button v-if="showCloseButton" type="button" class="cool-lightbox-toolbar__btn" title="Close" @click="close">
-            <Icon name="close" />
-          </button>
-        </div>
-        <!--/cool-lightbox--toolbar-->
       </div>
       <!--/cool-lightbox-inner-->
       
@@ -239,6 +248,9 @@ import Icon from './Icon.vue'
 import {
   fullScreenMode,
   closeFullscreen,
+  addFullscreenListener,
+  removeFullscreenListener,
+  matchAllDom,
   randomStr,
   isObject,
   isNumber,
@@ -261,10 +273,7 @@ export default {
     autoplay: AutoplayVideo,
   },
   props: {
-    index: {
-      type: Number,
-      default: 0
-    },
+    index: Number,
     items: {
       type: Array,
       required: true,
@@ -283,10 +292,9 @@ export default {
     },
     slideDuration: {
       type: Number,
-      default: 3000,
+      default: 3500,
     },
     useZoomBar: Boolean,
-    closeOnClickOutsideMobile: Boolean,
     overlayColor: {
       type: String,
       default: 'rgba(30, 30, 30, .9)'
@@ -297,8 +305,20 @@ export default {
     },
     gallery: Boolean,
     fullScreen: Boolean,
+    download: Boolean,
+    showClose: {
+      type: Boolean,
+      default: true,
+    },
+    navigator: {
+      type: Boolean,
+      default: undefined
+    },
     thumbsPosition: {
       type: String,
+      validtor(val) {
+        return ['right', 'bottom'].includes(val)
+      },
       default: 'right',
     },
     youtubeCookies: {
@@ -306,15 +326,16 @@ export default {
       default: true,
     },
     enableWheelEvent: Boolean,
-    showCloseButton: {
-      type: Boolean,
-      default: true,
-    },
     disableZoom: Boolean,
     enableScrollLock: {
       type: Boolean,
       default: true,
     },
+    // 点击关闭
+    clickOutsideHide: {
+      type: Boolean,
+      default: true
+    }
   },
   data() {
     return {
@@ -338,6 +359,7 @@ export default {
       lightboxInnerWidth: null,
 
       // styles data
+      isVisible: false,
       imgIndex: this.index,
       paddingBottom: false,
       imageLoading: false,
@@ -396,9 +418,15 @@ export default {
     // lightbox styles
     lightboxStyles() {
       return { 
-        'z-index': this.zIndex,
-        'background-color': this.overlayColor,
+        'z-index': this.zIndex
       }
+    },
+    maskStyles() {
+      const oStyle = {}
+      if (this.overlayColor) {
+        oStyle['background-color'] = this.overlayColor
+      }
+      return oStyle
     },
     innerStyles() {
       return {
@@ -414,7 +442,7 @@ export default {
         { 'cool-lightbox--show-thumbs': this.showThumbs },
         { 'cool-lightbox--is-swipping': this.isDraggingSwipe }
       ]
-      let classString = 'cool-lightbox--thumbs-'+this.thumbsPosition
+      let classString = 'cool-lightbox--thumbs-' + this.thumbsPosition
       classesReturn.push(classString)
 
       return classesReturn
@@ -440,6 +468,14 @@ export default {
     // check if the slide has previous element 
     hasPrevious() {
       return (this.imgIndex - 1 >= 0)
+    },
+    showNavigator() {
+      if (typeof this.navigator === 'boolean') {
+        return this.navigator
+      }
+      const $doc = document.body || documentElement
+      const width = $doc.clientWidth || $doc.offsetWidth
+      return width > 700
     }
   },
   watch: {
@@ -478,11 +514,21 @@ export default {
         self.swipeAnimation = null
       }, 300)
     },
+    index(val, prev) {
+      console.log('wathch index ', val, prev)
+      // 加入`isVisible`判断，防止外界更改index后重新初始化
+      if (isNumber(val) && !this.isVisible) {
+        this.$_initial(val)
+      }
+    },
     imgIndex(prev, val) {
-      console.log('imgIndex ', prev, val)
+      console.log('wathch imgIndex ', prev, val)
+      if (prev !== this.index) {
+        this.$emit('update:index', prev)
+      }
       // when animation is loaded
       this.$nextTick(() => {
-        // 打开&切换预览操作
+        // 切换预览
         if(prev !== null) {
           if(prev !== val) {
             const prevSrc = this.getItem(prev).src
@@ -490,13 +536,13 @@ export default {
               this.stopVideos()
             }
           }
-
           // add caption padding to Lightbox wrapper
           this.addCaptionPadding()
-          
-          if(this.checkIsVideo(prev)) {
+
+          const itemType = this.getMediaType(prev)
+          if (['video', 'webVideo'].includes(itemType)) {
             this.setAspectRatioVideo()
-          } else {
+          } else if (itemType === 'image') {
             if(!this.is_cached(this.getItem(prev).src)) {
               this.imageLoading = true
             }
@@ -514,24 +560,24 @@ export default {
     }, 
   },
   mounted() {
-    console.log('view mounted ...')
     // document.body.appendChild(this.$el)
-    this.initial()
+    if (isNumber(this.index)) {
+      this.$_initial(this.index)
+    }
+    addFullscreenListener.call(this, this.fullScreenListener)
+    // this.$on('hook:beforeDestroy', removeFullscreenListener.bind(this, this.fullScreenListener))
   },
   beforeDestroy () {
-    console.log('view beforeDestroy ...')
     if (this.enableScrollLock) {
       this.removeCompensateForScrollbar()
-      const $coolLightbox = this.$refs.coolLightbox
-      if($coolLightbox) {
-        enableBodyScroll($coolLightbox)
-      }
+      enableBodyScroll(this.$el)
     }
+    removeFullscreenListener.call(this, this.fullScreenListener)
   },
 
   methods: {
     stopVideos() {
-      const videos = this.$el.getElementsByClassName("cool-lightbox-video")
+      const videos = this.$el.querySelectorAll('.cool-lightbox-video')
       const isVideoPlaying = video => !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2)
       if(videos.length > 0) {
         Array.prototype.forEach.call(videos, video => {
@@ -578,19 +624,22 @@ export default {
       } else {
         fullScreenMode()
       }
-
+      // this.isFullScreenMode = !this.isFullScreenMode
+    },
+    fullScreenListener() {
       this.isFullScreenMode = !this.isFullScreenMode
     },
     // check if event is arrow button or toolbar button
-    checkIfIsButton(event) {
-      var elements = '.cool-lightbox__iframe *, .cool-lightbox-button, .cool-lightbox-button *, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
-      if (event.target.matches(elements)) {
-        return true
+    $_checkOutOfSwipe(event) {
+      if (event.type.includes('mouse')) {
+        const elements = [
+          '.cool-lightbox-iframe video',
+          '.cool-lightbox-iframe iframe'
+        ]
+        return matchAllDom(event.target, elements, event.currentTarget)
       }
-
-      return false
+      return fase
     },
-
     // start swipe event
     startSwipe(event) {
       if(this.isZooming) {
@@ -598,7 +647,7 @@ export default {
       }
 
       // check if is some button
-      if(this.checkIfIsButton(event)) {
+      if(this.$_checkOutOfSwipe(event)) {
         return false;
       }
 
@@ -654,7 +703,7 @@ export default {
 
     // end swipe event
     endSwipe(event) {
-      if(this.checkIfIsButton(event) && this.initialMouseX === 0) {
+      if(this.$_checkOutOfSwipe(event) && this.initialMouseX === 0) {
         return false;
       }
 
@@ -702,12 +751,12 @@ export default {
 
         // if the swipe is to the right
         if((this.endMouseX - this.initialMouseX) < -40) {
-          return this.swipeToRight()
+          return this.changeIndexToNext()
         } 
 
         // if the swipe is to the left
         if((this.endMouseX - this.initialMouseX) > 40) {
-          return this.swipeToLeft();
+          return this.changeIndexToPrev();
         }
       }
 
@@ -728,16 +777,6 @@ export default {
 
       this.xSwipeWrapper = -this.imgIndex*windowWidth - 30*this.imgIndex
     },
-    
-    // swipe to left effect
-    swipeToLeft() {
-      this.changeIndexToPrev()
-    },
-    
-    // swipe to right effect
-    swipeToRight() {
-      this.changeIndexToNext()
-    },
 
     // function that return x position from event
     getMouseXPosFromEvent(event) {
@@ -750,13 +789,13 @@ export default {
     // function that return Y position from event
     getMouseYPosFromEvent(event) {
       if(event.type.indexOf('mouse') !== -1){
-          return event.clientY;
+        return event.clientY;
       }
       return event.touches[0].clientY;
     },
 
     // toggle play slideshow event
-    togglePlaySlideshow() {
+    toggleSlide() {
       if(!this.slideshow) {
         return false
       }
@@ -814,18 +853,7 @@ export default {
           }, 50)
         }
       }
-    }, 
-
-    // show buttons event
-    showButtons(event) {
-      if (!this.checkIfIsButton(event)) {
-        const self = this
-        setTimeout(function() {
-          self.buttonsVisible = !self.buttonsVisible
-        }, 100)
-      }
     },
-
     // check if is allowed to drag
     checkMouseEventPropButton(button) {
       if (!this.isZooming) return false
@@ -866,8 +894,8 @@ export default {
         this.canZoom = false
         
         const item = e.target.parentNode.nodeName === 'PICTURE'
-            ? e.target.parentNode.parentNode
-            : e.target.parentNode
+          ? e.target.parentNode.parentNode
+          : e.target.parentNode
         const newZoom = 1.6 + this.zoomBar/10;
         item.style.transform  = 'translate3d(calc(-50% + '+this.left+'px), calc(-50% + '+this.top+'px), 0px) scale3d('+newZoom+', '+newZoom+', '+newZoom+')';
       }
@@ -945,7 +973,7 @@ export default {
     // Aspect Ratio responsive video
     setAspectRatioVideo() {
       const thisContext = this
-      let el = this.$el.querySelector('.cool-lightbox__inner')
+      let el = this.$el.querySelector('.cool-lightbox-inner')
 
       let computedStyle = getComputedStyle(el)
       if(window.innerWidth < 1440) {
@@ -991,7 +1019,7 @@ export default {
 
     // set lightbox inner width
     setLightboxInnerWidth() {
-      let el = this.$el.querySelector('.cool-lightbox__inner');
+      let el = this.$el.querySelector('.cool-lightbox-inner');
       let width = el.clientWidth
       this.lightboxInnerWidth = width
     },
@@ -1038,11 +1066,15 @@ export default {
         this.paddingBottom = 60
       }
     },
-    initial() {
+    // =======================================================================================
+    $_initial(index) {
       // swipe type
       this.swipeType = null
       this.initialMouseY = 0
       this.ySwipeWrapper = 0
+
+      this.isVisible = true
+      this.imgIndex = index
       
       // set loop from data
       this.loopData = this.loop
@@ -1054,20 +1086,11 @@ export default {
       if(this.enableWheelEvent) {
         window.addEventListener('wheel', this.wheelEvent)
       }
-      
-      // only in mobile
-      if(window.innerWidth < 700) {
-
-        // add click event
-        setTimeout(() => {
-          window.addEventListener('click', this.showButtons)
-        }, 200)
-      }
 
       if (this.enableScrollLock) {
         setTimeout(() => {
-          this.setCompensateForScrollbar();
-          disableBodyScroll(this.$refs.coolLightbox);
+          this.setCompensateForScrollbar()
+          disableBodyScroll(this.$el)
         }, 50)
       }
 
@@ -1075,9 +1098,10 @@ export default {
         // add caption padding to Lightbox wrapper
         this.addCaptionPadding()
 
-        if (this.checkIsVideo(this.imgIndex)) {
+        const itemType = this.getMediaType(this.imgIndex)
+        if (['video', 'webVideo'].includes(itemType)) {
           this.setAspectRatioVideo()
-        } else {
+        } else if (itemType === 'image') {
           if(!this.is_cached(this.getItem(this.imgIndex).src)) {
             this.imageLoading = true
           }
@@ -1092,16 +1116,25 @@ export default {
         this.$emit('open', this.imgIndex)
       })
     },
-    // ======================================================= close start
+    open(index) {
+      if (this.isVisible && isNumber(this.imgIndex)) {
+        if (index !== this.imgIndex) {
+          this.change(index)
+        }
+      } else {
+        this.$_initial(index)
+      }
+    },
     // close event
     close() {
       // hide and stop slideshow
+      this.isVisible = false
+      this.imgIndex = null
       this.stopSlideShow()
       this.resetZoom()
       this.showThumbs = false
 
-      this.$emit("close", this.imgIndex)
-      this.imgIndex = null // 触发销毁
+      this.$emit('close')
 
       // set starts X to 0
       this.startsX = 0
@@ -1122,12 +1155,9 @@ export default {
       window.removeEventListener('keydown', this.eventListener)
 
       if (this.enableScrollLock) {
-        this.removeCompensateForScrollbar();
-        enableBodyScroll(this.$refs.coolLightbox);
+        this.removeCompensateForScrollbar()
+        enableBodyScroll(this.$el)
       }
-
-      // remove click event
-      window.removeEventListener('click', this.showButtons)
 
       // remove resize event
       window.removeEventListener('resize', this.xPositionOnResize)
@@ -1137,18 +1167,24 @@ export default {
         window.removeEventListener('wheel', this.wheelEvent)
       }
     },
-    // close event click outside
     closeModal(event) {
-      if(!this.closeOnClickOutsideMobile) {
-        if(window.innerWidth < 700) {
-          return false
-        }
-      }
-      if(this.IsSwipping) {
-        return false
-      }
-      var elements = '.cool-lightbox__iframe, .cool-lightbox__iframe *, .cool-lightbox-zoom, .cool-lightbox-zoom *, .cool-lightbox-thumbs, svg, path, rect, .cool-lightbox-thumbs *, .cool-lightbox-button, .cool-lightbox-toolbar__btn, .cool-lightbox-toolbar__btn *, .cool-lightbox-button *, .cool-lightbox__slide__img *, .cool-lightbox-video, .cool-lightbox-caption h6, .cool-lightbox-caption p, .cool-lightbox-caption a';
-      if (!event.target.matches(elements)) {
+      if (!this.clickOutsideHide) return false
+      // 加载中
+      if (this.imageLoading) return false
+      if(this.IsSwipping) return false
+
+      const elements = [
+        'img',
+        'video',
+        'iframe',
+        'picture',
+        'source',
+        'svg',
+        'path'
+      ]
+      // 如果点击元素包含 elements，则不关闭
+      // 使用`event.currentTarget`，将检测区域缩到最小
+      if (!matchAllDom(event.target, elements, event.currentTarget)) {
         this.close()
       }
     },
@@ -1186,11 +1222,11 @@ export default {
     // change to next index
     changeIndexToNext() {
       if(this.hasNext) {
-        this.onIndexChange(this.imgIndex + 1)
+        this.change(this.imgIndex + 1)
       } else {
         // only if has loop prop
         if(this.loopData) {
-          this.onIndexChange(0)
+          this.change(0)
         }
       }
     },
@@ -1198,16 +1234,16 @@ export default {
     // change to prev index
     changeIndexToPrev() {
       if(this.hasPrevious) {
-        this.onIndexChange(this.imgIndex - 1)
+        this.change(this.imgIndex - 1)
       } else {
         // only if has loop prop
         if(this.loopData) {
-          this.onIndexChange(this.items.length - 1)
+          this.change(this.items.length - 1)
         }
       }
     },
     // index change
-    onIndexChange(index) {
+    change(index) {
       this.imgIndex = index
       this.$emit('change', index)
 

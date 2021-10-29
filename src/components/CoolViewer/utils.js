@@ -100,29 +100,70 @@ export function videoSourceType(src, { ext }) {
   return _ext ? `video/${_ext}` : ''
 }
 
-
 export function closeFullscreen() {
   if (document.exitFullscreen) {
-    document.exitFullscreen();
-  } else if (document.mozCancelFullScreen) { /* Firefox */
-    document.mozCancelFullScreen();
-  } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
-    document.webkitExitFullscreen();
-  } else if (document.msExitFullscreen) { /* IE/Edge */
-    document.msExitFullscreen();
+    document.exitFullscreen()
+  } else if (document.webkitCancelFullScreen) {
+    document.webkitCancelFullScreen();
+  } else if (document.mozCancelFullScreen) {
+    document.mozCancelFullScreen()
+  } else if (document.msExitFullscreen) {
+    document.msExitFullscreen()
   }
 }
 
 export function fullScreenMode() {
-  /* Get the documentElement (<html>) to display the page in fullscreen */
-  var elem = document.documentElement;
-  if (elem.requestFullscreen) {
-    elem.requestFullscreen();
-  } else if (elem.mozRequestFullScreen) { /* Firefox */
-    elem.mozRequestFullScreen();
-  } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-    elem.webkitRequestFullscreen();
-  } else if (elem.msRequestFullscreen) { /* IE/Edge */
-    elem.msRequestFullscreen();
+  const el = document.documentElement
+  if (el.requestFullscreen) {
+    el.requestFullscreen()
+    return true
+  } else if (el.webkitRequestFullScreen) {
+    el.webkitRequestFullScreen()
+    return true
+  } else if (el.mozRequestFullScreen) {
+    el.mozRequestFullScreen()
+    return true
+  } else if (el.msRequestFullscreen) {
+    el.msRequestFullscreen()
+    return true
   }
+  console.warn('对不起，您的浏览器不支持全屏模式')
+  return false
+}
+
+export function addFullscreenListener(listener) {
+  document.addEventListener('fullscreenchange', listener)
+  document.addEventListener('webkitfullscreenchange', listener)
+  document.addEventListener('mozfullscreenchange', listener)
+  document.addEventListener('msfullscreenchange', listener)
+}
+export function removeFullscreenListener(listener) {
+  document.removeEventListener('fullscreenchange', listener)
+  document.removeEventListener('webkitfullscreenchange', listener)
+  document.removeEventListener('mozfullscreenchange', listener)
+  document.removeEventListener('msfullscreenchange', listener)
+}
+
+/**
+ * 匹配所有元素，同 Element.matches
+ * @param {*} target 对比目标元素
+ * @param {*} selector 选择器
+ * @param {*} wrapper 选择器范围
+ * @returns 
+ */
+export function matchAllDom(target, selector, wrapper) {
+  if (!(target instanceof Element)) return false
+  if (!(wrapper instanceof Element)) {
+    wrapper = document
+  }
+  const selectorArr = Array.isArray(selector) ? selector : selector.split(',')
+  const matches = selectorArr.reduce((a, c) => {
+    const els = wrapper.querySelectorAll(c)
+    a.push(...els)
+    return a
+  }, [])
+  for (let i = 0, len = matches.length; i < len; i++) {
+    if (matches[i] === target) return true
+  }
+  return false
 }

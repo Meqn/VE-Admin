@@ -3,13 +3,17 @@ import Icon from './Icon'
 import Container from './Container'
 import PageHeader from './PageHeader'
 import Table from './Table'
+import { LayoutForm, LayoutFormItem, QueryFilter } from './LayoutForm'
 
 const components = [
   Flex,
   Icon,
   Container,
   PageHeader,
-  Table
+  Table,
+  LayoutForm,
+  LayoutFormItem,
+  QueryFilter
 ]
 
 const install = function(Vue) {

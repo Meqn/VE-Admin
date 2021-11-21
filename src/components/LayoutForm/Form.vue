@@ -2,6 +2,7 @@
   <el-form
     ref="elForm"
     class="ve-layout-form"
+    v-resize:debounce="$_resize"
     :model="model"
     :rules="rules"
     :labelPosition="labelAlign"
@@ -24,10 +25,12 @@
 </template>
 
 <script>
-import windowResize from '@/mixins/resize'
+import resizeDirective from 'v-resize-observer/src/directive'
 export default {
   name: 'VeForm',
-  mixins: [windowResize],
+  directives: {
+    resize: resizeDirective
+  },
   props: {
     // cells
     gutter: Number,
@@ -92,13 +95,12 @@ export default {
     getColumn() {
       return this.column
     },
-    $_resize() {
-      const winWidth = window.innerWidth || document.body.clientWidth
-      if (winWidth > 1680) {
+    $_resize({ width }) {
+      if (width > 1366) {
         this.column = 4
-      } else if (winWidth <= 1680 && winWidth > 1280) {
+      } else if (width <= 1366 && width > 992) {
         this.column = 3
-      } else if (winWidth <= 1280 && winWidth > 800) {
+      } else if (width <= 992 && width > 640) {
         this.column = 2
       } else {
         this.column = 1

@@ -25,7 +25,7 @@
 
 <script>
 export default {
-  name: 'VeFormItem',
+  name: 'GridFormItem',
   props: {
     // cell
     colSize: Number, // 显示column个数

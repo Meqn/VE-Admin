@@ -3,7 +3,7 @@ import Icon from './Icon'
 import Container from './Container'
 import PageHeader from './PageHeader'
 import Table from './Table'
-import { LayoutForm, LayoutFormItem, QueryFilter } from './LayoutForm'
+import { QueryFilter } from './GridForm'
 
 const components = [
   Flex,
@@ -11,8 +11,6 @@ const components = [
   Container,
   PageHeader,
   Table,
-  LayoutForm,
-  LayoutFormItem,
   QueryFilter
 ]
 

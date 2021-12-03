@@ -1,5 +1,5 @@
 
-# From & FromItem 表单
+# GridFrom & GridFromItem 表单
 
 > 同 `el-form` 和 `el-form-item`
 

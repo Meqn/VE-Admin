@@ -1,6 +1,6 @@
 <!-- eslint-disable no-irregular-whitespace -->
 <template>
-<LayoutForm
+<GridForm
   class="ve-query-filter"
   ref="searchForm"
   :gutter="gutter"
@@ -20,7 +20,7 @@
   @resize="$_changeColumn">
   <slot />
   <!-- label="　" 全角空格,解决`layout=vertical`错位显示问题 -->
-  <LayoutFormItem :offset="actionOffset" label="　" label-width="1px" class="form-action">
+  <GridFormItem :offset="actionOffset" label="　" label-width="1px" class="form-action">
     <div class="form-action-content">
       <slot name="action" v-bind="{ collapsed: isCollapsed }">
         <el-button @click="resetForm">{{ resetText }}</el-button>
@@ -36,17 +36,17 @@
         </el-link>
       </slot>
     </div>
-  </LayoutFormItem>
-</LayoutForm>
+  </GridFormItem>
+</GridForm>
 </template>
 
 <script>
-import { LayoutForm, LayoutFormItem } from './index'
+import { GridForm, GridFormItem } from './index'
 export default {
   name: 'VeQueryFilter',
   components: {
-    LayoutForm,
-    LayoutFormItem
+    GridForm,
+    GridFormItem
   },
   props: {
     // cells

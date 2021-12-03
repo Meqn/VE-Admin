@@ -1,7 +1,7 @@
 <template>
   <el-form
     ref="elForm"
-    class="ve-layout-form"
+    class="ve-grid-form"
     v-resize:debounce="$_resize"
     :model="model"
     :rules="rules"
@@ -27,7 +27,7 @@
 <script>
 import resizeDirective from 'v-resize-observer/src/directive'
 export default {
-  name: 'VeForm',
+  name: 'GridForm',
   directives: {
     resize: resizeDirective
   },
@@ -112,7 +112,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ve-layout-form{
+.ve-grid-form{
   &.el-form--label-top{
     .el-form-item__label{
       padding-bottom: 0;

@@ -1,7 +1,11 @@
 <template>
 <div :class="['ve-page-header', { 'has-footer': hasFooter }, { 'is-ghost': ghost }]">
   <slot name="breadcrumb">
-    <el-breadcrumb v-if="breadcrumb.length > 0" :separator-class="separator" class="page-header-breadcrumb">
+    <el-breadcrumb
+      v-if="breadcrumb.length > 0"
+      :separator="separator"
+      :separator-class="separatorIcon"
+      class="page-header-breadcrumb">
       <el-breadcrumb-item
         v-for="(route, i) in breadcrumb"
         :key="i"
@@ -12,9 +16,12 @@
   </slot>
   <ve-flex justify="between" align="middle" class="page-header-heading">
     <ve-flex align="middle" class="page-header-left">
-      <div v-if="showBack" class="page-back" @click="onBack">
-        <i :class="backIcon"></i> {{ backText }}
-      </div>
+      <slot name="back">
+        <ve-flex v-if="showBack" align="middle" class="page-back" @click.native="onBack">
+          <i :class="[backIcon, 'back-icon']"></i>
+          <span v-if="backText" class="back-text">{{ backText }}</span>
+        </ve-flex>
+      </slot>
       <slot name="title">
         <span class="page-title">{{ title }}</span>
         <span class="page-subtitle">{{ subTitle }}</span>
@@ -28,10 +35,15 @@
     <slot />
   </div>
   <div class="page-header-footer" v-if="hasFooter">
-    <slot name="footer" />
-    <el-tabs v-if="tabList.length > 0" class="page-header-tab" v-model="activeTab" @tab-click="handleTabClick">
-      <el-tab-pane v-for="tab in tabList" :key="tab.name" :label="tab.label" :name="tab.name" />
-    </el-tabs>
+    <template v-if="tabList.length > 0">
+      <el-tabs class="page-header-tab" v-model="activeTab" @tab-click="handleTabClick">
+        <el-tab-pane v-for="tab in tabList" :key="tab.name" :label="tab.label" :name="tab.name" />
+      </el-tabs>
+      <div class="page-header-tab-extra" v-if="$slots.tabExtra">
+        <slot name="tabExtra"></slot>
+      </div>
+    </template>
+    <slot v-else name="footer" />
   </div>
 </div>
 </template>
@@ -48,8 +60,9 @@ export default {
     subTitle: String,
     separator: {
       type: String,
-      default: 'el-icon-arrow-right'
+      default: '/'
     },
+    separatorIcon: String,
     breadcrumb: {
       type: Array,
       default: () => []
@@ -60,10 +73,7 @@ export default {
       type: String,
       default: 'el-icon-back'
     },
-    backText: {
-      type: String,
-      default: '返回'
-    },
+    backText: String,
     tabList: {
       type: Array,
       default: () => []
@@ -114,6 +124,7 @@ export default {
 
 <style lang="scss">
 .ve-page-header{
+  position: relative;
   padding: 16px 20px;
   background-color: #fff;
   &.has-footer{
@@ -127,10 +138,12 @@ export default {
       margin-bottom: 8px;
     }
     &-content{
+      position: relative;
       margin-top: 12px;
     }
     &-footer{
-      margin-top: 16px;
+      position: relative;
+      margin-top: 12px;
     }
     &-left{
       max-width: 72%;
@@ -139,6 +152,9 @@ export default {
       padding: 4px 0;
     }
     &-tab{
+      &-extra{
+        position: absolute; bottom: 8px; right: 0;
+      }
       .el-tabs__item{
         font-size: 16px;
       }
@@ -170,10 +186,14 @@ export default {
   }
   .page-back{
     position: relative;
-    margin-right: 40px;
+    // margin-right: 40px;
+    margin-right: 16px;
     cursor: pointer;
+    &:hover{
+      color: $--color-primary;
+    }
 
-    &::after{
+    /* &::after{
       content: "";
       position: absolute;
       width: 1px;
@@ -182,6 +202,12 @@ export default {
       top: 50%;
       transform: translateY(-50%);
       background-color: #dcdfe6;
+    } */
+    .back-icon{
+      font-size: 20px;
+    }
+    .back-text{
+      margin-left: 2px;
     }
   }
 }

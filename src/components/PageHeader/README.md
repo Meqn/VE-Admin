@@ -1,5 +1,6 @@
 # PageHeader
 
+参考：https://ant-design.gitee.io/components/page-header-cn/
 
 ## props
 - `title: String`: 标题
@@ -16,6 +17,9 @@
 ## events
 - `tab-click(tab: Component, event: Event)`: 
 
+
+## slots
+- `extra` : 操作区，位于 title 行的行尾
 
 
 ## demo

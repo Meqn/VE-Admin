@@ -1,7 +1,7 @@
 <!-- eslint-disable no-irregular-whitespace -->
 <template>
 <GridForm
-  class="ve-query-filter"
+  class="ve-query-form"
   ref="searchForm"
   :gutter="gutter"
   :model="model"
@@ -43,7 +43,7 @@
 <script>
 import { GridForm, GridFormItem } from './index'
 export default {
-  name: 'VeQueryFilter',
+  name: 'VeQueryForm',
   components: {
     GridForm,
     GridFormItem
@@ -79,7 +79,7 @@ export default {
     disabled: Boolean,
     // 表单项布局
     layout: String,
-    // queryfilter
+    // queryForm
     resetText: {
       type: String,
       default: '重 置'
@@ -202,7 +202,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ve-query-filter{
+.ve-query-form{
   .form-action-content{
     display: flex;
     justify-content: flex-end;

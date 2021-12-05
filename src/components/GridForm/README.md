@@ -2,6 +2,7 @@
 # GridFrom & GridFromItem 表单
 
 > 同 `el-form` 和 `el-form-item`
+> 
 
 
 ## props
@@ -15,7 +16,9 @@
 
 
 
-# QueryFilter 筛选表单
+# QueryForm 筛选表单
+
+el-query-form
 
 ## props
 

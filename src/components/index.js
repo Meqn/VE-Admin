@@ -3,7 +3,7 @@ import Icon from './Icon'
 import Container from './Container'
 import PageHeader from './PageHeader'
 import Table from './Table'
-import { QueryFilter } from './GridForm'
+import { QueryForm, GridForm, GridFormItem } from './GridForm'
 
 const components = [
   Flex,
@@ -11,7 +11,9 @@ const components = [
   Container,
   PageHeader,
   Table,
-  QueryFilter
+  QueryForm,
+  GridForm,
+  GridFormItem
 ]
 
 const install = function(Vue) {

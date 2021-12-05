@@ -17,7 +17,6 @@
     :validateOnRuleChange="validateOnRuleChange"
     :hideRequiredAsterisk="hideRequiredAsterisk"
     v-on="$listeners">
-    {{ column }} - {{ getSpan() }}
     <el-row ref="row" type="flex" justify="start" align="top" :gutter="gutter" class="form-row">
       <slot />
     </el-row>
@@ -27,7 +26,7 @@
 <script>
 import resizeDirective from 'v-resize-observer/src/directive'
 export default {
-  name: 'GridForm',
+  name: 'VeGridForm',
   directives: {
     resize: resizeDirective
   },

@@ -1,4 +1,5 @@
-import Layout from '@/layout'
+import Layout from '@demo/Layout'
+import BlankView from '@/layout/BlankView'
 
 export default [
   {
@@ -16,14 +17,14 @@ export default [
       },
       {
         path: 'table',
-        component: () => import('@demo/views/form/basic'),
+        component: BlankView,
         name: 'list_table',
         redirect: '/list/table/list',
         meta: { title: '表格列表', asMenu: true },
         children: [
           {
             path: 'list',
-            component: () => import('@demo/views/form/basic'),
+            component: () => import('@demo/views/list/table'),
             name: 'ListTableList',
             meta: { hidden: true, title: '表格列表', automount: true, activeMenu: '/list/table', cache: true }
           },

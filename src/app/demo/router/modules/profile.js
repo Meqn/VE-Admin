@@ -1,4 +1,5 @@
-import Layout from '@/layout'
+import Layout from '@demo/Layout'
+import BlankView from '@/layout/BlankView'
 
 export default [
   {
@@ -10,7 +11,7 @@ export default [
     children: [
       {
         path: 'basic',
-        component: () => import('@demo/views/form/basic'),
+        component: () => import('@demo/views/profile/basic'),
         name: 'profile_basic',
         meta: { title: '基础详情页' }
       },

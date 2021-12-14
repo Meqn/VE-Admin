@@ -1,7 +1,15 @@
 <template>
 <section class="ve-layout-wrapper">
   <div v-if="false" class="drawer-mask" />
-  <VeHeader />
+  <VeHeader>
+    <slot name="header" />
+    <template #logo>
+      <slot name="logo" />
+    </template>
+    <template #right>
+      <slot name="header-right" />
+    </template>
+  </VeHeader>
   <section class="ve-layout-body">
     <VeSide />
     <VeMain />

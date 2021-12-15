@@ -1,47 +1,47 @@
+// 1. 自定义变量
+
 /********************************************************************* element-ui style
 */
+/* Color
+-------------------------- */
+/// color|1|Brand Color|0
 $--color-primary: #409EFF !default;
-
+/// color|1|Functional Color|1
 $--color-success: #0BCD74 !default;
+/// color|1|Functional Color|1
 $--color-warning: #F5A623 !default;
+/// color|1|Functional Color|1
 $--color-danger: #FF3333 !default;
+/// color|1|Functional Color|1
 $--color-info: #909399 !default;
-$--color-white: white !default;
-$--color-black: black !default;
 
-$--color-text-primary: #303133 !default;
-$--color-text-regular: #606266 !default;
-$--color-text-secondary: #909399 !default;
-$--color-text-placeholder: #C0C4CC !default;
+/* Table
+-------------------------- */
+/// color||Color|0
+$--table-header-background-color: #f9f9f9;
+$--table-header-font-color: #303133 !default;
 
-$--border-color-base: #DCDFE6 !default;
-$--border-color-light: #E4E7ED !default;
-$--border-color-lighter: #EBEEF5 !default;
-$--border-color-extra-light: #F2F6FC !default;
-
-$--background-color-base: #F5F7FA !default;
 
 
 /********************************************************************* custom style
 */
-
 // colors
-$--color-blue: #409EFF;
+$--color-blue: $--color-primary;
 $--color-green: $--color-success;
 $--color-red: $--color-danger;
 $--color-orange: $--color-warning;
 $--color-gray: $--color-info;
 
-// text、border、background
-$--color-text-link: $--color-primary;
-$--color-text-hover: mix($--color-primary, #fff, 86%);
-$--color-text-active: mix($--color-primary, #000, 86%);
-
-$--background-color: #f0f2f5;
-
 // layout
+$--layout-background-color: #f0f2f5;
 $--layout-header-background-color: #001529;
 $--layout-aside-background-color: #fff;
 $--layout-aside-text-color: #606266;
 $--layout-aside-active-text-color: $--color-primary;
 $--layout-aside-active-background-color: #EFF7FF;
+
+
+
+// 2. 引入element-ui默认css变量，在页面中使用，具体变量详见: `./comm/element-var.scss`
+// ⚠️ sass变量覆盖，需要放在变量声明之前
+@import "~element-ui/packages/theme-chalk/src/common/var.scss";

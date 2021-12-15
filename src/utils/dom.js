@@ -72,7 +72,7 @@ export const once = function(element, event, handler) {
 
 /**
  * Check if an element has a class
- * @param {HTMLElement} el
+ * @param {Element} el
  * @param {string} cls
  * @returns {boolean}
  */
@@ -88,7 +88,7 @@ export function hasClass(el, cls) {
 
 /**
  * Add class to element
- * @param {HTMLElement} el
+ * @param {Element} el
  * @param {string} cls
  */
 export function addClass(el, cls) {
@@ -98,7 +98,7 @@ export function addClass(el, cls) {
 
 /**
  * Remove class from element
- * @param {HTMLElement} elm
+ * @param {Element} elm
  * @param {string} cls
  */
 export function removeClass(el, cls) {
@@ -110,7 +110,7 @@ export function removeClass(el, cls) {
 }
 
 /**
- * @param {HTMLElement} el
+ * @param {Element} el
  * @param {string} cls
  */
 export function toggleClass(el, cls) {

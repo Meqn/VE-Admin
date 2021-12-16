@@ -1,5 +1,6 @@
 import Flex from './Flex'
 import Icon from './Icon'
+import Text from './Text'
 import Container from './Container'
 import PageHeader from './PageHeader'
 import Table from './Table'
@@ -8,6 +9,7 @@ import { QueryForm, GridForm, GridFormItem } from './GridForm'
 const components = [
   Flex,
   Icon,
+  Text,
   Container,
   PageHeader,
   Table,

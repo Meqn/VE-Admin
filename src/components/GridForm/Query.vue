@@ -20,7 +20,7 @@
   @resize="$_changeColumn">
   <slot />
   <!-- label="　" 全角空格,解决`layout=vertical`错位显示问题 -->
-  <GridFormItem :offset="actionOffset" label="　" label-width="1px" class="form-action">
+  <GridFormItem :offset="actionOffset" label="0" label-width="1px" class="form-action">
     <div class="form-action-content">
       <slot name="action" v-bind="{ collapsed: isCollapsed }">
         <el-button @click="resetForm">{{ resetText }}</el-button>
@@ -203,6 +203,13 @@ export default {
 
 <style lang="scss">
 .ve-query-form{
+  .form-action{
+    .el-form-item__label{
+      opacity: 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
   .form-action-content{
     display: flex;
     justify-content: flex-end;

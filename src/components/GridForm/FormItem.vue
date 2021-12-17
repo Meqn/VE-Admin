@@ -28,7 +28,7 @@ export default {
   name: 'VeGridFormItem',
   props: {
     // cell
-    colSize: Number, // 显示 通过计算span的个数
+    span: Number, // 显示 通过计算span的个数
     // span: Number, // 栅格个数，优先级 > colSize
     offset: Number,
     // form-item
@@ -56,10 +56,9 @@ export default {
   },
   computed: {
     spanNum() {
-      // if (this.span) return this.span // 移除 span控制
       const colSpan = this.colSpan()
-      if (this.colSize) {
-        const _span = this.colSize / this.column()
+      if (this.span) {
+        const _span = this.span / this.column()
         if (_span >= 1) {
           return 24
         } else {

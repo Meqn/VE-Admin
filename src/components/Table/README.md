@@ -1,4 +1,6 @@
 
+# table
+
 
 ## props
 - `title: String`
@@ -41,16 +43,56 @@
 - reload
 - export
 - fullscreen
-- 
 
+
+## usage
+
+1. 单元格内容显示
+   - 绑定属性
+   - renderColumn 函数
+   - formatter 属性
+   - 指定 slot
+
+```html
+<ve-table
+  :data="articleList"
+  :columns="columns">
+
+  <template #action="{ row }">
+    <el-button type="text" @click="$router.push('/view/${row.id}/')">查看</el-button>
+  </template>
+</ve-table>
+
+<script>
+export default {
+  data() {
+    return {
+      columns: [
+        { prop: 'title', label: '标题', minWidth: 150 },
+        { prop: 'author', label: '作者', renderColumn: (h, { row }) => h('span', row.author?.name) },
+        { prop: 'createTime', label: '时间', formatter: this.formatterDate },
+        { prop: 'action', label: '操作', slots: { default: 'action', header: 'action-header' } }
+      ]
+    }
+  },
+  methods: {
+    formatterDate(row, column, cellValue, index) {
+      return cellValue
+    }
+  }
+}
+</script>
+```
 
 
 
 # Todo
-print
+1. 增加 request 方法
+2. print
   - [Print.js](https://github.com/crabbly/Print.js)
   - https://zhuanlan.zhihu.com/p/87151162
-fullscreen
+3. fullscreen
+  - https://www.npmjs.com/package/screenfull
   - [vue-fullscreen](https://github.com/mirari/vue-fullscreen)
 
 https://github.com/SheetJS/printj

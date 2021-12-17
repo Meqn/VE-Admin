@@ -63,7 +63,7 @@ export default {
   },
   data() {
     return {
-      column: 1
+      column: 3
     }
   },
   provide() {
@@ -99,7 +99,7 @@ export default {
         this.column = 4
       } else if (width <= 1366 && width > 992) {
         this.column = 3
-      } else if (width <= 992 && width > 640) {
+      } else if (width <= 992 && width > 600) {
         this.column = 2
       } else {
         this.column = 1

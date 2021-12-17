@@ -11,7 +11,7 @@
 - `layout`
 
 ### FormItem
-- `col-size`
+- `span`
 
 
 

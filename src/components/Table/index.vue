@@ -26,12 +26,13 @@
     </VeFlex>
   </VeFlex>
 
-  <!-- table -->
+  <!-- table alert -->
   <div class="ve-table-alert" v-show="tableSelection.length > 0">
     <i class="el-icon-info alert-icon" />
     <div class="alert-content">已选择 <strong>{{ tableSelection.length }}</strong> 项</div>
     <span class="alert-cancel" @click="$_handleDeselect">取消选择</span>
   </div>
+  <!-- table -->
   <div class="ve-table-main" v-loading="loading" :element-loading-text="loadingText">
     <el-table ref="elTable" v-bind="table" :data="tableData" @selection-change="$_handleSelection" v-on="$listeners" class="ve-table-data" :style="table.style || {}">
       <template v-slot:append="slotProps">
@@ -118,7 +119,7 @@ export default {
       const { toolbar } = this
       if (toolbar) {
         if (Array.isArray(toolbar)) return toolbar
-        return ['density', 'fullScreen', 'setting']
+        return ['reload', 'density', 'fullScreen', 'setting']
       }
       return []
     },

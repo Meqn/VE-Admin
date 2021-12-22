@@ -42,7 +42,7 @@ export default {
       'permissionRoutes'
     ]),
     isCollapse() {
-      return this.sidebar.opened
+      return !this.sidebar.opened
     },
     menus() {
       return this.filterRoutes(this.permissionRoutes)
@@ -58,6 +58,11 @@ export default {
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
+    },
+    closeSideBar() {
+      if (this.sidebar.opened) {
+        this.$store.dispatch('app/closeSideBar')
+      }
     },
     filterRoutes(routes, basePath = '/') {
       const res = []

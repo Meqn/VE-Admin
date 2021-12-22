@@ -80,24 +80,14 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-%multi-line-clamp{
-  display: -webkit-box;
-  // -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.ellipsis-2{
-  @extend %multi-line-clamp;
-  -webkit-line-clamp: 2;
-}
-.ellipsis-3{
-  @extend %multi-line-clamp;
-  -webkit-line-clamp: 3;
-}
-.ellipsis-4{
-  @extend %multi-line-clamp;
-  -webkit-line-clamp: 4;
+@for $i from 2 through 5 {
+  .ellipsis-#{$i}{
+    display: -webkit-box;
+    -webkit-line-clamp: $i;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .none{
@@ -140,20 +130,20 @@ $gaps: 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56;
     padding-left: $g + px !important;
   }
   // 水平方向
-  .ph-#{$g} {
+  .px-#{$g} {
     padding-left: $g + px !important;
     padding-right: $g + px !important;
   }
-  .mh-#{$g} {
+  .mx-#{$g} {
     margin-left: $g + px !important;
     margin-right: $g + px !important;
   }
   // 垂直方向
-  .pv-#{$g} {
+  .py-#{$g} {
     padding-top: $g + px !important;
     padding-bottom: $g + px !important;
   }
-  .mv-#{$g} {
+  .my-#{$g} {
     margin-top: $g + px !important;
     margin-bottom: $g + px !important;
   }

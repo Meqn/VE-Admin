@@ -1,5 +1,5 @@
 <template>
-<section class="ve-layout-wrapper">
+<section class="ve-layout-wrapper" v-resize:debounce="$_resize">
   <div v-if="false" class="drawer-mask" />
   <VeHeader>
     <slot name="header" />
@@ -11,7 +11,7 @@
     </template>
   </VeHeader>
   <section class="ve-layout-body">
-    <VeSide />
+    <VeSide ref="sidebar" />
     <VeMain />
   </section>
 </section>
@@ -20,6 +20,7 @@
 <script>
 import './layout.scss'
 import { VeHeader, VeSide, VeMain } from './components'
+import resizeDirective from 'v-resize-observer/src/directive'
 
 export default {
   name: 've-layout',
@@ -27,6 +28,19 @@ export default {
     VeHeader,
     VeSide,
     VeMain
+  },
+  directives: {
+    resize: resizeDirective
+  },
+  methods: {
+    $_resize({ width }) {
+      if (width < 992) {
+        this.$refs.sidebar?.closeSideBar()
+        this.$store.dispatch('app/toggleDevice', 'tablet')
+      } else {
+        this.$store.dispatch('app/toggleDevice', 'desktop')
+      }
+    }
   }
 }
 </script>

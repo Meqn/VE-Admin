@@ -1,6 +1,8 @@
 <script>
 import isNumber from 'lodash/isNumber'
-import { isEmptyElement, isVNode } from '@/utils/validate'
+import { isEmptyElement, isVNode, validCssValue } from '@/utils/validate'
+
+const prefixCls = 've-space'
 
 const SIZE_MAP = {
   small: 8,
@@ -8,7 +10,17 @@ const SIZE_MAP = {
   large: 24
 }
 
-const prefixCls = 've-space'
+function getSizeValue(val) {
+  if (typeof val === 'number') {
+    return val + 'px'
+  } else if (['small', 'middle', 'large'].includes(val)) {
+    return SIZE_MAP[val] + 'px'
+  } else if (validCssValue(val)) {
+    return val
+  } else {
+    return ''
+  }
+}
 
 export default {
   name: 'VeSpace',
@@ -17,7 +29,7 @@ export default {
       type: [Number, String],
       validator(val) {
         if (typeof val === 'string') {
-          return ['small', 'middle', 'large'].includes(val)
+          return ['small', 'middle', 'large'].includes(val) || validCssValue(val)
         } else {
           return isNumber(val)
         }
@@ -68,7 +80,7 @@ export default {
     const itemClassName = `${prefixCls}-item`
     const marginDirection = 'marginRight' // directionConfig === 'rtl' ? 'marginLeft' : 'marginRight';
     const spaceItemStyle = {
-      [direction === 'vertical' ? 'marginBottom' : marginDirection]: typeof size === 'string' ? `${SIZE_MAP[size]}px` : `${size}px`
+      [direction === 'vertical' ? 'marginBottom' : marginDirection]: getSizeValue(size)
     }
 
     // spacer

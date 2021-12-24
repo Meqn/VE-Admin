@@ -15,9 +15,11 @@
     :size="size"
     v-on="$listeners">
     <slot />
-    <template #label><slot name="label" /></template>
-    <template v-slot:error="itemError">
-      <slot v-bind="{ error: itemError }" />
+    <template v-if="$slots.label" #label>
+      <slot name="label" />
+    </template>
+    <template v-if="$scopedSlots.error" #error="{ error }">
+      <slot name="error" v-bind="{ error }"></slot>
     </template>
   </el-form-item>
 </el-col>

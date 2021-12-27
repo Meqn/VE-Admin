@@ -56,16 +56,21 @@ export default {
       validator(val) {
         return ['vertical', 'horizontal', ''].includes(val)
       }
+    },
+    column: {
+      type: Number,
+      validator(val) {
+        return val > 0 && val <= 4
+      }
     }
   },
   data() {
     return {
-      column: 3
+      columnNum: this.column || 3
     }
   },
   provide() {
     return {
-      getSpan: this.getSpan,
       getColumn: this.getColumn
     }
   },
@@ -84,23 +89,20 @@ export default {
     })
   },
   methods: {
-    getSpan() {
-      return Math.floor(24 / this.column)
-    },
     getColumn() {
-      return this.column
+      return this.column || this.columnNum
     },
     $_resize({ width }) {
       if (width > 1366) {
-        this.column = 4
+        this.columnNum = 4
       } else if (width <= 1366 && width > 992) {
-        this.column = 3
+        this.columnNum = 3
       } else if (width <= 992 && width > 600) {
-        this.column = 2
+        this.columnNum = 2
       } else {
-        this.column = 1
+        this.columnNum = 1
       }
-      this.$emit('resize', this.column)
+      this.$emit('resize', this.columnNum)
     }
   }
 }
@@ -113,8 +115,29 @@ export default {
       padding-bottom: 0;
     }
   }
-  .form-row{
+  &-grid{
     flex-wrap: wrap;
+  }
+  &-cell{
+    .el-form-item{
+      margin-bottom: 0;
+    }
+  }
+
+  &-group{
+    font-size: $--font-size-base;
+    color: $--color-text-primary;
+
+    &-header{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $--descriptions-header-margin-bottom;
+    }
+    &-title{
+      font-size: $--descriptions-title-font-size;
+      font-weight: bold;
+    }
   }
 }
 </style>

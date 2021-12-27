@@ -1,4 +1,5 @@
 <script>
+import { getSpanCount, getFormItemProps } from './utils'
 export default {
   name: 'VeFormItem',
   props: {
@@ -23,18 +24,18 @@ export default {
     formItemClass: [String, Object, Array],
     formItemStyle: [String, Object]
   },
-  inject: ['getSpan', 'getColumn', 'groupType'],
+  inject: ['getColumn', 'groupType'],
   data() {
     return {
-      visible: true,
-      validError: null
+      visible: true
     }
   },
   computed: {
     spanNum() {
-      const colSpan = this.getSpan()
+      const column = this.getColumn()
+      const colSpan = getSpanCount(column)
       if (this.span) {
-        const _span = this.span / this.getColumn()
+        const _span = this.span / column
         if (_span >= 1) {
           return 24
         } else {
@@ -56,35 +57,30 @@ export default {
     const { spanNum, offset, visible } = this
 
     // el-form-item
-    let errorSlot = {}
+    let scopedSlots = {}
     if (this.$scopedSlots.error) {
-      errorSlot = {
+      scopedSlots = {
         error: ({ error }) => this.$scopedSlots.error({ error })
       }
     }
-    const $formItem = (<el-form-item
-      ref="elFormItem"
-      class={this.formItemClass}
-      style={this.formItemStyle}
-      prop={this.prop}
-      label={this.label}
-      labelWidth={this.labelWidth}
-      required={this.required}
-      rules={this.rules}
-      error={this.error}
-      showMessage={this.showMessage}
-      inlineMessage={this.inlineMessage}
-      size={this.size}
-      scopedSlots={errorSlot}>
+    const formItemProps = getFormItemProps(Object.assign({}, scopedSlots, this.$props))
 
-      {this.$slots.default}
-      { this.$slots.label && (<template slot="label">{this.$slots.label}</template>) }
-    </el-form-item>)
+    // grid
+    const $gridItem = (
+      <el-col span={spanNum} offset={offset} vShow={visible} class="form-item-grid">
+        <el-form-item { ...formItemProps }>
+          {this.$slots.default}
+          { this.$slots.label && (<template slot="label">{this.$slots.label}</template>) }
+        </el-form-item>
+      </el-col>
+    )
+
+    const formItems = {
+      grid: $gridItem
+    }
 
     return (
-      <el-col span={spanNum} offset={offset} vShow={visible} class="form-col">
-        {$formItem}
-      </el-col>
+      formItems[this.groupType] || this.$slots.default
     )
   },
   methods: {

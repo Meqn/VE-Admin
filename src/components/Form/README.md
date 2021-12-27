@@ -1,7 +1,7 @@
 # Form
 
 - Form
-- Form.group (type: `grid`, `border`, `list`)
+- Form.group (type: `grid`, `cell`, `list`, `table-list`)
 - Form.item (cell, description)
 - Form.list
 - Form.table

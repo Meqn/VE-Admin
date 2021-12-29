@@ -23,6 +23,8 @@
 
 <script>
 import resizeDirective from 'v-resize-observer/src/directive'
+import './style.scss'
+
 export default {
   name: 'VeForm',
   directives: {
@@ -107,37 +109,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.ve-form{
-  &.el-form--label-top{
-    .el-form-item__label{
-      padding-bottom: 0;
-    }
-  }
-  &-grid{
-    flex-wrap: wrap;
-  }
-  &-cell{
-    .el-form-item{
-      margin-bottom: 0;
-    }
-  }
-
-  &-group{
-    font-size: $--font-size-base;
-    color: $--color-text-primary;
-
-    &-header{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: $--descriptions-header-margin-bottom;
-    }
-    &-title{
-      font-size: $--descriptions-title-font-size;
-      font-weight: bold;
-    }
-  }
-}
-</style>

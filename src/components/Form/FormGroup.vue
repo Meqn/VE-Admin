@@ -21,7 +21,10 @@ export default {
       default: 'top'
     },
     // Descriptions
-    direction: String,
+    direction: {
+      type: String,
+      default: 'horizontal'
+    },
     size: String
   },
   provide() {
@@ -106,9 +109,9 @@ export default {
       // cell
       const items = this.getItems()
       $content.cell = (
-        <el-descriptions border column={this.columnNum} direction={this.direction} size={this.size} class="ve-form-cell">
+        <el-descriptions border column={this.columnNum} direction={this.direction} size={this.size} class={['ve-form-cell', `ve-form-cell-${this.direction}`]}>
           { items.map(item => (
-            <el-descriptions-item label={item.props.label}>
+            <el-descriptions-item label={item.props.label} span={item.props.span || 1}>
               { item.slots.label && (<template slot="label">{item.slots.label}</template>) }
               <el-form-item { ...getFormItemProps(item.props, 'cell') }>
                 { item.slots.default }
@@ -134,7 +137,7 @@ export default {
             : null
         }
 
-        <div class="ve-form-group-body">{$content[type] || null}</div>
+        <div class="ve-form-group-body">{$content[type] || this.$slots.default}</div>
       </div>
     )
   }

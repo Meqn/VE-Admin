@@ -53,8 +53,19 @@ export default {
       this[method] = $item[method]
     })
   },
+  methods: {
+    hide() {
+      this.visible = false
+    },
+    show() {
+      this.visible = true
+    }
+  },
   render() {
-    const { spanNum, offset, visible } = this
+    const { groupType, spanNum, offset, visible } = this
+    const $formItems = {
+      grid: null
+    }
 
     // el-form-item
     let scopedSlots = {}
@@ -63,33 +74,23 @@ export default {
         error: ({ error }) => this.$scopedSlots.error({ error })
       }
     }
-    const formItemProps = getFormItemProps(Object.assign({}, scopedSlots, this.$props))
+    const formItemProps = getFormItemProps(Object.assign({}, { scopedSlots }, this.$props))
 
     // grid
-    const $gridItem = (
-      <el-col span={spanNum} offset={offset} vShow={visible} class="form-item-grid">
-        <el-form-item { ...formItemProps }>
-          {this.$slots.default}
-          { this.$slots.label && (<template slot="label">{this.$slots.label}</template>) }
-        </el-form-item>
-      </el-col>
-    )
-
-    const formItems = {
-      grid: $gridItem
+    if (groupType === 'grid') {
+      $formItems.grid = (
+        <el-col span={spanNum} offset={offset} vShow={visible} class="form-item-grid">
+          <el-form-item { ...formItemProps }>
+            {this.$slots.default}
+            { this.$slots.label && (<template slot="label">{this.$slots.label}</template>) }
+          </el-form-item>
+        </el-col>
+      )
     }
 
     return (
-      formItems[this.groupType] || this.$slots.default
+      $formItems[groupType] || this.$slots.default
     )
-  },
-  methods: {
-    hide() {
-      this.visible = false
-    },
-    show() {
-      this.visible = true
-    }
   }
 }
 </script>

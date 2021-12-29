@@ -1,0 +1,88 @@
+.ve-form{
+  &.el-form--label-top{
+    .el-form-item__label{
+      padding-bottom: 0;
+    }
+  }
+  // grid
+  &-grid{
+    flex-wrap: wrap;
+  }
+  // cell
+  &-cell{
+    .el-form-item{
+      margin-bottom: 0;
+
+      .el-form-item__error{
+        // 隐藏表单错误提示
+        display: none;
+        position: absolute; top: 50%; left: inherit; right: 0;
+        transform: translateY(-50%);
+      }
+      // 表单验证 去掉错误提示，替换红文本提示，
+      &.is-error{
+        .el-input__inner{
+          color: rgba(255, 51, 51, 0.9);
+
+          &::placeholder{
+            color: rgba(255, 51, 51, 0.6);
+          }
+        }
+      }
+    }
+    .el-input__inner{
+      border: none;
+    }
+
+    &-horizontal.el-descriptions{
+      .el-descriptions-item__label{
+        padding-left: 16px;
+      }
+    }
+  }
+  // group
+  &-group{
+    font-size: $--font-size-base;
+    color: $--color-text-primary;
+
+    &-header{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $--descriptions-header-margin-bottom;
+    }
+    &-title{
+      font-size: $--descriptions-title-font-size;
+      font-weight: bold;
+    }
+  }
+}
+
+.ve-query-form{
+  .form-action{
+    .el-form-item__label{
+      opacity: 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
+  .form-action-content{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .form-collapse{
+    display: inline-block;
+    margin-left: 16px;
+    cursor: pointer;
+
+    .icon-arrow{
+      transition: all .5s;
+    }
+    &.is-collapse{
+      .icon-arrow{
+        transform: rotate(-180deg);
+      }
+    }
+  }
+}

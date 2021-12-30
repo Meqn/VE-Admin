@@ -92,6 +92,15 @@ export function validPassword(name) {
   return reg.test(name)
 }
 
-export function isvalid(val) {
-  return val !== undefined && val !== null
+export function validCssValue(val) {
+  const reg = /^-?\d+(px|em|%|vw|vh|rem)$/
+  return reg.test(val)
+}
+
+export function isVNode(node) {
+  return node !== null && typeof node === 'object' && Object.prototype.hasOwnProperty.call(node, 'componentOptions')
+}
+
+export function isEmptyElement(c) {
+  return !(c.tag || (c.text && c.text.trim() !== ''));
 }

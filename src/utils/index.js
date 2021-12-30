@@ -1,5 +1,6 @@
 import { resolve } from 'path'
-import { isExternal } from './validate'
+import { isExternal, validCssValue } from './validate'
+import isNumber from 'lodash/isNumber'
 
 /**
  * Parse the time to string
@@ -171,11 +172,7 @@ export function cancelAnimationFrame (id) {
  * @returns 
  */
 export function cssUnit(val) {
-  const regx = /^\d+(px|em|%|vw|vh|rem)?$/
-  if (regx.test(val)) {
-    return isNaN(val) ? val : val + 'px'
-  }
-  return ''
+  return isNumber(val) ? (val + 'px') : validCssValue(val) ? val : ''
 }
 
 /**
@@ -199,7 +196,7 @@ export function fileType(fileSrc) {
     image: ['gif', 'jpg', 'jpeg', 'png', 'bmp', 'webp'],
     video: ['mp4', 'm3u8', 'rmvb', 'avi', '3gp', 'mkv', 'flv', 'mov'],
     audio: ['mp3', 'wav', 'wma', 'ogg', 'aac', 'flac'],
-    pdf: ['pdf']
+    doc: ['docx', 'excel', 'pdf']
   }
   const _fileSuffix = fileSuffix(fileSrc)
   if (!_fileSuffix) return ''

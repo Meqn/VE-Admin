@@ -31,7 +31,7 @@
       <slot name="extra" />
     </div>
   </ve-flex>
-  <div class="page-header-content" v-if="$slots.default">
+  <div v-if="$slots.default" class="page-header-content">
     <slot />
   </div>
   <div class="page-header-footer" v-if="hasFooter">
@@ -127,6 +127,7 @@ export default {
   position: relative;
   padding: 16px 20px;
   background-color: #fff;
+  
   &.has-footer{
     padding-bottom: 0;
   }
@@ -171,6 +172,7 @@ export default {
   }
   .page-title{
     margin-right: 12px;
+    color: $--color-text-primary;
     font-size: 20px;
     line-height: 32px;
     font-weight: bold;
@@ -181,7 +183,6 @@ export default {
   .page-subtitle{
     white-space: nowrap;
     font-size: 14px;
-    color: #606266;
     margin-right: 12px;
   }
   .page-back{

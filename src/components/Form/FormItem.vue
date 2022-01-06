@@ -19,12 +19,11 @@ export default {
       default: true
     },
     inlineMessage: Boolean,
-    size: String,
     // form-item 附加
     formItemClass: [String, Object, Array],
     formItemStyle: [String, Object]
   },
-  inject: ['getColumn', 'groupType'],
+  inject: ['group', 'getColumn'],
   data() {
     return {
       visible: true
@@ -62,7 +61,8 @@ export default {
     }
   },
   render() {
-    const { groupType, spanNum, offset, visible } = this
+    const { spanNum, offset, visible } = this
+    const groupType = this.group.type
     const $formItems = {
       grid: null
     }
@@ -74,7 +74,10 @@ export default {
         error: ({ error }) => this.$scopedSlots.error({ error })
       }
     }
-    const formItemProps = getFormItemProps(Object.assign({}, { scopedSlots }, this.$props))
+    const formItemProps = getFormItemProps(
+      { ...this.$props, scopedSlots, size: this.group.groupSize },
+      this.group
+    )
 
     // grid
     if (groupType === 'grid') {

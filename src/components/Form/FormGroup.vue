@@ -29,14 +29,17 @@ export default {
   },
   provide() {
     return {
-      groupType: this.type,
+      group: this,
       getColumn: this.getColumnFromGroup
     }
   },
-  inject: ['getColumn'],
+  inject: ['form', 'getColumn'],
   computed: {
     columnNum() {
       return this.column || this.getColumn()
+    },
+    groupSize() {
+      return this.size || this.form.size
     }
   },
   methods: {
@@ -109,15 +112,20 @@ export default {
       // cell
       const items = this.getItems()
       $content.cell = (
-        <el-descriptions border column={this.columnNum} direction={this.direction} size={this.size} class={['ve-form-cell', `ve-form-cell-${this.direction}`]}>
-          { items.map(item => (
-            <el-descriptions-item label={item.props.label} span={item.props.span || 1}>
-              { item.slots.label && (<template slot="label">{item.slots.label}</template>) }
-              <el-form-item { ...getFormItemProps(item.props, 'cell') }>
-                { item.slots.default }
-              </el-form-item>
-            </el-descriptions-item>
-          ))}
+        <el-descriptions border column={this.columnNum} direction={this.direction} size={this.groupSize} class={['ve-form-cell', `ve-form-cell-${this.direction}`]}>
+          { items.map(item => {
+            const formItemProps = getFormItemProps({ ...item.props, size: this.groupSize }, this)
+            return (
+              <el-descriptions-item label={item.props.label} span={item.props.span || 1}>
+                <label slot="label" class={['cell-item-label', { 'is-required': formItemProps.props.required }, { 'is-no-asterisk': this.form.hideRequiredAsterisk }]}>
+                  { item.slots.label || item.props.label }
+                </label>
+                <el-form-item { ...formItemProps }>
+                  { item.slots.default }
+                </el-form-item>
+              </el-descriptions-item>
+            )
+          })}
         </el-descriptions>
       )
     }

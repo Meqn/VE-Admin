@@ -33,6 +33,14 @@
     .el-input__inner{
       border: none;
     }
+    // required 显示 * 号
+    .cell-item-label{
+      &.is-required:not(.is-no-asterisk)::before{
+        content: "*";
+        color: #FF3333;
+        margin-right: 4px;
+      }
+    }
 
     &-horizontal.el-descriptions{
       .el-descriptions-item__label{

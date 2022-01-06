@@ -73,7 +73,8 @@ export default {
   },
   provide() {
     return {
-      getColumn: this.getColumn
+      getColumn: this.getColumn,
+      form: this
     }
   },
   computed: {

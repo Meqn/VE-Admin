@@ -10,7 +10,7 @@
 - `columns: Array<Object>`: el-table-column属性(包含下列属性)
   - `prop: String`: 对应列内容的字段名
   - `visible: Boolean`: 是否在列设置中显示(不配置该属性则不显示)
-  - `renderColumn({ row, column, $index }): Function`: 列区域内容渲染
+  - `render({ row, column, $index }): Function`: 列区域内容渲染
   - `slots: Object`: 自定义列及表头的内容slot名 `{ default, header }`
 - `data: Array<Object>`: 显示的数据
 - `pagination: object`: el-pagination分页属性(包含下列属性)
@@ -69,7 +69,7 @@ export default {
     return {
       columns: [
         { prop: 'title', label: '标题', minWidth: 150 },
-        { prop: 'author', label: '作者', renderColumn: (h, { row }) => h('span', row.author?.name) },
+        { prop: 'author', label: '作者', render: (h, { row }) => h('span', row.author?.name) },
         { prop: 'createTime', label: '时间', formatter: this.formatterDate },
         { prop: 'action', label: '操作', slots: { default: 'action', header: 'action-header' } }
       ]

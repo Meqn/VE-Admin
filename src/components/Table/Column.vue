@@ -7,23 +7,26 @@ export default {
   inject: ['top'],
   render(h) {
     const $top = this.top
-    const { renderColumn, slots } = this.option
-    const defaultSlot = (slots && slots.default) ? $top.$scopedSlots[slots.default] : null
-    const headerSlot = (slots && slots.header) ? $top.$scopedSlots[slots.header] : null
-
+    const { render: renderColumn, slots } = this.option
     const scopedSlots = {}
-    if (renderColumn || defaultSlot) {
-      // props = { row, column, $index }
-      scopedSlots.default = props => (renderColumn ? renderColumn(h, props) : defaultSlot(props))
-    }
+
+    const headerSlot = (slots && slots.header) ? $top.$scopedSlots[slots.header] : null
     if (headerSlot) {
       // props = { column, $index }
       scopedSlots.header = props => headerSlot(props)
     }
-    return h('el-table-column', {
+
+    const defaultSlot = (slots && slots.default) ? $top.$scopedSlots[slots.default] : null
+    if (renderColumn || defaultSlot) {
+      // props = { row, column, $index }
+      scopedSlots.default = props => (renderColumn ? renderColumn(props, h) : defaultSlot(props))
+    }
+
+    const columnProps = {
       props: this.option,
       scopedSlots
-    })
+    }
+    return (<el-table-column {...columnProps} />)
   }
 }
 </script>

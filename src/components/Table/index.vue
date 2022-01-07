@@ -3,7 +3,7 @@
   <!-- search -->
   <div v-if="$slots.search" class="ve-table-search"><slot name="search"/></div>
   <!-- header -->
-  <VeFlex v-if="showHeader" justify="between" align="middle" class="ve-table-header">
+  <div v-if="showHeader" class="ve-table-header">
     <VeFlex align="middle">
       <div v-if="title" class="table-title">
         <slot name="title">{{ title }}</slot>
@@ -24,13 +24,15 @@
         </el-tooltip>
       </div>
     </VeFlex>
-  </VeFlex>
+  </div>
 
   <!-- table alert -->
   <div class="ve-table-alert" v-show="tableSelection.length > 0">
     <i class="el-icon-info alert-icon" />
-    <div class="alert-content">已选择 <strong>{{ tableSelection.length }}</strong> 项</div>
-    <span class="alert-cancel" @click="$_handleDeselect">取消选择</span>
+    <slot v-bind:alert="{ rows: tableSelection }">
+      <div class="alert-content">已选择 <strong>{{ tableSelection.length }}</strong> 项</div>
+      <span class="alert-cancel" @click="$_handleDeselect">取消选择</span>
+    </slot>
   </div>
   <!-- table -->
   <div class="ve-table-main" v-loading="loading" :element-loading-text="loadingText">
@@ -55,6 +57,7 @@
       </slot>
     </VeFlex>
   </div>
+  <slot name="footer"></slot>
 </div>
 </template>
 
@@ -89,10 +92,7 @@ export default {
       type: Object,
       default: () => ({})
     },
-    pagination: {
-      type: Object,
-      default: () => ({})
-    },
+    pagination: [Boolean, Object],
     fullElement: [String, Object],
     loading: Boolean,
     loadingText: {
@@ -117,11 +117,9 @@ export default {
     },
     toolbarList() {
       const { toolbar } = this
-      if (toolbar) {
-        if (Array.isArray(toolbar)) return toolbar
-        return ['reload', 'density', 'fullScreen', 'setting']
-      }
-      return []
+      if (Array.isArray(toolbar)) return toolbar
+      else if (toolbar === true) return ['reload', 'density', 'fullScreen', 'setting']
+      else return []
     },
     toolbarData() {
       return {
@@ -207,9 +205,13 @@ $toolbarSize: 20px;
 
 .ve-table{
   &-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 16px 0;
   }
   .table-title{
+    color: $--color-text-primary;
     font-size: 16px;
     font-weight: bold;
     margin-right: 16px;

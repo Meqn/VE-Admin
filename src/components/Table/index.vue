@@ -36,7 +36,16 @@
   </div>
   <!-- table -->
   <div class="ve-table-main" v-loading="loading" :element-loading-text="loadingText">
-    <el-table ref="elTable" v-bind="table" :data="tableData" @selection-change="$_handleSelection" v-on="$listeners" class="ve-table-data" :style="table.style || {}">
+    <el-table
+      ref="elTable"
+      v-bind="table"
+      :data="tableData"
+      class="ve-table-data"
+      :style="table.style || {}"
+      :row-style="handleRowStyle"
+      v-on="$listeners"
+      @selection-change="$_handleSelection"
+      @cell-dblclick="$_hanleCellDoubleClick">
       <template v-slot:append="slotProps">
         <slot name="table-append" v-bind="slotProps" />
       </template>
@@ -95,6 +104,12 @@ export default {
       type: Object,
       default: () => ({})
     },
+    editable: {
+      type: String,
+      validator(val) {
+        return ['field', 'single', 'multiple'].includes(val)
+      }
+    },
     pagination: [Boolean, Object],
     fullElement: [String, Object],
     loading: Boolean,
@@ -111,7 +126,9 @@ export default {
   },
   data() {
     return {
-      tableSelection: []
+      tableSelection: [],
+      editRow: [],
+      editCell: null
     }
   },
   computed: {
@@ -149,6 +166,9 @@ export default {
         layout: 'total, prev, pager, next, sizes',
         align: 'right'
       }, this.pagination)
+    },
+    editableKeys() {
+      return this.columns.filter(item => item.editable).map(item => item.prop)
     }
   },
   mounted() {
@@ -182,6 +202,16 @@ export default {
     $_handleSelection(selection) {
       this.tableSelection = selection
     },
+    $_hanleCellDoubleClick(row, column, cell, event) {
+      console.log('cell click', cell, event)
+      if (this.editableKeys.includes(column.property) && this.editable === 'field') {
+        this.edit({ row, column })
+        this.$nextTick(() => {
+          const $input = cell.querySelector('input') || cell.querySelector('textarea')
+          $input && $input.focus()
+        })
+      }
+    },
     // 改变table密度
     changeDensity(size) {
       this.$set(this.table, 'size', size)
@@ -198,6 +228,54 @@ export default {
     // 打印table数据
     print() {
       console.log('print table ...')
+    },
+    // 设定table每行index
+    handleRowStyle({ row, rowIndex }) {
+      Object.defineProperty(row, '$_index', {
+        value: rowIndex,
+        writable: true,
+        enumerable: false
+      })
+      return typeof this.table.rowStyle === 'function'
+        ? this.table.rowStyle({ row, rowIndex })
+        : this.table.rowStyle || null
+    },
+    edit(value, editing) {
+      switch (this.editable) {
+        case 'field':
+          this.$_setEditCell(value, editing)
+          break;
+        case 'single':
+          this.$_setEditSingleRow(value, editing)
+          break;
+        case 'multiple':
+          this.$_setEditMultipleRow(value, editing)
+          break;
+      }
+    },
+    $_setEditMultipleRow(index, editing = true) {
+      const { editRow } = this
+      if (index >= 0) {
+        const rowIndex = editRow.indexOf(index)
+        if (editing) {
+          (rowIndex === -1) && this.editRow.push(index)
+        } else {
+          (rowIndex !== -1) && this.editRow.splice(rowIndex, 1)
+        }
+      } else {
+        this.editRow = []
+      }
+    },
+    $_setEditSingleRow(index, editing = true) {
+      if (index >= 0 && editing) {
+        this.editRow = [index]
+      } else {
+        this.editRow = []
+      }
+    },
+    $_setEditCell(cell, editing = true) {
+      // cell = { row, column }
+      this.editCell = (cell && editing) ? { label: cell.column?.property, index: cell.row?.$_index } : null
     }
   }
 }

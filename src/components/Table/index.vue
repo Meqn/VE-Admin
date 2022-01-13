@@ -4,13 +4,13 @@
   <div v-if="$slots.search" class="ve-table-search"><slot name="search"/></div>
   <!-- header -->
   <div v-if="showHeader" class="ve-table-header">
-    <VeFlex align="middle">
+    <Flex align="middle">
       <div v-if="title" class="table-title">
         <slot name="title">{{ title }}</slot>
       </div>
       <slot name="left" />
-    </VeFlex>
-    <VeFlex align="middle">
+    </Flex>
+    <Flex align="middle">
       <slot name="right" />
       <!-- toolbar -->
       <div v-if="toolbarList.length > 0" class="ve-table-toolbar">
@@ -23,7 +23,7 @@
           <component :is="toolbarData[item].component" v-bind="toolbarData[item].props" />
         </el-tooltip>
       </div>
-    </VeFlex>
+    </Flex>
   </div>
 
   <!-- table alert -->
@@ -54,7 +54,7 @@
     </el-table>
 
     <!-- pagination -->
-    <VeFlex v-if="paginationProps" :justify="paginationProps.align" class="ve-table-pagination" :style="pagination.style || {}">
+    <Flex v-if="paginationProps" :justify="paginationProps.align" class="ve-table-pagination" :style="pagination.style || {}">
       <slot name="pagination">
         <el-pagination
           ref="elPagination"
@@ -65,14 +65,14 @@
           @next-click="$_paginationNextClick"
         />
       </slot>
-    </VeFlex>
+    </Flex>
   </div>
   <slot name="footer"></slot>
 </div>
 </template>
 
 <script>
-import VeFlex from '@/components/Flex'
+import Flex from '@/components/Flex'
 import Column from './Column'
 import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
@@ -81,7 +81,7 @@ import { TableSetting, TableDensity, TableReload, TablePrint, TableFullscreen } 
 export default {
   name: 'VeTable',
   components: {
-    VeFlex,
+    Flex,
     Column,
     TableSetting,
     TableDensity,
@@ -110,7 +110,7 @@ export default {
     editable: {
       type: String,
       validator(val) {
-        return ['field', 'single', 'multiple'].includes(val)
+        return ['cell', 'single-row', 'row'].includes(val)
       }
     },
     pagination: [Boolean, Object],
@@ -207,7 +207,7 @@ export default {
     },
     // 双击进行编辑
     $_hanleCellDoubleClick(row, column, cell, event) {
-      if (this.editableKeys.includes(column.property) && this.editable === 'field') {
+      if (this.editableKeys.includes(column.property) && this.editable === 'cell') {
         const rowKey = row.$_row_index
         const colKey = column.property
         this.edit({ rowKey, colKey, row, column })
@@ -245,7 +245,7 @@ export default {
       
       // 编辑 class
       if (editableKeys.includes(prop)) {
-        className = 'cell-edit'
+        className += ' cell-edit'
 
         if (editingCell) {
           const { rowKey, colKey } = editingCell
@@ -261,12 +261,21 @@ export default {
       return className
     },
     // 从源数据复制一份 row 用作临时编辑数据
-    $_copyEditingData(rowKey) {
+    $_copyEditingData(rowKey, rawData) {
       if (rowKey >= 0) {
-        this.$set(this.editingData, rowKey, cloneDeep(this.data[rowKey]))
+        this.$set(this.editingData, rowKey, cloneDeep(rawData || this.data[rowKey]))
       }
     },
-    $_setEditMultipleRow(rowKey, editing = true) {
+    $_setEditCell(cell, editing = true) {
+      // cell = { rowKey: Number, colKey: Number, row?: Object, column?: Object }
+      if (cell && (cell.rowKey >= 0) && editing) {
+        this.editingCell = cell
+        this.$_copyEditingData(cell.rowKey)
+      } else if (editing === false || cell === null) {
+        this.editingCell = null
+      }
+    },
+    $_setEditRow(rowKey, editing = true) {
       const { editingRow } = this
       if (rowKey >= 0) {
         const rowIndex = editingRow.indexOf(rowKey)
@@ -298,15 +307,6 @@ export default {
         this.editingRow = []
       }
     },
-    $_setEditCell(cell, editing = true) {
-      // cell = { rowKey: Number, colKey: Number, row?: Object, column?: Object }
-      if (cell && (cell.rowKey >= 0) && editing) {
-        this.editingCell = cell
-        this.$_copyEditingData(cell.rowKey)
-      } else if (editing === false || cell === null) {
-        this.editingCell = null
-      }
-    },
     // 改变table密度
     changeDensity(size) {
       this.$set(this.table, 'size', size)
@@ -324,10 +324,11 @@ export default {
     print() {
       console.log('print table ...')
     },
-    save(rowKey) {
+    // 保存数据
+    save(rowKey, newData) {
       if (rowKey >= 0) {
         const rawData = this.data[rowKey]
-        const editData = this.editingData[rowKey]
+        const editData = newData || this.editingData[rowKey]
         // 判断数据是否有更新
         if (!isEqual(rawData, editData)) {
           this.data.splice(rowKey, 1, cloneDeep(editData))
@@ -343,16 +344,24 @@ export default {
     },
     edit(value, editing) {
       switch (this.editable) {
-        case 'field':
+        case 'cell':
           this.$_setEditCell(value, editing)
           break;
-        case 'single':
+        case 'row':
+          this.$_setEditRow(value, editing)
+          break;
+        case 'single-row':
           this.$_setEditSingleRow(value, editing)
           break;
-        case 'multiple':
-          this.$_setEditMultipleRow(value, editing)
-          break;
       }
+    },
+    getEdit() {
+      const { editable } = this
+      return editable
+        ? editable === 'cell'
+          ? this.editingCell
+          : this.editingRow
+        : null
     }
   }
 }

@@ -38,7 +38,7 @@ export default {
         const fieldProps = {
           on: {
             blur: () => {
-              if (top.editable === 'field') {
+              if (top.editable === 'cell') {
                 top.save($index)
               }
             },

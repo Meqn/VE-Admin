@@ -18,18 +18,28 @@ export default {
 
     const defaultSlot = (slots && slots.default) ? top.$scopedSlots[slots.default] : null
 
-    if (top.editable && editable) {
-      scopedSlots.default = props => {
-        const { row, $index } = props
-        if ((top.editCell && top.editCell.label === prop && top.editCell.index === $index) || top.editRow.includes($index)) {
-          props.column.editing = true
+    // 是否可编辑状态
+    const isEdit = top.editable && editable
+    // 是否自定义渲染 column
+    const isCustomRender = renderColumn || defaultSlot
+
+    if (isEdit || isCustomRender) {
+      scopedSlots.default = ({ row, column, $index }) => {
+        // 是否编辑 column
+        const isEditCell = top.editingCell && top.editingCell.colKey === prop && top.editingCell.rowKey === $index
+        // 是否编辑 row
+        const isEditRow = top.editingRow.includes($index)
+        // 设置当前 row 或 column 处于编辑状态
+        // 可在 `scopedSlots.default`中通过`column.editing`来判断是否处于编辑状态
+        if (isEditCell || isEditRow) {
+          column.editing = true
         }
         
         const fieldProps = {
           on: {
             blur: () => {
               if (top.editable === 'field') {
-                top.editCell = null
+                top.save($index)
               }
             },
             change: val => {
@@ -38,19 +48,22 @@ export default {
           }
         }
 
-        return (
-          renderColumn
-            ? renderColumn(h, props)
-            : defaultSlot
-              ? defaultSlot(props)
-              : props.column.editing
-                ? <el-input vModel={row[prop]} type={valueType} {...fieldProps} />
-                : row[prop]
-        )
-      }
-    } else {
-      if ((renderColumn || defaultSlot)) {
-        scopedSlots.default = props => (renderColumn ? renderColumn(h, props) : defaultSlot(props))
+        if (isEdit) {
+          const _row = column.editing ? top.editingData[$index] : row
+          return (
+            renderColumn
+              ? renderColumn(h, { row: _row, column, $index })
+              : defaultSlot
+                ? defaultSlot({ row: _row, column, $index })
+                : column.editing
+                  ? <el-input vModel={_row[prop]} type={valueType} {...fieldProps} />
+                  : _row[prop]
+          )
+        }
+        
+        if (isCustomRender) {
+          return (renderColumn ? renderColumn(h, { row, column, $index }) : defaultSlot({ row, column, $index }))
+        }
       }
     }
 

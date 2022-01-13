@@ -39,10 +39,11 @@
     <el-table
       ref="elTable"
       v-bind="table"
-      :data="tableData"
+      :data="data"
       class="ve-table-data"
       :style="table.style || {}"
-      :row-style="handleRowStyle"
+      :row-style="$_handleRowStyle"
+      :cell-class-name="$_handleCellClass"
       v-on="$listeners"
       @selection-change="$_handleSelection"
       @cell-dblclick="$_hanleCellDoubleClick">
@@ -73,6 +74,8 @@
 <script>
 import VeFlex from '@/components/Flex'
 import Column from './Column'
+import cloneDeep from 'lodash/cloneDeep'
+import isEqual from 'lodash/isEqual'
 import { TableSetting, TableDensity, TableReload, TablePrint, TableFullscreen } from './components'
 
 export default {
@@ -127,14 +130,12 @@ export default {
   data() {
     return {
       tableSelection: [],
-      editRow: [],
-      editCell: null
+      editingData: {}, // 临时编辑数据
+      editingRow: [], // 当前编辑的 row
+      editingCell: null // 当前编辑的 cell
     }
   },
   computed: {
-    tableData() {
-      return this.data || this.table?.data || []
-    },
     toolbarList() {
       const { toolbar } = this
       if (Array.isArray(toolbar)) return toolbar
@@ -157,6 +158,7 @@ export default {
     tableColumns() {
       return this.columns.filter(v => v.visible !== false)
     },
+    // 配置分页属性
     paginationProps() {
       if (!this.pagination) return false
       return Object.assign({
@@ -167,6 +169,7 @@ export default {
         align: 'right'
       }, this.pagination)
     },
+    // 可编辑的字段
     editableKeys() {
       return this.columns.filter(item => item.editable).map(item => item.prop)
     }
@@ -202,14 +205,106 @@ export default {
     $_handleSelection(selection) {
       this.tableSelection = selection
     },
+    // 双击进行编辑
     $_hanleCellDoubleClick(row, column, cell, event) {
-      console.log('cell click', cell, event)
       if (this.editableKeys.includes(column.property) && this.editable === 'field') {
-        this.edit({ row, column })
+        const rowKey = row.$_row_index
+        const colKey = column.property
+        this.edit({ rowKey, colKey, row, column })
+        
         this.$nextTick(() => {
           const $input = cell.querySelector('input') || cell.querySelector('textarea')
           $input && $input.focus()
         })
+      }
+    },
+    // 给每行 row 设置索引 `$_row_index`
+    $_handleRowStyle({ row, rowIndex }) {
+      Object.defineProperty(row, '$_row_index', {
+        value: rowIndex,
+        writable: true,
+        enumerable: false
+      })
+      const rowStyle = this.table.rowStyle
+      return typeof rowStyle === 'function' ? rowStyle.call(this, { row, rowIndex }) : rowStyle || null
+    },
+    // 给可编辑单元格增加class
+    $_handleCellClass({ row, column, rowIndex, columnIndex }) {
+      let className = ''
+      const { editableKeys, editingCell, editingRow } = this
+      const { cellClassName } = this.table
+      const prop = column.property
+      
+      // 自定义 cellClassName
+      if (cellClassName) {
+        const _className = typeof cellClassName === 'function'
+          ? cellClassName.call(this, { row, column, rowIndex, columnIndex })
+          : cellClassName || ''
+        className += `${_className}`
+      }
+      
+      // 编辑 class
+      if (editableKeys.includes(prop)) {
+        className = 'cell-edit'
+
+        if (editingCell) {
+          const { rowKey, colKey } = editingCell
+          if (rowIndex === rowKey && prop === colKey) {
+            className += ' cell-edit-active'
+          }
+        }
+        if (editingRow && editingRow.includes(rowIndex)) {
+          className += ' cell-edit-active'
+        }
+      }
+      
+      return className
+    },
+    // 从源数据复制一份 row 用作临时编辑数据
+    $_copyEditingData(rowKey) {
+      if (rowKey >= 0) {
+        this.$set(this.editingData, rowKey, cloneDeep(this.data[rowKey]))
+      }
+    },
+    $_setEditMultipleRow(rowKey, editing = true) {
+      const { editingRow } = this
+      if (rowKey >= 0) {
+        const rowIndex = editingRow.indexOf(rowKey)
+        if (editing) {
+          if (rowIndex === -1) {
+            this.editingRow.push(rowKey)
+            this.$_copyEditingData(rowKey)
+          }
+        } else {
+          if (rowIndex !== -1) {
+            this.editingRow.splice(rowIndex, 1)
+          }
+        }
+      } else {
+        this.editingRow = []
+      }
+    },
+    $_setEditSingleRow(rowKey, editing = true) {
+      if (rowKey >= 0 && editing) {
+        if (this.editingRow?.length > 0) {
+          return this.$message.warning('只能同时编辑一行')
+        }
+        if (this.editingRow?.includes(rowKey)) {
+          return console.log('当前行已处于编辑状态')
+        }
+        this.editingRow = [rowKey]
+        this.$_copyEditingData(rowKey)
+      } else {
+        this.editingRow = []
+      }
+    },
+    $_setEditCell(cell, editing = true) {
+      // cell = { rowKey: Number, colKey: Number, row?: Object, column?: Object }
+      if (cell && (cell.rowKey >= 0) && editing) {
+        this.editingCell = cell
+        this.$_copyEditingData(cell.rowKey)
+      } else if (editing === false || cell === null) {
+        this.editingCell = null
       }
     },
     // 改变table密度
@@ -229,16 +324,22 @@ export default {
     print() {
       console.log('print table ...')
     },
-    // 设定table每行index
-    handleRowStyle({ row, rowIndex }) {
-      Object.defineProperty(row, '$_index', {
-        value: rowIndex,
-        writable: true,
-        enumerable: false
-      })
-      return typeof this.table.rowStyle === 'function'
-        ? this.table.rowStyle({ row, rowIndex })
-        : this.table.rowStyle || null
+    save(rowKey) {
+      if (rowKey >= 0) {
+        const rawData = this.data[rowKey]
+        const editData = this.editingData[rowKey]
+        // 判断数据是否有更新
+        if (!isEqual(rawData, editData)) {
+          this.data.splice(rowKey, 1, cloneDeep(editData))
+          this.$emit('value-change', editData, rowKey, this.editingCell && this.editingCell.colKey)
+        }
+        // 取消编辑模式
+        this.edit(rowKey, false)
+        // 删除复制的 edit数据
+        this.$nextTick(() => {
+          delete this.editingData[rowKey]
+        })
+      }
     },
     edit(value, editing) {
       switch (this.editable) {
@@ -252,30 +353,6 @@ export default {
           this.$_setEditMultipleRow(value, editing)
           break;
       }
-    },
-    $_setEditMultipleRow(index, editing = true) {
-      const { editRow } = this
-      if (index >= 0) {
-        const rowIndex = editRow.indexOf(index)
-        if (editing) {
-          (rowIndex === -1) && this.editRow.push(index)
-        } else {
-          (rowIndex !== -1) && this.editRow.splice(rowIndex, 1)
-        }
-      } else {
-        this.editRow = []
-      }
-    },
-    $_setEditSingleRow(index, editing = true) {
-      if (index >= 0 && editing) {
-        this.editRow = [index]
-      } else {
-        this.editRow = []
-      }
-    },
-    $_setEditCell(cell, editing = true) {
-      // cell = { row, column }
-      this.editCell = (cell && editing) ? { label: cell.column?.property, index: cell.row?.$_index } : null
     }
   }
 }

@@ -3,12 +3,47 @@
   <template v-if="data.column.editing">
     <div class="ve-table-cell-content">
       <slot name="edit">
-        <el-input v-model="data.row[prop]" ref="field" v-on="$listeners" />
+        <el-input-number
+          v-if="fieldType === 'inputNumber'"
+          @keyup.enter.native="$_handleSave"
+          @keyup.27.native="$_handleCancel"
+          :min="1" :max="100"
+          ref="field" v-model="data.row[prop]" v-on="$listeners" v-bind="fieldProps" />
+        <el-select
+          v-else-if="fieldType === 'select'"
+          @keyup.27.native="$_handleCancel"
+          placeholder="请选择"
+          ref="field" v-model="data.row[prop]" v-on="$listeners" v-bind="fieldProps">
+          <template v-if="Array.isArray(fieldProps.options)">
+            <el-option v-for="item in fieldProps.options" :key="item.value" :label="item.label" :value="item.value" />
+          </template>
+        </el-select>
+        <el-switch
+          v-else-if="fieldType === 'switch'"
+          class="switch-text"
+          ref="field" v-model="data.row[prop]" v-on="$listeners" v-bind="fieldProps" />
+        <el-time-picker
+          v-else-if="fieldType === 'time'"
+          placeholder="选择时间" :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }" value-format="HH:mm:ss" 
+          ref="field" v-model="data.row[prop]" v-on="$listeners" v-bind="fieldProps" />
+        <el-date-picker
+          v-else-if="fieldType === 'date' || fieldType === 'datetime'"
+          placeholder="选择日期" value-format="yyyy-MM-dd"
+          ref="field" v-model="data.row[prop]" v-on="$listeners" v-bind="fieldProps" :type="fieldType" />
+        <el-input
+          v-else-if="fieldType === 'textarea'"
+          @keyup.27.native="$_handleCancel"
+          ref="field" autosize v-model="data.row[prop]" v-on="$listeners" v-bind="fieldProps" type="textarea" />
+        <el-input
+          v-else
+          @keyup.enter.native="$_handleSave"
+          @keyup.27.native="$_handleCancel"
+          ref="field" v-model="data.row[prop]" v-on="$listeners" v-bind="fieldProps" />
       </slot>
     </div>
     <template v-if="showButtons">
       <Icon name="el-icon-check" title="保存" @click="$_handleSave" class="btn-save" />
-      <Icon v-if="hasCancel" name="el-icon-close" title="取消" @click="$_handleCancel" class="btn-cancel" />
+      <Icon v-if="showCancel" name="el-icon-close" title="取消" @click="$_handleCancel" class="btn-cancel" />
     </template>
   </template>
   <template v-else>
@@ -37,11 +72,20 @@ export default {
     mode: {
       type: String,
       validator(val) {
-        return ['auto', 'hand'].includes(val)
-      },
-      default: 'auto'
+        return ['auto', 'handle'].includes(val)
+      }
     },
-    field: Object,
+    fieldType: {
+      type: String,
+      validator(val) {
+        return ['', 'text', 'textarea', 'inputNumber', 'select', 'switch', 'time', 'date', 'datetime'].includes(val)
+      },
+      default: 'text'
+    },
+    fieldProps: {
+      type: Object,
+      default: () => {}
+    },
     hasCancel: Boolean
   },
   computed: {
@@ -51,8 +95,14 @@ export default {
     isEditCell() {
       return this.top.editableType === 'cell'
     },
+    cellEditMode() {
+      return this.top.editableConfig?.cellEditMode || 'auto'
+    },
     showButtons() {
-      return this.top.editableType === 'cell' && this.mode === 'hand'
+      return this.isEditCell && this.cellEditMode === 'handle'
+    },
+    showCancel() {
+      return this.hasCancel || this.top.editableConfig?.cellEditCancel
     }
   },
   watch: {
@@ -66,13 +116,13 @@ export default {
             $field && $field.focus()
           })
           // 自动保存 (绑定事件)
-          if (this.mode === 'auto') {
-            document.addEventListener('click', this.$_hanleClickCell)
+          if (this.cellEditMode === 'auto') {
+            document.addEventListener('click', this.$_hanleClickSave)
           }
         } else {
           // 取消自动保存 (绑定事件)
-          if (this.mode === 'auto') {
-            document.removeEventListener('click', this.$_hanleClickCell)
+          if (this.cellEditMode === 'auto') {
+            document.removeEventListener('click', this.$_hanleClickSave)
           }
         }
       }
@@ -82,15 +132,20 @@ export default {
     $_handleEdit() {
       this.top.edit(this.data)
     },
+    // 编辑保存
     $_handleSave() {
       if (this.isEditCell) {
         this.top.save(this.data.$index)
       }
     },
+    // 取消编辑
     $_handleCancel() {
-      this.top.edit(this.data.$index, false)
+      if (this.isEditCell) {
+        this.top.edit(this.data.$index, false)
+      }
     },
-    $_hanleClickCell(ev) {
+    // 自动保存
+    $_hanleClickSave(ev) {
       if (!this.$el.contains(ev.target)) {
         this.$_handleSave()
       }

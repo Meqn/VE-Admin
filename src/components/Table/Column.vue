@@ -43,7 +43,7 @@ export default {
               ? renderColumn(h, { row: _row, column, $index })
               : defaultSlot
                 ? defaultSlot({ row: _row, column, $index })
-                : <Cell data={{ row: _row, column, $index }} />
+                : <Cell data={{ row: _row, column, $index }} fieldProps={this.option.fieldProps} fieldType={this.option.fieldType} />
           )
         }
         

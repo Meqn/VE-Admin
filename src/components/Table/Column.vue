@@ -1,4 +1,5 @@
 <script>
+import Cell from './Cell.vue'
 export default {
   name: 'TableColumn',
   props: {
@@ -7,7 +8,7 @@ export default {
   inject: ['top'],
   render(h) {
     const top = this.top
-    const { render: renderColumn, slots, editable, valueType, prop } = this.option
+    const { render: renderColumn, slots, editable, prop } = this.option
     const scopedSlots = {}
     
     const headerSlot = (slots && slots.header) ? top.$scopedSlots[slots.header] : null
@@ -18,46 +19,31 @@ export default {
 
     const defaultSlot = (slots && slots.default) ? top.$scopedSlots[slots.default] : null
 
-    // 是否可编辑状态
-    const isEdit = top.editable && editable
+    // 是否可编辑
+    const isEditable = top.editableType && editable
     // 是否自定义渲染 column
     const isCustomRender = renderColumn || defaultSlot
 
-    if (isEdit || isCustomRender) {
+    if (isEditable || isCustomRender) {
       scopedSlots.default = ({ row, column, $index }) => {
-        // 是否编辑 column
-        const isEditCell = top.editingCell && top.editingCell.colKey === prop && top.editingCell.rowKey === $index
-        // 是否编辑 row
-        const isEditRow = top.editingRow.includes($index)
+        // 判断当前是否编辑 column
+        const isEditingCell = top.editingCell && top.editingCell.colKey === prop && top.editingCell.rowKey === $index
+        // 判断当前是否编辑 row
+        const isEditingRow = top.editingRow.includes($index)
         // 设置当前 row 或 column 处于编辑状态
         // 可在 `scopedSlots.default`中通过`column.editing`来判断是否处于编辑状态
-        if (isEditCell || isEditRow) {
+        if (isEditingCell || isEditingRow) {
           column.editing = true
         }
         
-        const fieldProps = {
-          on: {
-            blur: () => {
-              if (top.editable === 'cell') {
-                top.save($index)
-              }
-            },
-            change: val => {
-              console.log('change', val)
-            }
-          }
-        }
-
-        if (isEdit) {
+        if (isEditable) {
           const _row = column.editing ? top.editingData[$index] : row
           return (
             renderColumn
               ? renderColumn(h, { row: _row, column, $index })
               : defaultSlot
                 ? defaultSlot({ row: _row, column, $index })
-                : column.editing
-                  ? <el-input vModel={_row[prop]} type={valueType} {...fieldProps} />
-                  : _row[prop]
+                : <Cell data={{ row: _row, column, $index }} />
           )
         }
         

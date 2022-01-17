@@ -1,0 +1,141 @@
+$toolbarSize: 20px;
+
+.ve-table{
+  &-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+  }
+  .table-title{
+    color: $--color-text-primary;
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 16px;
+  }
+  &-toolbar{
+    height: $toolbarSize;
+    margin-left: 24px;
+    
+    .toolbar-item{
+      display: inline-block;
+      height: $toolbarSize;
+      margin-left: 16px;
+      vertical-align: top;
+      &:first-child{
+        margin-left: 0;
+      }
+    }
+    .toolbar-icon{
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      font-size: $toolbarSize;
+      line-height: 1;
+      vertical-align: baseline;
+      font-style: normal;
+      fill: currentColor;
+      color: $--color-text-primary;
+      cursor: pointer;
+      &:hover{
+        color: $--color-primary;
+      }
+      svg{
+        width: 1em;
+        height: 1em;
+        display: inline-block;
+      }
+    }
+  }
+  &-alert{
+    overflow: hidden; align-items: center;
+    display: flex;
+    padding: 8px 16px;
+    color: $--color-text-primary;
+    margin-bottom: 12px;
+    background-color: mix($--color-white, $--color-primary, 90%);
+    border: 1px solid mix($--color-white, $--color-primary, 60%);
+    border-radius: 4px;
+    transition: opacity .2s;
+    .alert-icon{
+      font-size: 16px;
+      color: $--color-primary;
+      margin-right: 8px
+    }
+    .alert-content{
+      flex: 1;
+    }
+    .alert-cancel{
+      color: $--color-primary;
+      cursor: pointer;
+    }
+  }
+  &-data.el-table{
+    width: 100%;
+    &.el-table--large{
+      th, td{
+        padding-top: 16px;
+        padding-bottom: 16px;
+      }
+    }
+    &.el-table--medium{
+      th, td{
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+    }
+    &.el-table--mini{
+      th, td{
+        padding-top: 4px;
+        padding-bottom: 4px;
+      }
+    }
+  }
+  &-pagination{
+    margin-top: 20px;
+  }
+
+  &-cell{
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    &-content{
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: normal;
+      word-break: break-all;
+    }
+
+    .btn-edit{
+      margin: 4px 0 0 8px;
+      font-size: 16px;
+      color: $--color-primary;
+      cursor: pointer;
+      float: right;
+      visibility: hidden;
+    }
+    .btn-save, .btn-cancel{
+      margin-left: 8px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .btn-save{
+      color: $--color-success;
+    }
+    .btn-cancel{
+      color: $--color-danger;
+    }
+  }
+}
+
+.ve-table{
+  .cell-edit:hover{
+    .btn-edit{
+      visibility: visible;
+    }
+  }
+}

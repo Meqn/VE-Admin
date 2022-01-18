@@ -78,7 +78,7 @@ export default {
     fieldType: {
       type: String,
       validator(val) {
-        return ['', 'text', 'textarea', 'inputNumber', 'select', 'switch', 'time', 'date', 'datetime'].includes(val)
+        return ['text', 'textarea', 'inputNumber', 'select', 'switch', 'time', 'date', 'datetime'].includes(val)
       },
       default: 'text'
     },
@@ -107,7 +107,6 @@ export default {
   },
   watch: {
     'data.column.editing'(val) {
-      console.log('watch: data.column.editing', val, this.data)
       if (this.isEditCell) {
         if (val) {
           // 自动获取焦点

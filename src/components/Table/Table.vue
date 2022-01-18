@@ -40,7 +40,7 @@
       ref="elTable"
       v-bind="table"
       :data="data"
-      class="ve-table-data"
+      :class="['ve-table-data', editableTableClass]"
       :style="table.style || {}"
       :row-style="$_handleRowStyle"
       :cell-class-name="$_handleCellClass"
@@ -67,7 +67,8 @@
       </slot>
     </Flex>
   </div>
-  <slot name="footer"></slot>
+  <el-button plain dashed icon="el-icon-plus" style="margin: 12px 0; width: 100%" @click="$_addRow">添加一行数据</el-button>
+  <slot name="footer" />
 </div>
 </template>
 
@@ -78,6 +79,7 @@ import Column from './Column'
 import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
 import { TableSetting, TableDensity, TableReload, TablePrint, TableFullscreen } from './components'
+import { EDIT_CLASS, ROW_INDEX, ROW_KEY, TABLE_METHODS } from './constant'
 
 const isObject = arg => arg !== null && typeof arg === 'object'
 
@@ -110,12 +112,7 @@ export default {
       type: Object,
       default: () => ({})
     },
-    editable: {
-      type: String,
-      validator(val) {
-        return ['cell', 'single-row', 'row'].includes(val)
-      }
-    },
+    editable: [String, Object],
     pagination: [Boolean, Object],
     fullElement: [String, Object],
     loading: Boolean,
@@ -176,15 +173,38 @@ export default {
     editableKeys() {
       return this.columns.filter(item => item.editable).map(item => item.prop)
     },
+    // 可编辑配置项
+    editableConfig() {
+      const { editable } = this
+      if (editable) {
+        const defaults = {
+          type: 'row',
+          cellEditMode: 'auto',
+          cellEditCancel: false
+        }
+        return typeof editable === 'string'
+          ? { ...defaults, type: editable }
+          : { ...defaults, ...editable }
+      }
+      return false
+    },
+    // 可编辑类型：单元格、单行、多行
     editableType() {
-      return this.editable
+      return this.editableConfig ? this.editableConfig.type : null
+    },
+    editableTableClass() {
+      return this.editableType ? this.editableType === 'cell' ? EDIT_CLASS.tableCellEdit : EDIT_CLASS.tableRowEdit : ''
+    }
+  },
+  watch: {
+    'data.length'(val) {
+      console.log('data.length change ....', val)
     }
   },
   mounted() {
     // 绑定el-table组件 & 方法
-    const tableMethods = ['clearSelection', 'toggleRowSelection', 'toggleAllSelection', 'toggleRowExpansion', 'setCurrentRow', 'clearSort', 'clearFilter', 'doLayout', 'sort']
     this.$table = this.$refs['elTable']
-    tableMethods.forEach(method => {
+    TABLE_METHODS.forEach(method => {
       this[method] = this.$table[method]
     })
     // 绑定el-pagination组件 & 事件
@@ -204,25 +224,44 @@ export default {
     $_paginationNextClick(num) {
       this.$emit('pagination-next-click', num)
     },
+    // 清除已选择行
     $_handleDeselect() {
       this.clearSelection()
     },
     $_handleSelection(selection) {
       this.tableSelection = selection
     },
-    // 双击进行编辑
+    // 双击进入编辑
     $_hanleCellDoubleClick(row, column) {
-      if (this.editableKeys.includes(column.property) && this.editableType === 'cell') {
+      // 未启用编辑
+      if (!this.editableConfig) return
+      // 该字段不支持编辑
+      if (!this.editableKeys.includes(column.property)) return
+
+      if (this.editableType === 'cell' && this.editableConfig.cellEditMode === 'auto') {
         this.edit({ row, column })
       }
     },
     // 给每行 row 设置索引 `$_row_index`
     $_handleRowStyle({ row, rowIndex }) {
-      Object.defineProperty(row, '$_row_index', {
-        value: rowIndex,
-        writable: true,
-        enumerable: false
-      })
+      if (this.editable) {
+        // 设置每行索引
+        Object.defineProperty(row, ROW_INDEX, {
+          value: rowIndex,
+          writable: true,
+          enumerable: false
+        })
+        // 设置每行唯一值
+        if (!row[ROW_KEY]) {
+          Object.defineProperty(row, ROW_KEY, {
+            value: 'row_' + Math.floor(Math.random() * Date.now()).toString(36),
+            writable: true,
+            enumerable: false
+          })
+        }
+      }
+      
+      // 传递的 rowStyle 属性
       const rowStyle = this.table.rowStyle
       return typeof rowStyle === 'function' ? rowStyle.call(this, { row, rowIndex }) : rowStyle || null
     },
@@ -243,16 +282,16 @@ export default {
       
       // 编辑 class
       if (editableKeys.includes(prop)) {
-        className += ' cell-edit'
+        className += ` ${EDIT_CLASS.cellEdit}`
 
         if (editingCell) {
           const { rowKey, colKey } = editingCell
           if (rowIndex === rowKey && prop === colKey) {
-            className += ' cell-edit-active'
+            className += ` ${EDIT_CLASS.cellEditActive}`
           }
         }
         if (editingRow && editingRow.includes(rowIndex)) {
-          className += ' cell-edit-active'
+          className += ` ${EDIT_CLASS.cellEditActive}`
         }
       }
       
@@ -260,22 +299,21 @@ export default {
     },
     // 从源数据复制一份 row 用作临时编辑数据
     $_copyEditingData(rowKey, rawData) {
+      console.log('copyData', rowKey, rawData)
       if (rowKey >= 0) {
         this.$set(this.editingData, rowKey, cloneDeep(rawData || this.data[rowKey]))
       }
     },
     $_setEditCell(cell, editing = true) {
-      console.log('$_setEditCell', cell)
       if (editing && isObject(cell)) {
         const { row, column, $index } = cell
-        const rowKey = typeof $index === 'number' ? $index : row['$_row_index']
+        const rowKey = typeof $index === 'number' ? $index : row[ROW_INDEX]
         const colKey = column.property
         if (rowKey >= 0 && colKey) {
           this.editingCell = { rowKey, colKey, row, column }
           this.$_copyEditingData(rowKey)
         }
       } else if (editing === false || cell === null) {
-        console.log('$_setEditCell', cell, '取消编辑')
         this.editingCell = null
       }
     },
@@ -311,6 +349,21 @@ export default {
         this.editingRow = []
       }
     },
+    $_deleteEdit(rowKey) {
+      if (rowKey >= 0) {
+        const rowIndex = this.editingRow.indexOf(rowKey)
+        if (rowIndex !== -1) {
+          this.editingRow.splice(rowIndex, 1)
+        }
+
+        if (this.editingCell && this.editingCell.rowKey === rowKey) {
+          this.editingCell = null
+        }
+      }
+    },
+    $_addRow() {
+      this.$emit('add-row', this.data)
+    },
     // 改变table密度
     changeDensity(size) {
       this.$set(this.table, 'size', size)
@@ -330,7 +383,8 @@ export default {
     },
     // 删除数据
     delete(rowKey) {
-      if (this.data[rowKey]) {
+      if (rowKey >= 0 && this.data[rowKey]) {
+        this.$_deleteEdit(rowKey)
         this.data.splice(rowKey, 1)
       }
     },
@@ -346,6 +400,7 @@ export default {
         if (!isEqual(rawData, editData)) {
           this.data.splice(rowKey, 1, cloneDeep(editData))
           this.$emit('value-change', editData, this.editableType === 'cell' ? this.editingCell : rowKey)
+          // this.editableConfig?.valueChange(editData, this.editableType === 'cell' ? this.editingCell : rowKey)
         }
         // 取消编辑模式
         this.edit(rowKey, false)
@@ -376,6 +431,14 @@ export default {
           ? this.editingCell
           : this.editingRow
         : null
+    },
+    addRow(row) {
+      if (this.editableType === 'single-row' && this.editingRow.length > 0) {
+        return this.$message.warning('只能同时编辑一行')
+      } else {
+        this.data.push(cloneDeep(row))
+        this.edit(this.data.length - 1)
+      }
     }
   }
 }

@@ -108,6 +108,10 @@ $toolbarSize: 20px;
       text-overflow: ellipsis;
       white-space: normal;
       word-break: break-all;
+
+      .ve-table .cell.el-tooltip &{
+        white-space: nowrap;
+      }
     }
 
     .btn-edit{

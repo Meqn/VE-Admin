@@ -21,7 +21,14 @@ $--color-info: #909399 !default;
 $--table-header-background-color: #f9f9f9;
 $--table-header-font-color: #303133 !default;
 
+/* Button
+-------------------------- */
+$--button-border-radius: 2px;
+$--button-medium-border-radius: 2px;
 
+/* form
+-------------------------- */
+$--input-border-radius: 2px; // default: 4px
 
 /********************************************************************* custom style
 */
@@ -39,8 +46,6 @@ $--layout-aside-background-color: #fff;
 $--layout-aside-text-color: #606266;
 $--layout-aside-active-text-color: $--color-primary;
 $--layout-aside-active-background-color: #EFF7FF;
-
-
 
 // 2. 引入element-ui默认css变量，在页面中使用，具体变量详见: `./comm/element-var.scss`
 // ⚠️ sass变量覆盖，需要放在变量声明之前

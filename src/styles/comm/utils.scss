@@ -1,3 +1,4 @@
+@use "sass:math";
 /**************************************************************
  文本 text
 */
@@ -136,7 +137,7 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
 
 @mixin widthDiv($num, $den) {
   .w-#{$num}\/#{$den}{
-    width: ($num / $den * 100) * 1%;
+    width: math.div($num, $den) * 100%;
   }
 }
 @include widthDiv(1, 2);
@@ -276,5 +277,10 @@ $gaps: 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56;
   &-stretch{
     display: flex;
     align-items: stretch;
+  }
+  &-center-middle, &-middle-center{
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }

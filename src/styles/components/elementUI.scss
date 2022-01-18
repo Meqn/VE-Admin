@@ -1,3 +1,19 @@
+// button
+.el-button{
+  &[dashed]{
+    border-style: dashed;
+  }
+  &[full]{
+    width: 100%;
+  }
+  &[block]{
+    display: block;
+  }
+  &[square]{
+    border-radius: 0;
+  }
+}
+
 // 日历弹窗
 .el-date-table td{
   text-align: center !important;
@@ -16,4 +32,29 @@
   transition: all .3s;
   line-height: 40px;
 }
-
+// el-switch
+.el-switch{
+  // 带文本
+  &.switch-text, &[text]{
+    .el-switch__label{
+      position: absolute;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity .3s;
+      
+      &.is-active{
+        z-index: 1;
+        color: #fff;
+        opacity: 1;
+      }
+    }
+    .el-switch__label--left{
+      margin-right: 0;
+      left: 24px;
+    }
+    .el-switch__label--right{
+      margin-left: 0;
+      right: 24px;
+    }
+  }
+}

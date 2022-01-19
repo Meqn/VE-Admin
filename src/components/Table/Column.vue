@@ -1,5 +1,7 @@
 <script>
 import Cell from './Cell.vue'
+import { ROW_KEY } from './constant'
+
 export default {
   name: 'TableColumn',
   props: {
@@ -26,10 +28,15 @@ export default {
 
     if (isEditable || isCustomRender) {
       scopedSlots.default = ({ row, column, $index }) => {
+        const rowKey = row[ROW_KEY] // 当前所属行唯一值
+        const { editingCell } = top
+
         // 判断当前是否编辑 column
-        const isEditingCell = top.editingCell && top.editingCell.colKey === prop && top.editingCell.rowKey === $index
+        const isEditingCell = editingCell && editingCell.colKey === prop && editingCell.rowKey === rowKey
+        
         // 判断当前是否编辑 row
-        const isEditingRow = top.editingRow.includes($index)
+        const isEditingRow = top.editingRow.includes(rowKey)
+
         // 设置当前 row 或 column 处于编辑状态
         // 可在 `scopedSlots.default`中通过`column.editing`来判断是否处于编辑状态
         if (isEditingCell || isEditingRow) {
@@ -37,13 +44,13 @@ export default {
         }
         
         if (isEditable) {
-          const _row = column.editing ? top.editingData[$index] : row
+          const _row = column.editing ? top.editingData[rowKey] : row
           return (
             renderColumn
               ? renderColumn(h, { row: _row, column, $index })
               : defaultSlot
                 ? defaultSlot({ row: _row, column, $index })
-                : <Cell data={{ row: _row, column, $index }} fieldProps={this.option.fieldProps} fieldType={this.option.fieldType} />
+                : <Cell data={{ row: _row, column, $index }} rowKey={rowKey} fieldProps={this.option.fieldProps} fieldType={this.option.fieldType} />
           )
         }
         

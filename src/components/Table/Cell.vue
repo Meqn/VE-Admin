@@ -69,6 +69,7 @@ export default {
       type: Object,
       required: true
     },
+    rowKey: String,
     mode: {
       type: String,
       validator(val) {
@@ -134,13 +135,13 @@ export default {
     // 编辑保存
     $_handleSave() {
       if (this.isEditCell) {
-        this.top.save(this.data.$index)
+        this.top.save(this.rowKey || this.data.row)
       }
     },
     // 取消编辑
     $_handleCancel() {
       if (this.isEditCell) {
-        this.top.edit(this.data.$index, false)
+        this.top.edit(this.data, false)
       }
     },
     // 自动保存

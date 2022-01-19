@@ -4,14 +4,13 @@
   <div v-if="$slots.search" class="ve-table-search"><slot name="search"/></div>
   <!-- header -->
   <div v-if="showHeader" class="ve-table-header">
-    <Flex align="middle">
-      <div v-if="title" class="table-title">
-        <slot name="title">{{ title }}</slot>
-      </div>
-      <slot name="left" />
+    <Flex align="middle" class="ve-table-header-left">
+      <slot name="title">
+        <span class="table-title">{{ title }}</span>
+      </slot>
     </Flex>
-    <Flex align="middle">
-      <slot name="right" />
+    <Flex align="middle" class="ve-table-header-right">
+      <slot name="extra" />
       <!-- toolbar -->
       <div v-if="toolbarList.length > 0" class="ve-table-toolbar">
         <el-tooltip
@@ -67,7 +66,7 @@
       </slot>
     </Flex>
   </div>
-  <el-button plain dashed icon="el-icon-plus" style="margin: 12px 0; width: 100%" @click="$_addRow">添加一行数据</el-button>
+  <el-button v-if="newRow" plain dashed icon="el-icon-plus" style="margin: 12px 0; width: 100%" @click="$_addRow">{{ newRowText }}</el-button>
   <slot name="footer" />
 </div>
 </template>
@@ -79,9 +78,19 @@ import Column from './Column'
 import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
 import { TableSetting, TableDensity, TableReload, TablePrint, TableFullscreen } from './components'
-import { EDIT_CLASS, ROW_INDEX, ROW_KEY, TABLE_METHODS } from './constant'
+import { EDIT_CLASS, ROW_INDEX, ROW_KEY, TABLE_METHODS, ALERT_MESSAGE } from './constant'
 
 const isObject = arg => arg !== null && typeof arg === 'object'
+
+// 定义对象不可枚举属性
+function defineNonEnumKey(obj, key, value) {
+  Object.defineProperty(obj, key, {
+    value: value,
+    writable: true,
+    enumerable: false
+  })
+  return obj
+}
 
 export default {
   name: 'VeTable',
@@ -113,6 +122,7 @@ export default {
       default: () => ({})
     },
     editable: [String, Object],
+    newRow: [Boolean, String],
     pagination: [Boolean, Object],
     fullElement: [String, Object],
     loading: Boolean,
@@ -130,6 +140,7 @@ export default {
   data() {
     return {
       tableSelection: [],
+      rowDataMap: {}, // 所有临时数据
       editingData: {}, // 临时编辑数据
       editingRow: [], // 当前编辑的 row
       editingCell: null // 当前编辑的 cell
@@ -152,8 +163,7 @@ export default {
       }
     },
     showHeader() {
-      const { title, left, right } = this.$slots
-      return this.title || this.toolbarList.length > 0 || title || left || right
+      return this.title || this.toolbarList.length > 0 || this.$slots.title || this.$slots.extra
     },
     tableColumns() {
       return this.columns.filter(v => v.visible !== false)
@@ -180,7 +190,8 @@ export default {
         const defaults = {
           type: 'row',
           cellEditMode: 'auto',
-          cellEditCancel: false
+          cellEditCancel: false,
+          onlyOneLineMessage: ALERT_MESSAGE.onlyOneEdit
         }
         return typeof editable === 'string'
           ? { ...defaults, type: editable }
@@ -194,6 +205,9 @@ export default {
     },
     editableTableClass() {
       return this.editableType ? this.editableType === 'cell' ? EDIT_CLASS.tableCellEdit : EDIT_CLASS.tableRowEdit : ''
+    },
+    newRowText() {
+      return typeof this.newRow === 'string' ? this.newRow : '添加一行数据'
     }
   },
   watch: {
@@ -242,22 +256,37 @@ export default {
         this.edit({ row, column })
       }
     },
-    // 给每行 row 设置索引 `$_row_index`
+    // 设置 rowKey 和 rowIndex
+    $_setRowKey(row, index) {
+      if (isObject(row)) {
+        let rowKey = row[ROW_KEY] // 唯一值
+        // 设置每行唯一值
+        if (!rowKey) {
+          rowKey = 'row_' + Math.floor(Math.random() * 1000000)
+          defineNonEnumKey(row, ROW_KEY, rowKey)
+        }
+
+        if (index >= 0) {
+          // 设置每行索引
+          defineNonEnumKey(row, ROW_INDEX, index)
+        }
+        return row
+      }
+      return null
+    },
+    $_getRowKey(row) {
+      return isObject(row)
+        ? row[ROW_KEY]
+        : this.rowDataMap[row]
+          ? row
+          : null
+    },
+    // 给每行 row 设置唯一key
     $_handleRowStyle({ row, rowIndex }) {
       if (this.editable) {
-        // 设置每行索引
-        Object.defineProperty(row, ROW_INDEX, {
-          value: rowIndex,
-          writable: true,
-          enumerable: false
-        })
-        // 设置每行唯一值
-        if (!row[ROW_KEY]) {
-          Object.defineProperty(row, ROW_KEY, {
-            value: 'row_' + Math.floor(Math.random() * Date.now()).toString(36),
-            writable: true,
-            enumerable: false
-          })
+        const rowData = this.$_setRowKey(row, rowIndex)
+        if (rowData) {
+          this.rowDataMap[rowData[ROW_KEY]] = rowData
         }
       }
       
@@ -286,30 +315,35 @@ export default {
 
         if (editingCell) {
           const { rowKey, colKey } = editingCell
-          if (rowIndex === rowKey && prop === colKey) {
+          if (row[ROW_KEY] === rowKey && prop === colKey) {
             className += ` ${EDIT_CLASS.cellEditActive}`
           }
         }
-        if (editingRow && editingRow.includes(rowIndex)) {
+        if (editingRow && editingRow.includes(row[ROW_KEY])) {
           className += ` ${EDIT_CLASS.cellEditActive}`
         }
       }
       
       return className
     },
-    // 从源数据复制一份 row 用作临时编辑数据
+    // 从源数据复制一份 row 用作临时编辑数据, 参数rowKey只能是 唯一值
     $_copyEditingData(rowKey, rawData) {
-      console.log('copyData', rowKey, rawData)
-      if (rowKey >= 0) {
-        this.$set(this.editingData, rowKey, cloneDeep(rawData || this.data[rowKey]))
+      const rowIndex = this.findRowIndex(rowKey)
+      // 判断 rowkey是否有效
+      if (rowIndex >= 0) {
+        const cloneData = cloneDeep(rawData || this.data[rowIndex])
+        // 设置 rowKey, cloneDeep只复制可枚举值
+        defineNonEnumKey(cloneData, ROW_KEY, rowKey)
+        
+        this.$set(this.editingData, rowKey, cloneData)
       }
     },
     $_setEditCell(cell, editing = true) {
-      if (editing && isObject(cell)) {
-        const { row, column, $index } = cell
-        const rowKey = typeof $index === 'number' ? $index : row[ROW_INDEX]
+      if (editing && isObject(cell) && cell.row && cell.column) {
+        const { row, column } = cell
+        const rowKey = row[ROW_KEY]
         const colKey = column.property
-        if (rowKey >= 0 && colKey) {
+        if (colKey && this.rowDataMap[rowKey]) {
           this.editingCell = { rowKey, colKey, row, column }
           this.$_copyEditingData(rowKey)
         }
@@ -317,31 +351,36 @@ export default {
         this.editingCell = null
       }
     },
-    $_setEditRow(rowKey, editing = true) {
-      const { editingRow } = this
-      if (rowKey >= 0) {
-        const rowIndex = editingRow.indexOf(rowKey)
+    $_setEditRow(row, editing = true) {
+      const rowKey = this.$_getRowKey(row)
+      
+      if (rowKey) {
+        const _index = this.editingRow.indexOf(rowKey)
+
         if (editing) {
-          if (rowIndex === -1) {
+          if (_index === -1) {
             this.editingRow.push(rowKey)
             this.$_copyEditingData(rowKey)
           }
         } else {
-          if (rowIndex !== -1) {
-            this.editingRow.splice(rowIndex, 1)
+          if (_index !== -1) {
+            this.editingRow.splice(_index, 1)
           }
         }
       } else {
         this.editingRow = []
       }
     },
-    $_setEditSingleRow(rowKey, editing = true) {
-      if (rowKey >= 0 && editing) {
-        if (this.editingRow?.length > 0) {
-          return this.$message.warning('只能同时编辑一行')
+    $_setEditSingleRow(row, editing = true) {
+      const rowKey = this.$_getRowKey(row)
+
+      if (rowKey && editing) {
+        const { editingRow } = this
+        if (editingRow.length > 0) {
+          return this.$message.warning(this.editableConfig.onlyOneLineMessage)
         }
-        if (this.editingRow?.includes(rowKey)) {
-          return console.log('当前行已处于编辑状态')
+        if (editingRow.includes(rowKey)) {
+          return console.warn(ALERT_MESSAGE.rowEditing)
         }
         this.editingRow = [rowKey]
         this.$_copyEditingData(rowKey)
@@ -349,20 +388,129 @@ export default {
         this.editingRow = []
       }
     },
-    $_deleteEdit(rowKey) {
-      if (rowKey >= 0) {
-        const rowIndex = this.editingRow.indexOf(rowKey)
-        if (rowIndex !== -1) {
-          this.editingRow.splice(rowIndex, 1)
+    // 移除编辑中的 row 或 cell
+    $_removeEditing(rowKey) {
+      if (this.editingRow.length > 0) {
+        const keyIndex = this.editingRow.indexOf(rowKey)
+        if (keyIndex !== -1) {
+          this.editingRow.splice(keyIndex, 1)
         }
+      }
 
-        if (this.editingCell && this.editingCell.rowKey === rowKey) {
-          this.editingCell = null
-        }
+      if (this.editingCell && this.editingCell.rowKey === rowKey) {
+        this.editingCell = null
       }
     },
     $_addRow() {
-      this.$emit('add-row', this.data)
+      this.$emit('new-row', this.data)
+    },
+    /**
+     * 删除数据
+     * @param {string} rowKey 行唯一值
+     */
+    delete(rowKey) {
+      if (!this.editable) {
+        return console.warn(ALERT_MESSAGE.notEditable)
+      }
+      const _rowKey = this.$_getRowKey(rowKey)
+      const rowIndex = this.findRowIndex(_rowKey)
+      
+      if (_rowKey) {
+        this.$_removeEditing(_rowKey)
+        this.data.splice(rowIndex, 1)
+        this.$nextTick(() => {
+          delete this.rowDataMap[_rowKey] // 从所有临时数据中删除该条
+          delete this.editingData[_rowKey] // 从临时编辑数据中删除该条
+        })
+      }
+    },
+    /**
+     * 保存数据
+     * @param {object} row 行数据
+     * @param {object} newData 新数据
+     */
+    save(row, newData) {
+      if (!this.editable) {
+        return console.warn(ALERT_MESSAGE.notEditable)
+      }
+      const rowKey = this.$_getRowKey(row)
+      const rowIndex = this.findRowIndex(rowKey)
+
+      if (rowIndex >= 0) {
+        const rawData = this.data[rowIndex]
+        const editData = newData || this.editingData[rowKey]
+        if (!editData) {
+          return this.$message.error('数据不存在!')
+        }
+        // 判断数据是否有更新
+        if (!isEqual(rawData, editData)) {
+          // 克隆一份更新的数据，且携带 rowKey
+          const copyEditData = defineNonEnumKey(cloneDeep(editData), ROW_KEY, rowKey)
+          // 更新原始数据
+          this.data.splice(rowIndex, 1, copyEditData)
+          this.$emit('value-change', copyEditData, this.editableType === 'cell' ? this.editingCell : rowKey)
+          // this.editableConfig?.valueChange(editData, this.editableType === 'cell' ? this.editingCell : rowKey)
+        }
+        // 取消编辑模式
+        this.edit(rowKey, false)
+        // 删除复制的 edit数据
+        this.$nextTick(() => {
+          delete this.editingData[rowKey]
+        })
+      }
+    },
+    /**
+     * 编辑数据
+     * @param {object | string} value 编辑`row` 或`cell`数据
+     * @param {boolean} editing 编辑或取消
+     */
+    edit(value, editing) {
+      if (!this.editable) {
+        return console.warn(ALERT_MESSAGE.notEditable)
+      }
+      switch (this.editableType) {
+        case 'cell':
+          this.$_setEditCell(value, editing)
+          break;
+        case 'row':
+          this.$_setEditRow(value, editing)
+          break;
+        case 'single-row':
+          this.$_setEditSingleRow(value, editing)
+          break;
+      }
+    },
+    /**
+     * 插入新一行数据
+     * @param {object} row 新增数据
+     * @param {string} position 头部或尾部插入, [`top`,`end`]
+     */
+    addRow(row, position = 'end') {
+      if (!this.editable) {
+        return console.warn(ALERT_MESSAGE.notEditable)
+      }
+      if (this.editableType === 'single-row' && this.editingRow.length > 0) {
+        return this.$message.warning(this.editableConfig.onlyOneLineMessage)
+      } else {
+        const index = this.data.length
+        const rowData = this.$_setRowKey(cloneDeep(row), index)
+
+        if (position === 'top') {
+          // 顶部插入
+          this.data.unshift(rowData)
+        } else {
+          // 尾部插入
+          this.data.push(rowData)
+        }
+        this.$nextTick(() => {
+          this.edit(rowData[ROW_KEY])
+        })
+      }
+    },
+    // 通过rowKey找到rowIndex
+    findRowIndex(rowKey) {
+      const row = this.rowDataMap[rowKey]
+      return row ? row[ROW_INDEX] : -1
     },
     // 改变table密度
     changeDensity(size) {
@@ -380,65 +528,6 @@ export default {
     // 打印table数据
     print() {
       console.log('print table ...')
-    },
-    // 删除数据
-    delete(rowKey) {
-      if (rowKey >= 0 && this.data[rowKey]) {
-        this.$_deleteEdit(rowKey)
-        this.data.splice(rowKey, 1)
-      }
-    },
-    // 保存数据
-    save(rowKey, newData) {
-      if (rowKey >= 0) {
-        const rawData = this.data[rowKey]
-        const editData = newData || this.editingData[rowKey]
-        if (!editData) {
-          return this.$message.error('数据不存在!')
-        }
-        // 判断数据是否有更新
-        if (!isEqual(rawData, editData)) {
-          this.data.splice(rowKey, 1, cloneDeep(editData))
-          this.$emit('value-change', editData, this.editableType === 'cell' ? this.editingCell : rowKey)
-          // this.editableConfig?.valueChange(editData, this.editableType === 'cell' ? this.editingCell : rowKey)
-        }
-        // 取消编辑模式
-        this.edit(rowKey, false)
-        // 删除复制的 edit数据
-        this.$nextTick(() => {
-          delete this.editingData[rowKey]
-        })
-      }
-    },
-    // 编辑数据, `editing = false`取消编辑
-    edit(value, editing) {
-      switch (this.editableType) {
-        case 'cell':
-          this.$_setEditCell(value, editing)
-          break;
-        case 'row':
-          this.$_setEditRow(value, editing)
-          break;
-        case 'single-row':
-          this.$_setEditSingleRow(value, editing)
-          break;
-      }
-    },
-    getEdit() {
-      const { editable } = this
-      return editable
-        ? editable === 'cell'
-          ? this.editingCell
-          : this.editingRow
-        : null
-    },
-    addRow(row) {
-      if (this.editableType === 'single-row' && this.editingRow.length > 0) {
-        return this.$message.warning('只能同时编辑一行')
-      } else {
-        this.data.push(cloneDeep(row))
-        this.edit(this.data.length - 1)
-      }
     }
   }
 }

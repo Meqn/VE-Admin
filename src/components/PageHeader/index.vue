@@ -2,13 +2,14 @@
 <div :class="['ve-page-header', { 'has-footer': hasFooter }, { 'is-ghost': ghost }]">
   <slot name="breadcrumb">
     <el-breadcrumb
-      v-if="breadcrumb.length > 0"
-      :separator="separator"
-      :separator-class="separatorIcon"
+      v-if="breadcrumbProps && breadcrumbRoutes.length > 0"
+      :separator="breadcrumbProps.separator"
+      :separator-class="breadcrumbProps.separatorClass"
       class="page-header-breadcrumb">
       <el-breadcrumb-item
-        v-for="(route, i) in breadcrumb"
+        v-for="(route, i) in breadcrumbRoutes"
         :key="i"
+        :replace="!!route.route"
         :to="{ path: route.path }">
         {{ route.text }}
       </el-breadcrumb-item>
@@ -17,9 +18,9 @@
   <ve-flex justify="between" align="middle" class="page-header-heading">
     <ve-flex align="middle" class="page-header-left">
       <slot name="back">
-        <ve-flex v-if="showBack" align="middle" class="page-back" @click.native="onBack">
-          <i :class="[backIcon, 'back-icon']"></i>
-          <span v-if="backText" class="back-text">{{ backText }}</span>
+        <ve-flex v-if="backProps" align="middle" class="page-back" @click.native="onBack">
+          <i :class="[backProps.icon, 'back-icon']"></i>
+          <span v-if="backProps.text" class="back-text">{{ backProps.text }}</span>
         </ve-flex>
       </slot>
       <slot name="title">
@@ -50,33 +51,83 @@
 
 <script>
 import VeFlex from '@/components/Flex'
+import isObjectLike from 'lodash/isObjectLike'
+
 export default {
   name: 'VePageHeader',
   components: {
     VeFlex
   },
   props: {
+    ghost: Boolean,
     title: String,
     subTitle: String,
-    separator: {
-      type: String,
-      default: '/'
-    },
-    separatorIcon: String,
-    breadcrumb: {
-      type: Array,
-      default: () => []
-    },
-    ghost: Boolean,
-    showBack: Boolean,
-    backIcon: {
-      type: String,
-      default: 'el-icon-back'
-    },
-    backText: String,
+    breadcrumb: [Boolean, Object],
+    back: [Boolean, Object],
     tabList: {
       type: Array,
       default: () => []
+    }
+  },
+  data() {
+    return {
+      activeTab: ''
+    }
+  },
+  computed: {
+    hasFooter() {
+      return this.tabList.length > 0 || this.$slots.footer
+    },
+    backProps() {
+      const { back } = this
+      if (back) {
+        const defaults = {
+          // text: '返回',
+          icon: 'el-icon-back'
+        }
+        if (isObjectLike(back)) {
+          return {
+            ...defaults,
+            ...back
+          }
+        }
+        return defaults
+      }
+      return false
+    },
+    breadcrumbProps() {
+      const { breadcrumb } = this
+      if (breadcrumb) {
+        const defaults = {
+          separator: '/',
+          separatorClass: ''
+        }
+        if (isObjectLike(breadcrumb)) {
+          return {
+            ...defaults,
+            ...breadcrumb
+          }
+        }
+        return defaults
+      }
+      return false
+    },
+    breadcrumbRoutes() {
+      const { breadcrumbProps, $route } = this
+      if (breadcrumbProps) {
+        if (breadcrumbProps.routes) {
+          return breadcrumbProps.routes
+        }
+        if ($route && $route.matched) {
+          const len = $route.matched.length
+          return $route.matched.map((route, index) => ({
+            text: route.meta.title,
+            path: (len - 1) === index ? ($route.fullPath || route.path) : route.path
+          }))
+        }
+        return []
+      }
+      return []
     }
   },
   watch: {
@@ -94,18 +145,13 @@ export default {
         }
       },
       immediate: true
-    }
-    
-  },
-  data() {
-    return {
-      activeTab: ''
+    },
+    activeTab(val) {
+      this.$emit('tab-change', val)
     }
   },
-  computed: {
-    hasFooter() {
-      return this.tabList.length > 0 || this.$slots.footer
-    }
+  created() {
+    console.log('this.$route', this.$route)
   },
   methods: {
     onBack() {
@@ -193,7 +239,6 @@ export default {
     &:hover{
       color: $--color-primary;
     }
-
     /* &::after{
       content: "";
       position: absolute;

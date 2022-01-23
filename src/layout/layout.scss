@@ -1,8 +1,8 @@
 $--sidebar-fixed-zindex: 999;
-$--layout-header-height: 56px;
+$--sider-width: 210px;
 
-.ve-layout-wrapper{
-  display: flex; flex-direction: column;
+.ve-layout{
+  position: relative;
   overflow: hidden;
   width: 100%;
   height: 100%;
@@ -12,27 +12,40 @@ $--layout-header-height: 56px;
     position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: $--sidebar-fixed-zindex;
     background: rgba($color: #000000, $alpha: 0.45);
   }
+
+  &-main{
+    overflow-y: auto;
+    display: flex; flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+  }
+
+  &-content{
+    position: relative;
+    box-sizing: border-box;
+    flex: 1;
+    flex-basis: auto;
+  }
 }
 
 .ve-layout-header{
-  position: relative;
-  z-index: 3;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
   display: flex;
-  height: $--layout-header-height;
   color: #fff;
   background-color: $--layout-header-background-color;
   box-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
 
-  .header-left{
-    width: 210px;
+  .header-left, .header-center, .header-right{
+    display: flex;
+    align-items: center;
     height: 100%;
+  }
+  .header-left{
+    width: $--sider-width - 20px;
   }
   .header-center{
     flex: 1 1 0%;
-  }
-  .header-right, .header-center{
-    display: flex;
-    margin-right: 20px;
   }
   .header-logo{
     display: flex;
@@ -53,9 +66,10 @@ $--layout-header-height: 56px;
   .header-item{
     display: flex;
     align-items: center;
-    height: $--layout-header-height;
-    color: inherit;
+    height: 100%;
     padding: 0 12px;
+    margin-left: 8px;
+    color: inherit;
     cursor: pointer;
     &:hover{
       background-color: mix($--layout-header-background-color, #fff, 92%);
@@ -63,21 +77,15 @@ $--layout-header-height: 56px;
   }
 }
 
-.ve-layout-body{
-  position: relative;
-  display: flex;
-  flex: 1;
-  min-height: 0;
-}
-
 .ve-layout-aside{
   overflow: hidden;
-  position: relative; z-index: 2;
-  display: flex;
-  flex-direction: column;
+  position: relative; z-index: 10;
+  display: flex; flex-direction: column;
   color: $--layout-aside-text-color;
   background-color: $--layout-aside-background-color;
   box-shadow: 0 2px 8px 0 rgba(29, 35, 41, 0.1);
+  transition: all 300ms ease-in;
+  
   &.is-fixed{
     position: fixed; top: 0; left: 0; bottom: 0; z-index: $--sidebar-fixed-zindex;
   }
@@ -91,7 +99,7 @@ $--layout-header-height: 56px;
   }
   .sidebar-menu{
     &:not(.el-menu--collapse){
-      width: 210px;
+      width: $--sider-width;
     }
     &.el-menu{
       border-right: none;
@@ -153,10 +161,3 @@ $--layout-header-height: 56px;
     cursor: pointer;
   }
 }
-
-.ve-layout-main{
-  position: relative;
-  min-width: 0;
-  flex: 1;
-}
-

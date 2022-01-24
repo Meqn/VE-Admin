@@ -1,4 +1,5 @@
-$--sidebar-fixed-zindex: 999;
+$--header-zindex: 99;
+$--sider-zindex: 90;
 $--sider-width: 210px;
 
 .ve-layout{
@@ -9,11 +10,12 @@ $--sider-width: 210px;
   background-color: $--layout-background-color;
 
   .drawer-mask {
-    position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: $--sidebar-fixed-zindex;
+    position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 999;
     background: rgba($color: #000000, $alpha: 0.45);
   }
 
   &-main{
+    overflow-x: hidden;
     overflow-y: auto;
     display: flex; flex-direction: column;
     flex: 1;
@@ -30,7 +32,7 @@ $--sider-width: 210px;
 }
 
 .ve-layout-header{
-  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+  position: fixed; top: 0; left: 0; right: 0; z-index: $--header-zindex;
   display: flex;
   color: #fff;
   background-color: $--layout-header-background-color;
@@ -42,7 +44,8 @@ $--sider-width: 210px;
     height: 100%;
   }
   .header-left{
-    width: $--sider-width - 20px;
+    width: $--sider-width;
+    justify-content: center;
   }
   .header-center{
     flex: 1 1 0%;
@@ -79,7 +82,7 @@ $--sider-width: 210px;
 
 .ve-layout-aside{
   overflow: hidden;
-  position: relative; z-index: 10;
+  position: relative; z-index: $--sider-zindex;
   display: flex; flex-direction: column;
   color: $--layout-aside-text-color;
   background-color: $--layout-aside-background-color;
@@ -87,7 +90,7 @@ $--sider-width: 210px;
   transition: all 300ms ease-in;
   
   &.is-fixed{
-    position: fixed; top: 0; left: 0; bottom: 0; z-index: $--sidebar-fixed-zindex;
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: $--sider-zindex;
   }
   .sidebar-scrollbar{
     overflow-x: hidden !important;

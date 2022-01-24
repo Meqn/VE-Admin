@@ -1,8 +1,7 @@
 import AppConfig from '@demo/app.config'
 import Storage from '@/utils/storage'
 
-const SIDEBAR_STATUS = 'sidebarStatus'
-const SIDEBAR_THEME = 'sidebarStatus'
+const SIDEBAR_STATUS = 'SIDEBAR_STATUS'
 
 const state = {
   name: 'demo',
@@ -10,40 +9,26 @@ const state = {
     url: AppConfig.logo_url,
     text: AppConfig.logo_text
   },
-  sidebar: {
-    opened: !!Storage.get(SIDEBAR_STATUS),
-    theme: Storage.get(SIDEBAR_THEME) || 'light'
-  },
-  device: 'desktop'
+  sideCollapsed: !!Storage.get(SIDEBAR_STATUS),
+  isMobile: false
 }
 
 const mutations = {
-  TOGGLE_SIDEBAR: state => {
-    state.sidebar.opened = !state.sidebar.opened
-    if (state.sidebar.opened) {
-      Storage.set(SIDEBAR_STATUS, 1)
-    } else {
-      Storage.set(SIDEBAR_STATUS, 0)
-    }
+  SET_SIDEBAR_TYPE(state, type) {
+    state.sideCollapsed = type
+    Storage.set(SIDEBAR_STATUS, type)
   },
-  CLOSE_SIDEBAR: (state) => {
-    Storage.set(SIDEBAR_STATUS, 0)
-    state.sidebar.opened = false
-  },
-  TOGGLE_DEVICE: (state, device) => {
-    state.device = device
+  SET_MOBILE_TYPE(state, type) {
+    state.isMobile = type
   }
 }
 
 const actions = {
-  toggleSideBar({ commit }) {
-    commit('TOGGLE_SIDEBAR')
+  toggleSideBar({ commit }, val) {
+    commit('SET_SIDEBAR_TYPE', val)
   },
-  closeSideBar({ commit }) {
-    commit('CLOSE_SIDEBAR')
-  },
-  toggleDevice({ commit }, device) {
-    commit('TOGGLE_DEVICE', device)
+  toggleMobile({ commit }, val) {
+    commit('SET_MOBILE_TYPE', val)
   }
 }
 

@@ -2,11 +2,11 @@
   <el-container class="ve-layout" v-resize:debounce="$_resize">
     <div v-if="false" class="drawer-mask" />
 
-    <LayoutSider :width="siderWidth" :style="{ paddingTop: headerHeight }" />
+    <LayoutSider :width="`${siderWidth}px`" :style="{ paddingTop: `${headerHeight}px` }" />
 
     <section class="ve-layout-main">
-      <LayoutHeader :height="headerHeight" class="v-layout-header" />
-      <el-header :height="headerHeight" style="background: transparent"></el-header>
+      <LayoutHeader :height="`${headerHeight}px`" />
+      <el-header :height="`${headerHeight}px`" style="background: transparent"></el-header>
 
       <LayoutMain />
 
@@ -35,27 +35,28 @@ export default {
   },
   data() {
     return {
-      layoutWidth: 0,
-      headerHeight: '56px',
-      siderWidth: '210px'
+      viewWidth: 1920,
+      headerHeight: 56
     }
   },
-  mounted() {
-    const $header = this.$refs['header']
-    if ($header) {
-      this.layout.headerHeight = $header.$el.clientHeight
+  computed: {
+    siderWidth() {
+      return this.$store.getters.sideCollapsed ? 64 : 210
+    }
+  },
+  provide() {
+    return {
+      layout: this
     }
   },
   methods: {
     $_resize({ width }) {
-      console.log('resize ', width)
-      this.layoutWidth = width
-      if (width < 992) {
-        this.$refs.sidebar?.closeSideBar()
-        this.$store.dispatch('app/toggleDevice', 'tablet')
-      } else {
-        this.$store.dispatch('app/toggleDevice', 'desktop')
-      }
+      this.viewWidth = width
+      const isMobile = width < 767
+      const sideCollapsed = width < 992
+
+      this.$store.dispatch('app/toggleMobile', isMobile)
+      this.$store.dispatch('app/toggleSideBar', sideCollapsed)
     }
   }
 }

@@ -1,0 +1,107 @@
+<template>
+<section class="ve-page-layout">
+
+  <div v-if="$slots.header" :class="['ve-page-layout-header', headClass]" :style="headStyle">
+    <slot name="header" />
+  </div>
+  <PageHeader
+    v-else
+    :ghost="ghost"
+    :title="title"
+    :subTitle="subTitle"
+    :breadcrumb="breadcrumb"
+    :back="back"
+    :tabList="tabList"
+    v-on="$listeners">
+    <!-- 面包屑导航区域 -->
+    <template v-if="$slots.breadcrumb" #breadcrumb>
+      <slot name="breadcrumb" />
+    </template>
+    <!-- 标题区域 -->
+    <template v-if="$slots.title" #title>
+      <slot name="title" />
+    </template>
+    <!-- 默认内容区域 -->
+    <template v-if="content || $slots.content" #default>
+      <slot name="content">{{ content }}</slot>
+    </template>
+    <!-- 操作区 -->
+    <template v-if="$slots.extra" #extra>
+      <slot name="extra" />
+    </template>
+    <!-- tabList 右侧区域 -->
+    <template v-if="$slots.tabExtra" #tabExtra>
+      <slot name="tabExtra" />
+    </template>
+  </PageHeader>
+
+  <div class="ve-page-layout-content">
+    <slot />
+  </div>
+
+  <div v-if="$slots.footer" :class="['ve-page-layout-footer', footClass]" :style="footStyles">
+    <slot name="footer" />
+  </div>
+</section>
+</template>
+
+<script>
+import PageHeader from '@/components/PageHeader'
+
+export default {
+  name: 'PageLayout',
+  components: {
+    PageHeader
+  },
+  props: {
+    headStyle: [String, Object],
+    headClass: String,
+    bodyStyle: [String, Object],
+    bodyClass: String,
+    footStyle: {
+      type: [String, Object],
+      default: () => {}
+    },
+    footClass: String,
+    // 头部区域
+    content: String,
+    ghost: Boolean,
+    title: String,
+    subTitle: String,
+    breadcrumb: [Boolean, Object],
+    back: [Boolean, Object],
+    tabList: {
+      type: Array,
+      default: () => []
+    }
+  },
+  inject: ['layout'],
+  computed: {
+    footStyles() {
+      const width = `calc(100% - ${this.layout.siderWidth}px)`
+      if (typeof this.footStyle === 'string') {
+        return `${this.footStyle}; width: ${width};`
+      } else {
+        return { width: `${width}`, ...this.footStyle }
+      }
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+.ve-page-layout{
+  &-footer{
+    position: fixed; bottom: 0; right: 0; z-index: 10;
+    width: 100%;
+    padding: 8px 20px;
+    background-color: #fff;
+    box-shadow: 0 -6px 16px -8px rgb(0 0 0 / 8%), 0 -9px 28px 0 rgb(0 0 0 / 5%), 0 -12px 48px 16px rgb(0 0 0 / 3%);
+    transition: width .3s cubic-bezier(.645,.045,.355,1);
+  }
+  &-content{
+    position: relative;
+    padding: 20px;
+  }
+}
+</style>

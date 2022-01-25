@@ -11,7 +11,7 @@
       <LayoutMain />
 
       <el-footer height="auto" class="v-layout-footer">
-        <div class="pt-24 pb-24 tac">Copyright @ 2022 Ve-admin. All Rights Reserved</div>
+        <div class="pt-24 pb-24 tac">Copyright @ 2022 <a href="https://github.com/veComponent/VE-Admin/" target="_blank">VE-Admin</a>. All Rights Reserved</div>
       </el-footer>
     </section>
 

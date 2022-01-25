@@ -1,5 +1,5 @@
 <template>
-<header class="ve-layout-header">
+<el-header class="ve-layout-header pl-0" :height="height">
   <div class="header-left">
     <slot name="logo">
       <a class="header-logo">
@@ -20,7 +20,7 @@
     <Notice class="header-item" />
     <Account class="header-item" />
   </div>
-</header>
+</el-header>
 </template>
 
 <script>
@@ -28,11 +28,14 @@ import Search from './Search'
 import Notice from './Notice'
 import Account from './Account.vue'
 export default {
-  name: 'VeLayoutHeader',
+  name: 'LayoutHeader',
   components: {
     Search,
     Notice,
     Account
+  },
+  props: {
+    height: String
   },
   computed: {
     logo() {

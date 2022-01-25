@@ -1,3 +1,3 @@
-export { default as VeHeader } from './header'
-export { default as VeSide } from './sidebar'
-export { default as VeMain } from './Main'
+export { default as LayoutHeader } from './header'
+export { default as LayoutSider } from './sidebar'
+export { default as LayoutMain } from './Main'

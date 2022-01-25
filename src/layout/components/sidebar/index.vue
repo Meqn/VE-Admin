@@ -1,10 +1,10 @@
 <template>
-  <aside :class="['ve-layout-aside sidebar-dark', { 'is-fixed': isFixed }, { 'is-collapse': isCollapse }]">
+  <aside :class="['ve-layout-aside sidebar-dark', { 'is-collapse': sideCollapsed }]" :style="{ width }">
     <el-scrollbar class="sidebar-scrollbar" wrap-class="sidebar-scrollbar-wrap">
       <el-menu
         class="sidebar-menu"
         :default-active="activeMenu"
-        :collapse="isCollapse"
+        :collapse="sideCollapsed"
         mode="vertical">
         <sidebar-item
           v-for="item in menus"
@@ -15,7 +15,7 @@
     </el-scrollbar>
     <div class="sidebar-links">
       <div class="sidebar-collapse" @click="toggleSideBar">
-        <i :class="[isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold']"></i>
+        <i :class="[sideCollapsed ? 'el-icon-s-unfold' : 'el-icon-s-fold']"></i>
       </div>
     </div>
   </aside>
@@ -27,23 +27,18 @@ import SidebarItem from './SidebarItem.vue'
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'VeLayoutAside',
+  name: 'LayoutSider',
   components: {
     SidebarItem
   },
-  data() {
-    return {
-      isFixed: false
-    }
+  props: {
+    width: String
   },
   computed: {
     ...mapGetters([
-      'sidebar',
+      'sideCollapsed',
       'permissionRoutes'
     ]),
-    isCollapse() {
-      return !this.sidebar.opened
-    },
     menus() {
       return this.filterRoutes(this.permissionRoutes)
     },
@@ -56,13 +51,8 @@ export default {
     }
   },
   methods: {
-    toggleSideBar() {
-      this.$store.dispatch('app/toggleSideBar')
-    },
-    closeSideBar() {
-      if (this.sidebar.opened) {
-        this.$store.dispatch('app/closeSideBar')
-      }
+    toggleSideBar(val) {
+      this.$store.dispatch('app/toggleSideBar', typeof val === 'boolean' ? val : !this.sideCollapsed)
     },
     filterRoutes(routes, basePath = '/') {
       const res = []

@@ -1,6 +1,7 @@
 <script>
 import isNumber from 'lodash/isNumber'
-import { isEmptyElement, isVNode, validCssValue } from '@/utils/validate'
+import { isEmptyElement, validCssValue } from '@/utils/validate'
+import { isVNode } from '@/utils/vnode'
 
 const prefixCls = 've-space'
 

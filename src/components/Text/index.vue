@@ -93,6 +93,7 @@ export default {
         { icon ? <Icon name={icon} class="mr-4" /> : null }
         { wrapper(this, this.$slots.default) }
         { copyable ? $copy : null }
+        {this.$slots.right}
       </tag>
     )
   },
@@ -132,7 +133,7 @@ $type-colors: (
 .ve-text{
   display: inline-flex;
   align-items: center;
-  color: $--color-text-primary;
+  color: $--color-text-regular;
 
   &.is-hover{
     cursor: pointer;

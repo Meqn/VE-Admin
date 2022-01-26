@@ -1,9 +1,9 @@
 <template>
-  <i v-if="iconType === 'svg'" class="ve-icon" v-on="$listeners" :style="iconStyle">
+  <i v-if="iconType === 'svg'" class="ve-icon" v-on="$listeners" :style="iconStyle" role="icon">
     <svg class="svg-icon"><use :xlink:href="`#icon-${name}`" /></svg>
   </i>
-  <i v-else-if="iconType === 'external'" class="ve-icon external-icon" v-on="$listeners" :style="iconStyle" />
-  <i v-else :class="['ve-icon', name]" v-on="$listeners" :style="iconStyle" />
+  <i v-else-if="iconType === 'external'" class="ve-icon external-icon" v-on="$listeners" :style="iconStyle" role="img" />
+  <i v-else :class="['ve-icon', name]" v-on="$listeners" :style="iconStyle" role="icon" />
 </template>
 
 <script>
@@ -60,7 +60,6 @@ export default {
 
 <style lang="scss">
 .ve-icon{
-  overflow: hidden;
   display: inline-block;
   width: 1em;
   height: 1em;

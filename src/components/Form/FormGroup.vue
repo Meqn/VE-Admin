@@ -48,37 +48,37 @@ export default {
     },
     getOptionProps(vnode) {
       if (vnode.componentOptions) {
-        const componentOptions = vnode.componentOptions;
-        const { propsData = {}, Ctor = {} } = componentOptions;
-        const props = (Ctor.options || {}).props || {};
-        const res = {};
+        const componentOptions = vnode.componentOptions
+        const { propsData = {}, Ctor = {} } = componentOptions
+        const props = (Ctor.options || {}).props || {}
+        const res = {}
         for (const k in props) {
-          const v = props[k];
-          const defaultValue = v.default;
+          const v = props[k]
+          const defaultValue = v.default
           if (defaultValue !== undefined) {
-            res[k] = isFunction(defaultValue) ? defaultValue.call(vnode) : defaultValue;
+            res[k] = isFunction(defaultValue) ? defaultValue.call(vnode) : defaultValue
           }
         }
-        return { ...res, ...propsData };
+        return { ...res, ...propsData }
       }
-      return {};
+      return {}
     },
     getSlots(vnode) {
-      const componentOptions = vnode.componentOptions || {};
-      const children = vnode.children || componentOptions.children || [];
-      const slots = {};
+      const componentOptions = vnode.componentOptions || {}
+      const children = vnode.children || componentOptions.children || []
+      const slots = {}
       children.forEach(child => {
         if (!isEmptyElement(child)) {
-          const name = (child.data && child.data.slot) || 'default';
-          slots[name] = slots[name] || [];
+          const name = (child.data && child.data.slot) || 'default'
+          slots[name] = slots[name] || []
           if (child.tag === 'template') {
-            slots[name].push(child.children);
+            slots[name].push(child.children)
           } else {
-            slots[name].push(child);
+            slots[name].push(child)
           }
         }
-      });
-      return { ...slots };
+      })
+      return { ...slots }
     },
     getItems() {
       const $default = this.$slots.default || []

@@ -1,73 +1,20 @@
-<template>
-<div :class="['ve-page-header', { 'has-footer': hasFooter }, { 'is-ghost': ghost }]">
-  <slot name="breadcrumb">
-    <el-breadcrumb
-      v-if="breadcrumbProps && breadcrumbRoutes.length > 0"
-      :separator="breadcrumbProps.separator"
-      :separator-class="breadcrumbProps.separatorClass"
-      class="page-header-breadcrumb">
-      <el-breadcrumb-item
-        v-for="(route, i) in breadcrumbRoutes"
-        :key="i"
-        :replace="!!route.route"
-        :to="{ path: route.path }">
-        {{ route.text }}
-      </el-breadcrumb-item>
-    </el-breadcrumb>
-  </slot>
-  <ve-flex justify="between" align="middle" class="page-header-heading">
-    <ve-flex align="middle" class="page-header-left">
-      <slot name="back">
-        <ve-flex v-if="backProps" align="middle" class="page-back" @click.native="onBack">
-          <i :class="[backProps.icon, 'back-icon']"></i>
-          <span v-if="backProps.text" class="back-text">{{ backProps.text }}</span>
-        </ve-flex>
-      </slot>
-      <slot name="title">
-        <span class="page-title">{{ title }}</span>
-        <span class="page-subtitle">{{ subTitle }}</span>
-      </slot>
-    </ve-flex>
-    <div v-if="$slots.extra" class="page-header-extra">
-      <slot name="extra" />
-    </div>
-  </ve-flex>
-  <div v-if="$slots.default" class="page-header-content">
-    <slot />
-  </div>
-  <div class="page-header-footer" v-if="hasFooter">
-    <template v-if="tabList.length > 0">
-      <el-tabs class="page-header-tab" v-model="activeTab" @tab-click="handleTabClick">
-        <el-tab-pane v-for="tab in tabList" :key="tab.name" :label="tab.label" :name="tab.name" />
-      </el-tabs>
-      <div class="page-header-tab-extra" v-if="$slots.tabExtra">
-        <slot name="tabExtra"></slot>
-      </div>
-    </template>
-    <slot v-else name="footer" />
-  </div>
-</div>
-</template>
-
 <script>
-import VeFlex from '@/components/Flex'
 import isObjectLike from 'lodash/isObjectLike'
+import { omit } from '@/utils'
+import { getComponentFromProp } from '../utils'
 
 export default {
   name: 'VePageHeader',
-  components: {
-    VeFlex
-  },
   props: {
     ghost: Boolean,
-    title: String,
-    subTitle: String,
     breadcrumb: [Boolean, Object],
     back: [Boolean, Object],
-    tabList: {
-      type: Array,
-      default: () => []
-    }
+    title: String,
+    subTitle: String,
+    extra: String,
+    tabList: Array,
+    tabExtra: String,
+    tabProps: Object
   },
   data() {
     return {
@@ -75,6 +22,10 @@ export default {
     }
   },
   computed: {
+    hasHeading() {
+      const { $slots, backProps, title, subTitle, extra } = this
+      return $slots.back || $slots.title || $slots.extra || backProps || title || subTitle || extra
+    },
     hasFooter() {
       return this.tabList.length > 0 || this.$slots.footer
     },
@@ -132,16 +83,10 @@ export default {
   },
   watch: {
     tabList: {
-      handler(v) {
-        if (v && v.length > 0) {
-          this.activeTab = (() => {
-            const { tabList } = this
-            const act = tabList.filter(v => v.active)
-            if (act.length > 0) {
-              return act[0].name
-            }
-            return tabList[0].name
-          })()
+      handler(list) {
+        if (list && list.length > 0) {
+          const acts = list.filter(v => v.active)
+          this.activeTab = acts.length > 0 ? acts[0].name : list[0].name
         }
       },
       immediate: true
@@ -149,9 +94,6 @@ export default {
     activeTab(val) {
       this.$emit('tab-change', val)
     }
-  },
-  created() {
-    console.log('this.$route', this.$route)
   },
   methods: {
     onBack() {
@@ -161,9 +103,131 @@ export default {
         this.$router.go(-1)
       }
     },
-    handleTabClick(tab, event) {
+    onClickTab(tab, event) {
       this.$emit('tab-click', tab, event)
+    },
+    onClickExtra() {
+      this.$emit('extra-click')
+    },
+    onClickTabExtra() {
+      this.$emit('tab-extra-click')
     }
+  },
+  render() {
+    const {
+      $slots,
+      ghost = false,
+      breadcrumbProps,
+      breadcrumbRoutes,
+      backProps,
+      title,
+      subTitle,
+      tabProps = {},
+      tabList
+    } = this
+
+    const pageClass = {
+      've-page-header': true,
+      'has-footer': this.hasFooter,
+      'is-ghost': ghost
+    }
+    
+    // ------ breadcrumb 导航区域
+    let breadcrumbDom = $slots['breadcrumb']
+    if (!breadcrumbDom && breadcrumbProps && breadcrumbRoutes.length > 0) {
+      breadcrumbDom = (
+        <el-breadcrumb
+          separator={breadcrumbProps.separator}
+          separator-class={breadcrumbProps.separatorClass}
+          class="page-header-breadcrumb">
+          {
+            breadcrumbRoutes.map((route, i) => (
+              <el-breadcrumb-item key={i} replace={!!route.route} to={{ path: route.path }}>{ route.text }</el-breadcrumb-item>
+            ))
+          }
+        </el-breadcrumb>
+      )
+    }
+    
+    // ------ header 头部区域
+    // back 返回
+    let backDom = $slots['back']
+    if (!backDom && backProps) {
+      backDom = (
+        <div align="middle" class="page-back" onClick={this.onBack}>
+          <i class={[backProps.icon, 'back-icon']}></i>
+          { backProps.text ? (<span class="back-text">{ backProps.text }</span>) : null}
+        </div>
+      )
+    }
+    // title 标题
+    const titleDom = $slots['title'] || [title, subTitle].map((item, i) => {
+      if (i === 0 && title) {
+        return <span class="page-title">{ item }</span>
+      }
+      if (i === 1 && subTitle) {
+        return <span class="page-subtitle">{ subTitle }</span>
+      }
+    })
+    // extra 头部右侧扩展
+    const extraContent = getComponentFromProp(this, 'extra')
+
+    // heading 头部
+    const headingDom = this.hasHeading && (
+      <div class="page-header-heading">
+        <div class="page-header-left">
+          { backDom }
+          { titleDom }
+        </div>
+        { extraContent && <div class="page-header-extra" onClick={this.onClickExtra}>{extraContent}</div> }
+      </div>
+    )
+
+    // ------ footer 底部区域
+    let footDom = $slots['footer']
+    if (tabList.length > 0) {
+      const tabbarProps = {
+        class: 'page-header-tab',
+        props: {
+          ...tabProps
+        },
+        on: {
+          'tab-click': this.onClickTab
+        }
+      }
+      const tabsDom = (
+        <el-tabs vModel={this.activeTab} {...tabbarProps}>
+          {
+            tabList.map(item => {
+              const paneProps = {
+                props: omit(item, ['active', 'slot', 'render'])
+              }
+              const labelSlot = this.$scopedSlots[item.slot]
+              const labelRender = item.render
+              let labelDom = null
+              if (labelSlot || labelRender) {
+                labelDom = (
+                  <template slot="label">{ labelSlot ? labelSlot(item) : labelRender(this.$createElement, item) }</template>
+                )
+              }
+              return (<el-tab-pane {...paneProps}>{labelDom}</el-tab-pane>)
+            })
+          }
+        </el-tabs>
+      )
+      const tabExtraContent = getComponentFromProp(this, 'tabExtra')
+      const tabExtraDom = tabExtraContent && (<div class="page-header-tab-extra" onClick={this.onClickTabExtra}>{tabExtraContent}</div>)
+      footDom = [tabsDom, tabExtraDom]
+    }
+    
+    return (
+      <div class={pageClass}>
+        {breadcrumbDom}
+        {headingDom}
+        {$slots.default && (<div class="page-header-content">{$slots.default}</div>)}
+        {this.hasFooter && (<div class="page-header-footer">{footDom}</div>)}
+      </div>
+    )
   }
 }
 </script>
@@ -184,6 +248,11 @@ export default {
     &-breadcrumb{
       margin-bottom: 8px;
     }
+    &-heading{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
     &-content{
       position: relative;
       margin-top: 12px;
@@ -193,6 +262,8 @@ export default {
       margin-top: 12px;
     }
     &-left{
+      display: flex;
+      align-items: center;
       max-width: 72%;
     }
     &-left, &-extra{
@@ -204,12 +275,18 @@ export default {
       }
       .el-tabs__item{
         font-size: 16px;
+        height: 48px;
+        line-height: 48px;
       }
       .el-tabs__header{
         margin-bottom: 0;
       }
       .el-tabs__nav-wrap::after{
         display: none;
+      }
+      &.el-tabs--card > .el-tabs__header{
+        padding-top: 8px;
+        border-bottom: none;
       }
       .el-tabs__content{
         display: none;
@@ -233,6 +310,8 @@ export default {
   }
   .page-back{
     position: relative;
+    display: flex;
+    align-items: center;
     // margin-right: 40px;
     margin-right: 16px;
     cursor: pointer;

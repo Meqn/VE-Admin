@@ -27,7 +27,7 @@ export default {
       return $slots.back || $slots.title || $slots.extra || backProps || title || subTitle || extra
     },
     hasFooter() {
-      return this.tabList.length > 0 || this.$slots.footer
+      return (this.tabList && this.tabList.length > 0) || this.$slots.footer
     },
     backProps() {
       const { back } = this
@@ -185,7 +185,7 @@ export default {
 
     // ------ footer 底部区域
     let footDom = $slots['footer']
-    if (tabList.length > 0) {
+    if (tabList && tabList.length > 0) {
       const tabbarProps = {
         class: 'page-header-tab',
         props: {

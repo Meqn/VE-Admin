@@ -44,7 +44,7 @@ $--card-head-padding-sm: math.div($--card-head-padding, 2);
   &-bordered {
     border: $--card-border-base;
   }
-  &-ghost{
+  &-ghost, &-ghost &-actions{
     background-color: transparent;
   }
   &-loading {
@@ -194,7 +194,7 @@ $--card-head-padding-sm: math.div($--card-head-padding, 2);
     padding: 12px 0;
     list-style: none;
     border-top: $--card-border-base;
-    background: $--card-background-light;
+    background-color: $--card-background-light;
 
     & > li {
       position: relative;

@@ -1,21 +1,25 @@
 import Flex from './Flex'
 import Icon from './Icon'
 import Text from './Text'
+import Space from './Space'
+import { Card, CardGrid, CardMeta } from './Card'
 import Container from './Container'
 import PageHeader from './PageHeader'
-import Table from './Table'
-import { QueryForm, GridForm, GridFormItem } from './GridForm'
+import { Table, TableCell } from './Table'
+// import { GridForm, GridFormItem } from './GridForm'
+import { Form, FormGroup, FormItem, QueryForm } from './Form'
 
 const components = [
   Flex,
   Icon,
   Text,
+  Space,
+  Card, CardGrid, CardMeta,
   Container,
   PageHeader,
-  Table,
+  Table, TableCell,
   QueryForm,
-  GridForm,
-  GridFormItem
+  Form, FormGroup, FormItem
 ]
 
 const install = function(Vue) {

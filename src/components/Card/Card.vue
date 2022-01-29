@@ -2,12 +2,6 @@
 import './style.scss'
 import { omit } from '@/utils'
 import { filterEmpty, getComponentFromProp } from '../utils'
-/* import {
-  getSlotOptions,
-  filterEmpty,
-  getListeners,
-} from '../_util/props-util'; */
-// import BaseMixin from '../_util/BaseMixin';
 
 const prefixCls = 've-card'
 
@@ -18,10 +12,7 @@ export default {
     bodyStyle: Object,
     title: String,
     extra: String,
-    bordered: {
-      type: Boolean,
-      default: true
-    },
+    bordered: Boolean,
     loading: Boolean,
     hoverable: Boolean,
     type: String,
@@ -30,25 +21,22 @@ export default {
       type: String,
       validator(val) {
         return ['default', 'small'].includes(val)
-      },
-      default: 'default'
+      }
     },
     tabList: Array,
     tabExtra: String,
-    tabProps: {
-      type: Object,
-      default: () => {}
-    }
-    // tabs: tabprops, tabSlot, tabActive
-    // actions: $slots,
-    // tabBarExtraContent: slot,
-    // collapsible
+    tabProps: Object
   },
   data() {
     return {
       activeTab: '',
       widerPadding: false
     };
+  },
+  computed: {
+    hasTabs() {
+      return this.tabList && this.tabList.length > 0
+    }
   },
   watch: {
     tabList: {
@@ -68,11 +56,16 @@ export default {
     getTabPanel() {
       return this.tabList.map(item => {
         const paneProps = {
-          props: omit(item, ['active', 'slot'])
+          props: omit(item, ['active', 'slot', 'render'])
         }
         const labelSlot = this.$scopedSlots[item.slot]
-        const labelDom = labelSlot ? (<template slot="label">{labelSlot(item)}</template>) : null
-
+        const labelRender = item.render
+        let labelDom = null
+        if (labelSlot || labelRender) {
+          labelDom = (
+            <template slot="label">{ labelSlot ? labelSlot(item) : labelRender(this.$createElement, item) }</template>
+          )
+        }
         return (<el-tab-pane {...paneProps}>{labelDom}</el-tab-pane>)
       })
     },
@@ -81,8 +74,11 @@ export default {
         <li key={`action-${index}`}>{action}</li>
       ))
     },
-    onTabClick(tab, event) {
+    onClickTab(tab, event) {
       this.$emit('tab-click', tab, event)
+    },
+    onClickExtra() {
+      this.$emit('extra-click')
     },
     isContainGrid(nodes = []) {
       return nodes.some(node => node.tag && node.componentOptions && node.componentOptions.Ctor.options.name === 'VeCardGrid')
@@ -95,10 +91,9 @@ export default {
       bordered = true,
       size = 'default',
       type,
-      tabList,
+      tabProps = {},
+      hasTabs,
     } = this.$props
-
-    const hasTabs = tabList && tabList.length > 0
 
     const { $slots } = this;
     const classString = {
@@ -115,15 +110,15 @@ export default {
 
     const tabbarProps = {
       props: {
-        ...this.tabProps
+        ...tabProps
       },
       on: {
-        tabClick: this.onTabClick
+        'tab-click': this.onClickTab
       },
       class: `${prefixCls}-tabs`
     }
 
-    // header 头部区域
+    // ------ header 头部区域
     let header
     const titleContent = getComponentFromProp(this, 'title')
     const extraContent = getComponentFromProp(this, 'extra')
@@ -132,7 +127,7 @@ export default {
       ? (
         <div class={`${prefixCls}-head-wrapper`}>
           {titleContent && <div class={`${prefixCls}-head-title`}>{titleContent}</div>}
-          {extraContent && <div class={`${prefixCls}-extra`}>{extraContent}</div>}
+          {extraContent && <div class={`${prefixCls}-extra`} onClick="onClickExtra">{extraContent}</div>}
         </div>
       )
       : null
@@ -154,9 +149,11 @@ export default {
       )
     }
 
+    // ------ cover 卡片封面区域
     const cover = getComponentFromProp(this, 'cover')
     const coverDom = cover ? <div class={`${prefixCls}-cover`}>{cover}</div> : null
-
+    
+    // ------ body 主体区域
     const children = $slots.default
     const bodyProps = {
       class: `${prefixCls}-body`,
@@ -173,9 +170,10 @@ export default {
         {children}
       </div>
     )
-    
+
+    // ------ actions 卡片操作区域
     const actions = filterEmpty(this.$slots.actions)
-    const actionDom = actions && actions.length
+    const actionDom = actions && actions.length > 0
       ? (<ul class={`${prefixCls}-actions`}>{this.getAction(actions)}</ul>)
       : null
 

@@ -271,7 +271,7 @@ export default {
     }
     &-tab{
       &-extra{
-        position: absolute; bottom: 8px; right: 0;
+        position: absolute; bottom: 12px; right: 0;
       }
       .el-tabs__item{
         font-size: 16px;

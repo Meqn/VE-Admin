@@ -1,6 +1,5 @@
 <script>
-import isFunction from 'lodash/isFunction'
-import { isEmptyElement } from '@/utils/validate'
+import { getOptionProps, getSlots } from '../utils'
 import { getFormItemProps } from './utils'
 
 export default {
@@ -46,47 +45,13 @@ export default {
     getColumnFromGroup() {
       return this.columnNum
     },
-    getOptionProps(vnode) {
-      if (vnode.componentOptions) {
-        const componentOptions = vnode.componentOptions
-        const { propsData = {}, Ctor = {} } = componentOptions
-        const props = (Ctor.options || {}).props || {}
-        const res = {}
-        for (const k in props) {
-          const v = props[k]
-          const defaultValue = v.default
-          if (defaultValue !== undefined) {
-            res[k] = isFunction(defaultValue) ? defaultValue.call(vnode) : defaultValue
-          }
-        }
-        return { ...res, ...propsData }
-      }
-      return {}
-    },
-    getSlots(vnode) {
-      const componentOptions = vnode.componentOptions || {}
-      const children = vnode.children || componentOptions.children || []
-      const slots = {}
-      children.forEach(child => {
-        if (!isEmptyElement(child)) {
-          const name = (child.data && child.data.slot) || 'default'
-          slots[name] = slots[name] || []
-          if (child.tag === 'template') {
-            slots[name].push(child.children)
-          } else {
-            slots[name].push(child)
-          }
-        }
-      })
-      return { ...slots }
-    },
     getItems() {
       const $default = this.$slots.default || []
       const children = $default.filter(vnode => vnode.tag && vnode.componentOptions && vnode.componentOptions.Ctor.options.name === 'VeFormItem')
       const nodes = children.map(vnode => {
         return {
-          props: this.getOptionProps(vnode),
-          slots: this.getSlots(vnode),
+          props: getOptionProps(vnode),
+          slots: getSlots(vnode),
           vnode
         };
       })

@@ -7,15 +7,22 @@
   <PageHeader
     v-else
     :ghost="ghost"
+    :breadcrumb="breadcrumb"
     :title="title"
     :subTitle="subTitle"
-    :breadcrumb="breadcrumb"
+    :extra="extra"
     :back="back"
+    :tabExtra="tabExtra"
+    :tabProps="tabProps"
     :tabList="tabList"
     v-on="$listeners">
     <!-- 面包屑导航区域 -->
     <template v-if="$slots.breadcrumb" #breadcrumb>
       <slot name="breadcrumb" />
+    </template>
+    <!-- 返回区域 -->
+    <template v-if="$slots.back" #back>
+      <slot name="back" />
     </template>
     <!-- 标题区域 -->
     <template v-if="$slots.title" #title>
@@ -35,7 +42,7 @@
     </template>
   </PageHeader>
 
-  <div class="ve-page-layout-content">
+  <div :class="['ve-page-layout-content', bodyStyle]" :style="headStyle">
     <slot />
   </div>
 
@@ -54,36 +61,30 @@ export default {
     PageHeader
   },
   props: {
-    headStyle: [String, Object],
+    headStyle: Object,
     headClass: String,
-    bodyStyle: [String, Object],
+    bodyStyle: Object,
     bodyClass: String,
-    footStyle: {
-      type: [String, Object],
-      default: () => {}
-    },
+    footStyle: Object,
     footClass: String,
     // 头部区域
     content: String,
     ghost: Boolean,
-    title: String,
-    subTitle: String,
     breadcrumb: [Boolean, Object],
     back: [Boolean, Object],
-    tabList: {
-      type: Array,
-      default: () => []
-    }
+    title: String,
+    subTitle: String,
+    extra: String,
+    tabList: Array,
+    tabExtra: String,
+    tabProps: Object
   },
   inject: ['layout'],
   computed: {
     footStyles() {
+      const { footStyle = {} } = this
       const width = `calc(100% - ${this.layout.siderWidth}px)`
-      if (typeof this.footStyle === 'string') {
-        return `${this.footStyle}; width: ${width};`
-      } else {
-        return { width: `${width}`, ...this.footStyle }
-      }
+      return { width: `${width}`, ...footStyle }
     }
   }
 }

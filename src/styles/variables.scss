@@ -15,6 +15,16 @@ $--color-danger: #FF3333 !default;
 /// color|1|Functional Color|1
 $--color-info: #909399 !default;
 
+/* Link
+-------------------------- */
+$--link-color: mix(#ffffff, $--color-primary, 5%) !default;
+$--link-hover-color: $--color-primary !default;
+
+/* Border
+-------------------------- */
+/// borderRadius|1|Radius|0
+$--border-radius-base: 2px !default;
+
 /* Table
 -------------------------- */
 /// color||Color|0
@@ -29,6 +39,10 @@ $--button-medium-border-radius: 2px;
 /* form
 -------------------------- */
 $--input-border-radius: 2px; // default: 4px
+
+/* card
+-------------------------- */
+$--card-border-radius: 2px; // default: 4px
 
 /********************************************************************* custom style
 */

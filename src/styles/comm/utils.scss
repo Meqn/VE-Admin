@@ -1,7 +1,7 @@
 @use "sass:math";
-/**************************************************************
- 文本 text
-*/
+
+// 文本 text
+// ------------------------
 // Font Family
 $font-family-base: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
 $font-family-en: Helvetica Neue, Arial, sans-serif;
@@ -107,9 +107,8 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
   }
 }
 
-/**************************************************************
- 块显示/隐藏 block
-*/
+// 块显示/隐藏 block
+// ------------------------
 .none{
   display: none;
 }
@@ -123,9 +122,8 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
   visibility: visible;
 }
 
-/**************************************************************
- width, height
-*/
+// width, height
+// ------------------------
 .w-0{ width: 0px; }
 .w-full{ width: 100%; }
 .w-screen{ width: 100vw; }
@@ -156,10 +154,8 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
   @include widthDiv($i, 12);
 }
 
-
-/**************************************************************
- margin, padding
-*/
+// margin, padding
+// ------------------------
 $gaps: 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56;
 @each $g in $gaps {
   .mt-#{$g} {
@@ -213,9 +209,8 @@ $gaps: 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56;
   }  
 }
 
-/**************************************************************
- flex
-*/
+// flex
+// ------------------------
 .flex{
   display: flex;
   &-item{
@@ -282,5 +277,19 @@ $gaps: 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+}
+
+// mixins
+// ------------------------
+.clearfix {
+  zoom: 1;
+  &::before,
+  &::after {
+    display: table;
+    content: '';
+  }
+  &::after {
+    clear: both;
   }
 }

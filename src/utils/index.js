@@ -136,7 +136,7 @@ export function param2Obj(url) {
 }
 
 let raf = null
-export function requestAnimationFrame (callback) {
+export function requestAnimationFrame(callback) {
   if (!raf) {
     raf = (
       window.requestAnimationFrame ||
@@ -151,7 +151,7 @@ export function requestAnimationFrame (callback) {
 }
 
 let caf = null
-export function cancelAnimationFrame (id) {
+export function cancelAnimationFrame(id) {
   if (!caf) {
     caf = (
       window.cancelAnimationFrame ||
@@ -282,4 +282,14 @@ export function resolvePath(base, path) {
   } catch (error) {
     console.error(error)
   }
+}
+
+// 复制一份对象，并过滤掉指定的字段
+export function omit(obj, fields) {
+  const shallowCopy = Object.assign({}, obj)
+  for (let i = 0; i < fields.length; i += 1) {
+    const key = fields[i]
+    delete shallowCopy[key]
+  }
+  return shallowCopy
 }

@@ -97,10 +97,6 @@ export function validCssValue(val) {
   return reg.test(val)
 }
 
-export function isVNode(node) {
-  return node !== null && typeof node === 'object' && Object.prototype.hasOwnProperty.call(node, 'componentOptions')
-}
-
 export function isEmptyElement(c) {
   return !(c.tag || (c.text && c.text.trim() !== ''));
 }

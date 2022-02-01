@@ -2,14 +2,11 @@ const storage = window.localStorage
 
 export default {
   get(key) {
+    const localData = storage.getItem(key)
     try {
-      const localData = storage.getItem(key)
-      if (localData) {
-        return JSON.parse(localData)
-      }
-      return localData
+      return localData ? JSON.parse(localData) : localData
     } catch (err) {
-      return undefined
+      return localData
     }
   },
   set(key, value) {

@@ -14,7 +14,7 @@ $font-family-en: Helvetica Neue, Arial, sans-serif;
 $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
 @each $s in $fonts {
   .font-#{$s}{
-    font-size: $s + px;
+    font-size: $s + px !important;
   }
 }
 
@@ -32,44 +32,44 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
 .h4{ @include typography-title(20px, 1.4); }
 .h5{ @include typography-title(16px, 1.5); }
 
-.blue{ color: $--color-blue; }
-.green{ color: $--color-green; }
-.red{ color: $--color-red; }
-.orange{ color: $--color-orange; }
-.gray{ color: $--color-gray; }
+.blue{ color: $--color-blue !important; }
+.green{ color: $--color-green !important; }
+.red{ color: $--color-red !important; }
+.orange{ color: $--color-orange !important; }
+.gray{ color: $--color-gray !important; }
 
 // font位置
 .tal{
-  text-align: left;
+  text-align: left !important;
 }
 .tac{
-  text-align: center;
+  text-align: center !important;
 }
 .tar{
-  text-align: right;
+  text-align: right !important;
 }
 .taj{
-  text-align: justify;
+  text-align: justify !important;
 }
 .vat{
-  vertical-align: top;
+  vertical-align: top !important;
 }
 .vam{
-  vertical-align: middle;
+  vertical-align: middle !important;
 }
 .vab{
-  vertical-align: bottom;
+  vertical-align: bottom !important;
 }
 
 // font weight
 .fwn {
-  font-weight: normal;
+  font-weight: normal !important;
 }
 .fwb {
-  font-weight: bold;
+  font-weight: bold !important;
 }
 .fsi {
-  font-style: italic;
+  font-style: italic !important;
 }
 // 文本转换
 .ttc{
@@ -121,21 +121,26 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
 .visible{
   visibility: visible;
 }
+.inline{
+  display: inline-block;
+}
 
 // width, height
 // ------------------------
-.w-0{ width: 0px; }
-.w-full{ width: 100%; }
-.w-screen{ width: 100vw; }
-.w-min-0{ min-width: 0px; }
-.h-0{ height: 0px; }
-.h-full{ height: 100%; }
-.h-screen{ height: 100vh; }
-.h-min-0{ min-height: 0px; }
+.w-auto{ width: auto !important; }
+.w-0{ width: 0px !important; }
+.w-full{ width: 100% !important; }
+.w-screen{ width: 100vw !important; }
+.w-min-0{ min-width: 0px !important; }
+.h-0{ height: 0px !important; }
+.h-auto{ height: auto !important; }
+.h-full{ height: 100% !important; }
+.h-screen{ height: 100vh !important; }
+.h-min-0{ min-height: 0px !important; }
 
 @mixin widthDiv($num, $den) {
   .w-#{$num}\/#{$den}{
-    width: math.div($num, $den) * 100%;
+    width: math.div($num, $den) * 100% !important;
   }
 }
 @include widthDiv(1, 2);
@@ -147,7 +152,7 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
   @include widthDiv($i, 10);
 
   .h-#{$i}\/10{
-    height: ($i * 10) * 1%
+    height: ($i * 10) * 1% !important;
   }
 }
 @for $i from 1 to 12 {

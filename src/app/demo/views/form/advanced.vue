@@ -1,87 +1,137 @@
 <template>
-<PageLayout>
-  <ve-page-header
-    slot="header"
-    title="高级表单"
-    breadcrumb>
-    表单页用于向用户收集或验证信息，基础表单常见于数据项较少的表单场景。
-  </ve-page-header>
-  <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="100px" class="demo-dynamic">
-    <ve-card>
-      <el-form-item
-        prop="email"
-        label="邮箱"
-        :rules="[
-          { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-          { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
-        ]"
-      >
-        <el-input v-model="dynamicValidateForm.email"></el-input>
-      </el-form-item>
-      
-      <el-form-item
-        v-for="(domain, index) in dynamicValidateForm.domains"
-        :label="'域名' + index"
-        :key="domain.key"
-        :prop="'domains.' + index + '.value'"
-        :rules="{
-          required: true, message: '域名不能为空', trigger: 'blur'
-        }">
-        <el-input v-model="domain.value"></el-input><el-button @click.prevent="removeDomain(domain)">删除</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="submitForm('dynamicValidateForm')">提交</el-button>
-        <el-button @click="addDomain">新增域名</el-button>
-        <el-button @click="resetForm('dynamicValidateForm')">重置</el-button>
-      </el-form-item>
+<PageLayout
+  title="高级表单"
+  content="高级表单常见于一次性输入和提交大批量数据的场景。"
+  breadcrumb>
+
+  <ve-form :model="form" :rules="formRules" ref="form" label-position="top" class="advanced-form">
+    <ve-card title="仓库管理">
+      <ve-form-group type="grid" :gutter="32">
+        <ve-form-item prop="store.name" label="仓库名" required>
+          <el-input v-model="form.store.name"></el-input>
+        </ve-form-item>
+        <ve-form-item prop="store.url" label="仓库域名" required>
+          <el-input v-model="form.store.url">
+            <template slot="prepend">Https://</template>
+            <template slot="append">.com</template>
+          </el-input>
+        </ve-form-item>
+        <ve-form-item prop="store.owner" label="仓库管理员" required>
+          <el-select v-model="form.store.owner" placeholder="请选择" class="w-full">
+            <el-option
+              v-for="item in userList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </ve-form-item>
+        <ve-form-item prop="store.approver" required>
+          <ve-text slot="label">
+            审批人
+            <el-tooltip slot="right" effect="dark" content="仓库的管理对象" placement="top">
+              <ve-text type="info" class="ml-8"><ve-icon name="el-icon-warning-outline" /></ve-text>
+            </el-tooltip>
+          </ve-text>
+          <el-select v-model="form.store.approver" placeholder="请选择" class="w-full">
+            <el-option
+              v-for="item in userList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </ve-form-item>
+        <ve-form-item prop="store.dateRange" label="生效日期" required>
+          <el-date-picker
+            v-model="form.store.dateRange"
+            class="w-full"
+            type="daterange"
+            range-separator="-"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期">
+          </el-date-picker>
+        </ve-form-item>
+        <ve-form-item prop="store.type" label="仓库类型" required>
+          <el-select v-model="form.store.type" placeholder="请选择" class="w-full">
+            <el-option
+              v-for="item in typeList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </ve-form-item>
+      </ve-form-group>
     </ve-card>
 
-    <ve-card>
-      <el-table
-        :data="dynamicValidateForm.tableData"
-        style="width: 100%">
-        <el-table-column prop="date" label="日期" width="180">
-          <template slot-scope="scope">
-            <el-input v-model="scope.row.date" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="name" label="姓名" width="180">
-          <template slot-scope="scope">
-            <el-input v-model="scope.row.name" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="address" label="地址">
-          <template slot-scope="scope">
-            <el-input v-model="scope.row.address" />
-          </template>
-        </el-table-column>
-      </el-table>
+    <ve-card title="任务管理" class="mt-20">
+      <ve-form-group :gutter="32">
+        <ve-form-item prop="task.name" label="任务名" required>
+          <el-input v-model="form.task.name"></el-input>
+        </ve-form-item>
+        <ve-form-item prop="task.desc" label="任务描述" required>
+          <el-input v-model="form.task.desc"></el-input>
+        </ve-form-item>
+        <ve-form-item prop="task.executor" label="执行人" required>
+          <el-select v-model="form.store.executor" placeholder="请选择" class="w-full">
+            <el-option
+              v-for="item in userList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </ve-form-item>
+        <ve-form-item prop="task.officer" label="责任人" required>
+          <el-select v-model="form.store.officer" placeholder="请选择" class="w-full">
+            <el-option
+              v-for="item in userList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </ve-form-item>
+        <ve-form-item prop="task.dateRange" label="生效日期" required>
+          <el-date-picker
+            v-model="form.task.dateRange"
+            class="w-full"
+            type="daterange"
+            range-separator="-"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期">
+          </el-date-picker>
+        </ve-form-item>
+        <ve-form-item prop="task.type" label="任务类型" required>
+          <el-select v-model="form.task.type" placeholder="请选择" class="w-full">
+            <el-option
+              v-for="item in typeList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </ve-form-item>
+      </ve-form-group>
+    </ve-card>
 
-      <el-divider />
-
+    <ve-card title="成员管理" class="mt-20">
       <ve-table
-        ref="veTable"
-        :table="tableProps"
-        :data="dynamicValidateForm.tableData"
-        :columns="tableColumn"
-        :editable="{ type: 'cell', cellEditMode: 'auto', cellEditCancel: true }"
-        @value-change="onValueChange"
-        @cell-dblclick="onCellClick"
-        new-row="新用户"
-        @new-row="onAddRow">
-        <template v-slot:date="scope">
-          <VeTableCell :data="scope">
-            <el-date-picker
-              slot="edit"
-              v-model="scope.row.date"
-              type="date"
-              value-format="yyyy-M-d"
-              placeholder="选择日期">
-            </el-date-picker>
-          </VeTableCell>
+        ref="table"
+        :toolbar="false"
+        :data="form.users"
+        :columns="userColumns"
+        editable="single-row"
+        new-row
+        @new-row="onNewRow">
+        <template v-slot:part="scope">
+          <ve-table-cell :data="scope" fieldType="select" :fieldProps="{ options: partmentsList }">
+            {{ partmentsMap[scope.row['part']] }}
+          </ve-table-cell>
         </template>
         <template v-slot:action="scope">
-          <ve-space>
+          <ve-space :size="12">
             <template v-if="scope.column.editing">
               <el-button type="text" @click="onSaveRow(scope)">保存</el-button>
               <el-button type="text" @click="onCancelRow(scope)">取消</el-button>
@@ -89,153 +139,123 @@
             <template v-else>
               <el-button type="text" @click="onEditRow(scope)">编辑</el-button>
             </template>
-            <el-button type="text" @click="onDelRow(scope)">删除</el-button>
+            <el-popconfirm title="是否删除此行？" placement="top" @confirm="onDelRow(scope)">
+              <el-button type="text" slot="reference">删除</el-button>
+            </el-popconfirm>
           </ve-space>
         </template>
       </ve-table>
-
     </ve-card>
-  </el-form>
-
+  </ve-form>
 
   <VeFlex justify="right" slot="footer">
-    <el-button type="primary">立即创建</el-button>
-    <el-button>重置</el-button>
+    <el-button @click="resetForm('form')">重置</el-button>
+    <el-button type="primary" @click="submitForm('form')">立即创建</el-button>
   </VeFlex>
-  
 </PageLayout>
 </template>
 
 <script>
-const data = [{
-  date: '2016-05-02',
-  name: '王小虎',
-  gender: 0,
-  address: '上海市普陀区金沙江路 1518 弄'
-}, {
-  date: '2016-05-04',
-  name: '王小虎',
-  gender: 0,
-  address: '上海市普陀区金沙江路 1517 弄'
-}, {
-  date: '2016-05-01',
-  name: '王小虎2',
-  gender: 0,
-  address: '上海市普陀区金沙江路 1519 弄'
-}, {
-  date: '2016-05-03',
-  name: '王小虎',
-  gender: 0,
-  address: ''
-}]
-
-const options = [{
-  value: 'Beijing',
-  label: '北京'
-}, {
-  value: 'Shanghai',
-  label: '上海'
-}, {
-  value: 'Nanjing',
-  label: '南京'
-}, {
-  value: 'Chengdu',
-  label: '成都'
-}, {
-  value: 'Shenzhen',
-  label: '深圳'
-}, {
-  value: 'Guangzhou',
-  label: '广州'
-}]
-
 export default {
-  name: 'advanced-form',
+  name: 'AdvancedForm',
   data() {
     return {
-      dynamicValidateForm: {
-        domains: [{
-          value: ''
-        }],
-        email: '',
-        tableData: data
+      form: {
+        title: '',
+        store: {
+          name: '',
+          url: '',
+          owner: '',
+          approver: '',
+          dateRange: '',
+          type: '',
+        },
+        task: {
+          name: '',
+          desc: '',
+          executor: '',
+          officer: '',
+          dateRange: '',
+          type: '',
+        },
+        users: [
+          { name: 'John Brown', number: '00001', part: '1' },
+          { name: 'Jim Green', number: '00002', part: '2' },
+          { name: 'Joe Black', number: '00003', part: '3' },
+          { name: 'Lee Pink', number: '00004', part: '4' },
+          { name: 'Zhang Red', number: '00005', part: '5' }
+        ]
       },
-      tableColumn: [
-        { type: 'index' },
-        { prop: 'date', label: '日期时间', editable: false, slots: { default: 'date' }, fieldType: 'date' },
-        { prop: 'name', label: '真实姓名', editable: true, fieldProps: { clearable: true } },
-        { prop: 'gender', label: '性别', editable: true, fieldType: 'switch' },
-        { prop: 'address', label: '详细地址', editable: true, fieldType: 'select', fieldProps: { options }, showOverflowTooltip: true },
-        { prop: 'actions', label: '操作', slots: { default: 'action' } }
+      formRules: {
+        'store.name': [
+          { required: true, message: '请输入仓库名', trigger: 'blur' },
+          { min: 5, max: 40, message: '长度在 5 到 40 个字符', trigger: 'blur' }
+        ],
+        'store.dateRange': [
+          { required: true, message: '请选择起止时间', trigger: 'change' }
+        ]
+      },
+      userColumns: [
+        { type: 'index', label: '序号', width: '80px' },
+        { prop: 'name', label: '成员姓名', editable: true },
+        { prop: 'number', label: '工号', editable: true },
+        { prop: 'part', label: '所属部门', editable: true, slots: { default: 'part' } },
+        { prop: 'action', label: '操作', slots: { default: 'action' }, width: '150px' }
       ],
-      options: options,
-      tableProps: {}
+      partmentsList: [
+        { value: '1', label: 'New York No. 1 Lake Park' },
+        { value: '2', label: 'London No. 1 Lake Park' },
+        { value: '3', label: 'Sidney No. 1 Lake Park' },
+        { value: '4', label: 'Hongkong No. 1 Lake Park' },
+        { value: '5', label: 'Beijing No. 1 Lake Park' }
+      ],
+      userList: [
+        { label: '付晓晓', value: '1' },
+        { label: '周毛毛', value: '2' },
+        { label: '蔡丝丝', value: '3' }
+      ],
+      typeList: [
+        { label: '公开', value: '0' },
+        { label: '私密', value: '1' }
+      ]
     }
   },
-  mounted() {
+  computed: {
+    partmentsMap() {
+      return this.partmentsList.reduce((acc, item) => {
+        acc[item.value] = item.label
+        return acc
+      }, {})
+    }
   },
   methods: {
-    onClickout() {
-      console.log('click header out ...')
-    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!');
+          console.log('form', this.basicForm)
         } else {
           console.log('error submit!!');
-          return false;
+          return false
         }
       })
     },
     resetForm(formName) {
-      this.$refs[formName].resetFields();
-    },
-    removeDomain(item) {
-      var index = this.dynamicValidateForm.domains.indexOf(item)
-      if (index !== -1) {
-        this.dynamicValidateForm.domains.splice(index, 1)
-      }
-    },
-    addDomain() {
-      this.dynamicValidateForm.domains.push({
-        value: '',
-        key: Date.now()
-      });
-      this.dynamicValidateForm.tableData.push({
-        date: '',
-        name: '',
-        address: ''
-      })
-      this.$refs['veTable'].edit(this.dynamicValidateForm.tableData.length - 1)
-    },
-    onClickTableCell({ row, column, $index }) {
-      // console.log('on cell button click', { row, column, $index })
-      this.$refs['veTable'].edit($index)
-    },
-    onCellClick(row, column, cell, event) {
-      // console.log('on cell click', row, column, cell, event)
+      this.$refs[formName].resetFields()
     },
     onEditRow({ row, column, $index }) {
-      console.log('onEditRow ', row, column)
-      this.$refs['veTable'].edit(row)
+      this.$refs['table'].edit(row)
     },
     onSaveRow({ row, column, $index }) {
-      // console.log('保存数据', row)
-      this.$refs['veTable'].save(row)
+      this.$refs['table'].save(row)
     },
     onCancelRow({ row, column, $index }) {
-      this.$refs['veTable'].edit(row, false)
+      this.$refs['table'].edit(row, false)
     },
     onDelRow({ row, column, $index }) {
-      // this.dynamicValidateForm.tableData.splice($index, 1)
-      this.$refs['veTable'].delete(row)
+      this.$refs['table'].delete(row)
     },
-    onValueChange(a, b, c) {
-      console.log('change value', a, b, c)
-    },
-    onAddRow() {
-      this.$refs['veTable'].addRow(this.dynamicValidateForm.tableData[0], 'top')
+    onNewRow() {
+      this.$refs['table'].addRow({ name: '', number: '', part: '' })
     }
   }
 }

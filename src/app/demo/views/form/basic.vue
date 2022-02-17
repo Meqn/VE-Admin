@@ -22,10 +22,7 @@
       <el-form-item label="目标描述" prop="description">
         <el-input type="textarea" placeholder="请输入你的阶段性工作目标" v-model="basicForm.description" />
       </el-form-item>
-      <el-form-item label="衡量标准" prop="standard">
-        <el-input type="textarea" placeholder="请输入衡量标准" v-model="basicForm.standard"></el-input>
-      </el-form-item>
-      <el-form-item label="目标范围" prop="range">
+      <el-form-item label="目标类别" prop="range">
         <el-checkbox-group v-model="basicForm.range">
           <el-checkbox label="1">生活</el-checkbox>
           <el-checkbox label="2">科技</el-checkbox>
@@ -61,7 +58,7 @@
           权重
           <ve-text type="info" class="ml-4">(选填)</ve-text>
         </template>
-        <el-input-number v-model="basicForm.weight" :min="0" :max="10" />
+        <el-input-number v-model="basicForm.weight" :min="0" :max="10" class="w-auto" />
       </el-form-item>
       <el-form-item label="目标公开" prop="open">
         <el-radio-group v-model="basicForm.open">
@@ -71,7 +68,7 @@
         </el-radio-group>
         <div class="gray">客户、邀评人默认被分享</div>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="mt-40">
         <el-button type="primary" @click="submitForm('basicForm')">立即创建</el-button>
         <el-button @click="resetForm('basicForm')">重置</el-button>
       </el-form-item>
@@ -83,7 +80,7 @@
 
 <script>
 export default {
-  name: 'basic-form',
+  name: 'BasicForm',
   data() {
     return {
       basicForm: {
@@ -103,7 +100,7 @@ export default {
           { min: 5, max: 40, message: '长度在 5 到 40 个字符', trigger: 'blur' }
         ],
         date: [
-          { required: true, message: '起止时间', trigger: 'change' }
+          { required: true, message: '请选择起止时间', trigger: 'change' }
         ],
         description: [
           { required: true, message: '请填写工作目标', trigger: 'blur' }
@@ -113,9 +110,6 @@ export default {
         ],
         range: [
           { required: true, message: '请至少选择一个范围', trigger: 'change' }
-        ],
-        open: [
-          { required: true, message: '请选择活动资源', trigger: 'change' }
         ]
       }
     };

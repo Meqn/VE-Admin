@@ -8,13 +8,13 @@
  * 2. Prevent adjustments of font size after orientation changes in iOS.
  */
 
- html {
+html {
   box-sizing: border-box;
-	line-height: 1.15;
+  line-height: 1.15;
   -webkit-text-size-adjust: 100%; /* Prevent adjustments of font size after orientation changes in iOS */
   -ms-text-size-adjust: 100%;
   text-rendering: optimizeLegibility;
-	-webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
 }
@@ -24,29 +24,29 @@
 }
 
 /* Sections
-   ========================================================================== */
+  ========================================================================== */
 
 /**
  * Remove the margin in all browsers.
  */
 
- html, body, p, ol, ul, li, dl, dt, dd,
- blockquote, figure, fieldset, legend, textarea, pre, iframe,
- hr, h1, h2, h3, h4, h5, h6 {
-   margin: 0;
-   padding: 0;
- }
- 
- h1, h2, h3, h4, h5, h6 {
-   font-weight: 500;
- }
- 
- article, aside, dialog, figcaption, figure, footer, header, hgroup, main, nav, section {
-   display: block
- }
+html, body, p, ol, ul, li, dl, dt, dd,
+blockquote, figure, fieldset, legend, textarea, pre, iframe,
+hr, h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0;
+}
 
- ul, li {
-  list-style: none;
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+}
+
+article, aside, dialog, figcaption, figure, footer, header, hgroup, main, nav, section {
+  display: block
+}
+
+ul, li {
+list-style: none;
 }
 
 
@@ -77,7 +77,7 @@ th:not([align]) {
 
 
 /* Grouping content
-   ========================================================================== */
+  ========================================================================== */
 
 /**
  * 1. Add the correct box sizing in Firefox.

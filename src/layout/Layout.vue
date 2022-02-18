@@ -9,10 +9,8 @@
       <el-header :height="`${headerHeight}px`" style="background: transparent"></el-header>
 
       <LayoutMain />
-
-      <el-footer height="auto" class="v-layout-footer">
-        <div class="pt-24 pb-24 tac">Copyright @ 2022 <a href="https://github.com/veComponent/VE-Admin/" target="_blank">VE-Admin</a>. All Rights Reserved</div>
-      </el-footer>
+      
+      <LayoutFooter />
     </section>
 
   </el-container>
@@ -20,7 +18,7 @@
 
 <script>
 import './layout.scss'
-import { LayoutHeader, LayoutSider, LayoutMain } from './components'
+import { LayoutHeader, LayoutSider, LayoutMain, LayoutFooter } from './components'
 import resizeDirective from 'v-resize-observer/src/directive'
 
 export default {
@@ -28,7 +26,8 @@ export default {
   components: {
     LayoutHeader,
     LayoutSider,
-    LayoutMain
+    LayoutMain,
+    LayoutFooter
   },
   directives: {
     resize: resizeDirective

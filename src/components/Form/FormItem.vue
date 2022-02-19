@@ -21,7 +21,7 @@ export default {
     inlineMessage: Boolean,
     // form-item 附加
     formItemClass: [String, Object, Array],
-    formItemStyle: [String, Object]
+    formItemStyle: Object
   },
   inject: ['group', 'getColumn'],
   data() {

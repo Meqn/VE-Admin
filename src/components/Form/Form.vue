@@ -5,10 +5,10 @@
     v-resize:debounce="$_resize"
     :model="model"
     :rules="rules"
-    :labelPosition="labelAlign"
+    :labelPosition="labelPosition"
     :labelWidth="labelWidth"
     :labelSuffix="labelSuffix"
-    :inline="layout === 'horizontal'"
+    :inline="inline"
     :inlineMessage="inlineMessage"
     :statusIcon="statusIcon"
     :showMessage="showMessage"
@@ -34,7 +34,7 @@ export default {
     // form
     model: Object,
     rules: Object,
-    // inline: Boolean, //由layout控制
+    inline: Boolean,
     labelPosition: String,
     labelWidth: String,
     labelSuffix: String,
@@ -52,13 +52,6 @@ export default {
     size: String,
     disabled: Boolean,
     // 附加属性
-    // 表单项布局
-    layout: {
-      type: String,
-      validator(val) {
-        return ['vertical', 'horizontal', ''].includes(val)
-      }
-    },
     column: {
       type: Number,
       validator(val) {
@@ -75,13 +68,6 @@ export default {
     return {
       getColumn: this.getColumn,
       form: this
-    }
-  },
-  computed: {
-    labelAlign() {
-      return this.layout === 'vertical'
-        ? 'top' : this.labelPosition === 'top'
-          ? 'right' : this.labelPosition || 'right'
     }
   },
   mounted() {

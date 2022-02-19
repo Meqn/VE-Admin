@@ -14,16 +14,15 @@
   :validateOnRuleChange="validateOnRuleChange"
   :size="size"
   :disabled="disabled"
-  :layout="layout"
   @resize="$_changeColumn">
   <FormGroup type="grid" :gutter="gutter">
     <slot />
-    <!-- label=" " 全角空格,解决`layout=vertical`错位显示问题 -->
+    <!-- label=" " 全角空格,解决`label-position = top`错位显示问题 -->
     <FormItem :offset="actionOffset" label="0" label-width="1px" class="form-action">
       <div class="form-action-content">
         <slot name="action" v-bind="{ collapsed: isCollapsed }">
-          <el-button @click="resetForm">{{ resetText }}</el-button>
-          <el-button type="primary" @click="submitForm" :loading="loading">{{ searchText }}</el-button>
+          <el-button @click="$_resetForm">{{ resetText }}</el-button>
+          <el-button type="primary" @click="$_submitForm" :loading="loading">{{ searchText }}</el-button>
           <el-link
             v-if="hasCollapse"
             :class="['form-collapse', { 'is-collapse': isCollapsed }]"
@@ -79,7 +78,7 @@ export default {
     size: String,
     disabled: Boolean,
     // 表单项布局
-    layout: String,
+    // layout: String,
     // queryForm
     resetText: {
       type: String,
@@ -118,7 +117,7 @@ export default {
         this.toggleCollapse(false)
       })
     },
-    submitForm() {
+    $_submitForm() {
       this.$refs['searchForm'].validate((valid) => {
         if (valid) {
           this.loading = true
@@ -128,7 +127,7 @@ export default {
         }
       })
     },
-    resetForm() {
+    $_resetForm() {
       this.$refs['searchForm'].resetFields()
       this.$emit('reset')
     },

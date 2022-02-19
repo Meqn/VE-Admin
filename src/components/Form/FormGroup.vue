@@ -66,14 +66,7 @@ export default {
       cell: null
     }
     
-    if (type === 'grid') {
-      // grid
-      $content.grid = (
-        <el-row ref="row" type="flex" justify="start" align={this.align} gutter={this.gutter} class="ve-form-grid">
-          {this.$slots.default}
-        </el-row>
-      )
-    } else if (type === 'cell') {
+    if (type === 'cell') {
       // cell
       const items = this.getItems()
       $content.cell = (
@@ -92,6 +85,13 @@ export default {
             )
           })}
         </el-descriptions>
+      )
+    } else {
+      // type = grid
+      $content.grid = (
+        <el-row ref="row" type="flex" justify="start" align={this.align} gutter={this.gutter} class="ve-form-grid">
+          {this.$slots.default}
+        </el-row>
       )
     }
 

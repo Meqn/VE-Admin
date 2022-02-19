@@ -7,7 +7,7 @@ function isRequired(props, rules = {}) {
   let isRequired = false
   if (props && props.prop) {
     const itemRules = props.rules || rules[props.prop] || []
-    const requiredRule = props.required !== undefined ? { required: !!props.required } : [];
+    const requiredRule = props.required !== undefined ? { required: props.required !== false } : []; // 注： 若required 未赋值，则结果为 required = '' 
     [].concat(itemRules, requiredRule).every(rule => {
       if (rule.required) {
         isRequired = true

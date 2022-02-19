@@ -13,6 +13,7 @@
           v-else-if="fieldType === 'select'"
           @keyup.27.native="$_handleCancel"
           placeholder="请选择"
+          class="w-full"
           ref="field" v-model="data.row[prop]" v-on="$listeners" v-bind="fieldProps">
           <template v-if="Array.isArray(fieldProps.options)">
             <el-option v-for="item in fieldProps.options" :key="item.value" :label="item.label" :value="item.value" />

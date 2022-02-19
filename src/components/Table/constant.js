@@ -11,7 +11,17 @@ export const ROW_KEY = '$_row_key'
 export const ROW_INDEX = '$_row_index'
 
 // el-table 方法
-export const TABLE_METHODS = ['clearSelection', 'toggleRowSelection', 'toggleAllSelection', 'toggleRowExpansion', 'setCurrentRow', 'clearSort', 'clearFilter', 'doLayout', 'sort']
+export const TABLE_METHODS = [
+  'clearSelection',
+  'toggleRowSelection',
+  'toggleAllSelection',
+  'toggleRowExpansion',
+  'setCurrentRow',
+  'clearSort',
+  'clearFilter',
+  'doLayout',
+  'sort'
+]
 
 // el-pagination 事件
 export const PAGINATION_EVENT = {}

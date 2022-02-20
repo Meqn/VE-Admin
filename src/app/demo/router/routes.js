@@ -1,4 +1,4 @@
-import Layout from '@/layout'
+import Layout from '@demo/Layout'
 import Redirect from '@demo/views/redirect'
 
 import exceptionRoutes from './modules/exception'
@@ -31,6 +31,12 @@ export const constantRoutes = [
   {
     path: '/404',
     component: () => import('@demo/views/404'),
+    hidden: true,
+    meta: { noRequiresAuth: true, hidden: true }
+  },
+  {
+    path: '/demo',
+    component: () => import('@demo/views/demo'),
     hidden: true,
     meta: { noRequiresAuth: true, hidden: true }
   },

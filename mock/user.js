@@ -41,7 +41,7 @@ const menus = {
         },
         {
           name: 'list_table',
-          title: '表格列表'
+          title: '查询表格'
         },
         {
           name: 'list_search',

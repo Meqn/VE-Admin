@@ -12,7 +12,10 @@ export default {
     bodyStyle: Object,
     title: String,
     extra: String,
-    bordered: Boolean,
+    bordered: {
+      type: Boolean,
+      default: true
+    },
     loading: Boolean,
     hoverable: Boolean,
     type: String,
@@ -88,7 +91,7 @@ export default {
     const {
       headStyle = {},
       bodyStyle = {},
-      bordered = true,
+      bordered,
       size = 'default',
       type,
       tabProps = {},

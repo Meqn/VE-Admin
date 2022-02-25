@@ -4,14 +4,14 @@
 
 
 ## props
-- `size`: [Number, String], 间隔大小 `['small', 'middle', 'large']`
-- `direction`: String, 排列的方向 `['horizontal', 'vertical']`
-- `align`: String, 对齐的方式 `['start', 'end', 'center', 'baseline']`
-- `wrap`: Boolean, 是否自动换行
-- `spacer`: `[String, VNode]` 间隔符
+- `size: number | string` :  间隔大小 `['small', 'middle', 'large']`
+- `direction: String` : 排列的方向 `['horizontal', 'vertical']`
+- `align: String` : 对齐的方式 `['start', 'end', 'center', 'baseline']`
+- `wrap: boolean` : 是否自动换行
+- `spacer: string | VNode` : 间隔符
 
 
-## example
+## Usage
 
 ```html
 <ve-space :size="24" spacer="|">

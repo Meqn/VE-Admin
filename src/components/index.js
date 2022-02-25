@@ -6,7 +6,6 @@ import { Card, CardGrid, CardMeta } from './Card'
 import Container from './Container'
 import PageHeader from './PageHeader'
 import { Table, TableCell } from './Table'
-// import { GridForm, GridFormItem } from './GridForm'
 import { Form, FormGroup, FormItem, QueryForm } from './Form'
 
 const components = [

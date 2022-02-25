@@ -1,9 +1,7 @@
 <script>
 import { randomStr } from '@/utils'
 import staticData from './data'
-import { getProjectList, getCompanyList } from '@/api/common'
-import { getRoleList, getUserList, getDepartmentList, getJobList } from '@supervisor/api/system'
-import { getMyProjectList } from '@/app/supplier/api/device'
+import { getProjectList } from '@/api/common'
 
 export default {
   name: 'AppSelectFilter',
@@ -46,8 +44,8 @@ export default {
     immediate: Boolean,
     // 附加查询条件
     query: Object,
-    // 选项过滤的值
-    filterList: Array
+    // 请求后的数据处理
+    handler: Function
   },
   data() {
     const defaultVal = !this.multiple
@@ -135,7 +133,7 @@ export default {
       // 限制最大宽度，避免select-option内容过长超出屏幕
       try {
         const winWidth = window.innerWidth || document.body.clientWidth
-        const selectLeft = this.$el?.getBoundingClientRect?.()?.left
+        const selectLeft = this.$el?.getBoundingClientRect().left
         let maxWidth = this.$el.clientWidth
         if (selectLeft) {
           maxWidth = Math.round(winWidth - selectLeft - 20)
@@ -143,13 +141,6 @@ export default {
         document.querySelector(`.${this.popperClass}`).style['max-width'] = maxWidth + 'px'
       } catch (error) {
         console.error(error)
-      }
-    },
-    filterListFn() {
-      if (this.filterList) {
-        this.list = this.list.filter(item => {
-          return !this.filterList.includes(item.value)
-        })
       }
     },
     queryList(text) {
@@ -206,102 +197,14 @@ export default {
     $_project(text) {
       return getProjectList(this.getQuery('project_name', text)).then(({ data }) => {
         if (data) {
-          this.list = data.results.map(v => {
+          const results = data.results.map(v => {
             return {
               ...v,
               value: v.id,
               name: v.project_name
             }
           })
-          this.filterListFn()
-        }
-      })
-    },
-    // 我的项目
-    $_myProject(text) {
-      return getMyProjectList(this.getQuery('project_name', text)).then(({ data }) => {
-        if (data) {
-          this.list = data.list.map(v => {
-            return {
-              ...v,
-              value: v.project_id,
-              name: v.project_name
-            }
-          })
-          this.filterListFn()
-        }
-      })
-    },
-    // 企业列表
-    $_company(text) {
-      return getCompanyList(this.getQuery('company_name', text)).then(({ data }) => {
-        if (data) {
-          this.list = data.results.map(v => {
-            return {
-              ...v,
-              value: v.id,
-              name: v.company_name
-            }
-          })
-          this.filterListFn()
-        }
-      })
-    },
-    // 用户列表
-    $_user(text) {
-      return getUserList(this.getQuery('user_realname', text)).then(({ data }) => {
-        if (data) {
-          this.list = data.results.map(v => {
-            return {
-              ...v,
-              value: v.id,
-              name: v.user_realname
-            }
-          })
-          this.filterListFn()
-        }
-      })
-    },
-    // 用户角色列表
-    $_userRole(text) {
-      return getRoleList(this.getQuery('role_name', text)).then(({ data }) => {
-        if (data) {
-          this.list = data.map(v => {
-            return {
-              ...v,
-              value: v.id,
-              name: v.role_name
-            }
-          })
-          this.filterListFn()
-        }
-      })
-    },
-    // 科室列表
-    $_department(text) {
-      return getDepartmentList(this.getQuery('name', text)).then(({ data }) => {
-        if (data) {
-          this.list = data.map(v => {
-            return {
-              ...v,
-              value: v.id
-            }
-          })
-          this.filterListFn()
-        }
-      })
-    },
-    // 职务列表
-    $_job(text) {
-      return getJobList(this.getQuery('name', text)).then(({ data }) => {
-        if (data) {
-          this.list = data.results.map(v => {
-            return {
-              ...v,
-              value: v.id
-            }
-          })
-          this.filterListFn()
+          this.list = typeof handler === 'function' ? (this.handler() || []) : results
         }
       })
     }

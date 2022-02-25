@@ -1,5 +1,5 @@
 <template>
-<ve-flex direction="column" class="ve-container">
+<div class="ve-container">
   <div v-if="$slots.header" :class="['ve-container-head', headClass]" :style="headStyle">
     <slot name="header" />
   </div>
@@ -9,17 +9,12 @@
   <div v-if="$slots.footer" :class="['ve-container-foot', footClass]" :style="footStyle">
     <slot name="footer" />
   </div>
-</ve-flex>
+</div>
 </template>
 
 <script>
-import VeFlex from '@/components/Flex'
-
 export default {
   name: 'VeContainer',
-  components: {
-    VeFlex
-  },
   props: {
     headStyle: [String, Object],
     headClass: String,
@@ -33,6 +28,8 @@ export default {
 
 <style lang="scss">
 .ve-container{
+  display: flex;
+  flex-direction: column;
   position: relative;
   overflow: hidden;
   height: 100%;

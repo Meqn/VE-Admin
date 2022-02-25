@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import Icon from '@/components/Icon'
+import { Icon } from '../index'
 
 export default {
   name: 'VeTableCell',

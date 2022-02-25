@@ -4,12 +4,12 @@
   <div v-if="$slots.search" class="ve-table-search"><slot name="search"/></div>
   <!-- header -->
   <div v-if="showHeader" class="ve-table-header">
-    <Flex align="middle" class="ve-table-header-left">
+    <div class="flex-middle ve-table-header-left">
       <slot name="title">
         <span class="table-title">{{ title }}</span>
       </slot>
-    </Flex>
-    <Flex align="middle" class="ve-table-header-right">
+    </div>
+    <div class="flex-middle ve-table-header-right">
       <slot name="extra" />
       <!-- toolbar -->
       <div v-if="toolbarList.length > 0" class="ve-table-toolbar">
@@ -22,7 +22,7 @@
           <component :is="toolbarData[item].component" v-bind="toolbarData[item].props" />
         </el-tooltip>
       </div>
-    </Flex>
+    </div>
   </div>
 
   <!-- table alert -->
@@ -53,7 +53,7 @@
     </el-table>
 
     <!-- pagination -->
-    <Flex v-if="paginationProps" :justify="paginationProps.align" class="ve-table-pagination" :style="pagination.style || {}">
+    <div v-if="paginationProps" :class="['ve-table-pagination', `flex-${paginationProps.align}`]" :style="pagination.style || {}">
       <slot name="pagination">
         <el-pagination
           ref="elPagination"
@@ -64,7 +64,7 @@
           @next-click="$_paginationNextClick"
         />
       </slot>
-    </Flex>
+    </div>
   </div>
   <el-button v-if="newRow" plain dashed icon="el-icon-plus" style="margin: 12px 0; width: 100%" @click="$_addRow">{{ newRowText }}</el-button>
   <slot name="footer" />
@@ -73,7 +73,6 @@
 
 <script>
 import './style.scss'
-import Flex from '@/components/Flex'
 import Column from './Column'
 import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
@@ -95,7 +94,6 @@ function defineNonEnumKey(obj, key, value) {
 export default {
   name: 'VeTable',
   components: {
-    Flex,
     Column,
     TableSetting,
     TableDensity,
@@ -210,11 +208,11 @@ export default {
       return typeof this.newRow === 'string' ? this.newRow : '添加一行数据'
     }
   },
-  watch: {
+  /* watch: {
     'data.length'(val) {
       console.log('data.length change ....', val)
     }
-  },
+  }, */
   mounted() {
     // 绑定el-table组件 & 方法
     this.$table = this.$refs['elTable']

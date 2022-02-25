@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Fullscreen from '@/components/Fullscreen'
+import Fullscreen from '../../Fullscreen'
 export default {
   name: 'TableFullscreen',
   components: { Fullscreen },

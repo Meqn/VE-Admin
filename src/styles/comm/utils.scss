@@ -11,7 +11,7 @@ $font-family-en: Helvetica Neue, Arial, sans-serif;
 }
 
 // font 大小
-$fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
+$fonts: 12, 14, 16, 18, 20, 24, 30, 36, 44, 56, 64, 72;
 @each $s in $fonts {
   .font-#{$s}{
     font-size: $s + px !important;
@@ -39,53 +39,25 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
 .gray{ color: $--color-gray !important; }
 
 // font位置
-.tal{
-  text-align: left !important;
-}
-.tac{
-  text-align: center !important;
-}
-.tar{
-  text-align: right !important;
-}
-.taj{
-  text-align: justify !important;
-}
-.vat{
-  vertical-align: top !important;
-}
-.vam{
-  vertical-align: middle !important;
-}
-.vab{
-  vertical-align: bottom !important;
-}
+.tal{ text-align: left !important; }
+.tac{ text-align: center !important; }
+.tar{ text-align: right !important; }
+.taj{ text-align: justify !important; }
+.vat{ vertical-align: top !important; }
+.vam{ vertical-align: middle !important; }
+.vab{ vertical-align: bottom !important; }
 
 // font weight
-.fwn {
-  font-weight: normal !important;
-}
-.fwb {
-  font-weight: bold !important;
-}
-.fsi {
-  font-style: italic !important;
-}
+.fwn { font-weight: normal !important; }
+.fwb { font-weight: bold !important; }
+.fsi { font-style: italic !important; }
 // 文本转换
-.ttc{
-  text-transform: capitalize;
-}
-.ttl{
-  text-transform: lowercase;
-}
-.ttu{
-  text-transform: uppercase;
-}
+.ttc{ text-transform: capitalize; }
+.ttl{ text-transform: lowercase; }
+.ttu{ text-transform: uppercase; }
 
 /* 换行 */
-.norwap{
-  white-space: nowrap;
-}
+.norwap{ white-space: nowrap; }
 .break{
   word-break: break-all;
   word-wrap: break-word;
@@ -109,21 +81,11 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
 
 // 块显示/隐藏 block
 // ------------------------
-.none{
-  display: none;
-}
-.block{
-  display: block;
-}
-.hidden{
-  visibility: hidden;
-}
-.visible{
-  visibility: visible;
-}
-.inline{
-  display: inline-block;
-}
+.none{ display: none; }
+.block{ display: block; }
+.hidden{ visibility: hidden; }
+.visible{ visibility: visible; }
+.inline{ display: inline-block; }
 
 // width, height
 // ------------------------
@@ -161,7 +123,7 @@ $fonts: 12, 14, 16, 18, 20, 24, 30, 38, 46, 56, 68;
 
 // margin, padding
 // ------------------------
-$gaps: 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56;
+$gaps: 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56, 64, 72;
 @each $g in $gaps {
   .mt-#{$g} {
     margin-top: $g + px !important;
@@ -216,76 +178,45 @@ $gaps: 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56;
 
 // flex
 // ------------------------
+@mixin flexible($name, $prop, $val) {
+  &-#{$name} {
+    display: flex;
+    #{$prop}: $val
+  }
+  &--#{$name} {
+    #{$prop}: $val
+  }
+}
 .flex{
   display: flex;
+
   &-item{
     min-width: 0;
     flex: 1;
   }
-  &-row{
-    display: flex;
-    flex-direction: row;
-  }
-  &-column{
-    display: flex;
-    flex-direction: column;
-  }
-  &-nowrap{
-    display: flex;
-    flex-wrap: nowrap;
-  }
-  &-wrap{
-    display: flex;
-    flex-wrap: wrap;
-  }
-  &-left{
-    display: flex;
-    justify-content: flex-start;
-  }
-  &-center{
-    display: flex;
-    justify-content: center
-  }
-  &-right{
-    display: flex;
-    justify-content: flex-end;
-  }
-  &-between{
-    display: flex;
-    justify-content: space-between;
-  }
-  &-around{
-    display: flex;
-    justify-content: space-around;
-  }
-  &-top{
-    display: flex;
-    align-items: flex-start;
-  }
-  &-middle{
-    display: flex;
-    align-items: center;
-  }
-  &-bottom{
-    display: flex;
-    align-items: flex-end;
-  }
-  &-baseline{
-    display: flex;
-    align-items: baseline;
-  }
-  &-stretch{
-    display: flex;
-    align-items: stretch;
-  }
-  &-center-middle, &-middle-center{
+  @include flexible(row, flex-direction, row);
+  @include flexible(column, flex-direction, column);
+  @include flexible(nowrap, flex-wrap, nowrap);
+  @include flexible(wrap, flex-wrap, wrap);
+  @include flexible(left, justify-content, flex-start);
+  @include flexible(center, justify-content, center);
+  @include flexible(right, justify-content, flex-end);
+  @include flexible(between, justify-content, space-between);
+  @include flexible(around, justify-content, space-around);
+  @include flexible(top, align-items, flex-start);
+  @include flexible(middle, align-items, center);
+  @include flexible(bottom, align-items, flex-end);
+  @include flexible(baseline, align-items, baseline);
+  @include flexible(stretch, align-items, stretch);
+  
+  &-centre, &-center-middle, &-middle-center{
     display: flex;
     align-items: center;
     justify-content: center;
   }
 }
 
-// mixins
+// clearfix
 // ------------------------
 .clearfix {
   zoom: 1;

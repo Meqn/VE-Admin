@@ -78,10 +78,10 @@ const assetsCDN = {
   css: [],
   js: [
     '//cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js',
-    '//cdn.jsdelivr.net/npm/vue-router@3.5.2/dist/vue-router.min.js',
+    '//cdn.jsdelivr.net/npm/vue-router@3.5.3/dist/vue-router.min.js',
     '//cdn.jsdelivr.net/npm/vuex@3.6.2/dist/vuex.min.js',
-    '//cdn.jsdelivr.net/npm/element-ui@2.15.6/lib/index.js',
-    '//cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js',
+    '//cdn.jsdelivr.net/npm/element-ui@2.15.7/lib/index.js',
+    '//cdn.jsdelivr.net/npm/axios@0.24.0/dist/axios.min.js',
     '//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js',
     '//cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js',
     '//cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js'
@@ -154,7 +154,7 @@ module.exports = {
   css: {
     loaderOptions: {
       scss: {
-        prependData: '@import "~@/styles/variables.scss";'
+        prependData: '@use "sass:math";@import "~@/styles/variables.scss";'
       }
     }
   },

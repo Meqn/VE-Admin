@@ -1,5 +1,5 @@
-import { getRoleMenus } from '@/api/user'
-import { constantRoutes, asyncRoutes, notFoundRoute } from '@demo/router/routes'
+// import { getMenus } from '@/api/user'
+// import { constantRoutes, asyncRoutes, notFoundRoute } from '@demo/router/routes'
 import { flatMapDeep } from '@/utils'
 
 /**
@@ -83,45 +83,57 @@ function flatMenus(menus) {
   return res
 }
 
-const state = {
-  routes: [],
-  addRoutes: [],
-  cachedViews: []
-}
+/**
+ * 权限路由参数
+ * @param {object} param 参数
+ * @param {object} param.routes 路由配置 {constantRoutes, asyncRoutes, notFoundRoute}
+ * @param {object} param.fetches http请求结合 { getMenus }
+ * @returns 
+ */
+export default function createPermission({ routes = {}, fetches = {} }) {
+  const { getMenus } = fetches
+  const { constantRoutes, asyncRoutes, notFoundRoute } = routes
 
-const mutations = {
-  SET_ROUTES(state, routes) {
-    state.addRoutes = routes
-    state.routes = constantRoutes.concat(routes)
-  },
-  SET_CACHE_VIEWS(state, views) {
-    state.cachedViews = views
+  const state = {
+    routes: [],
+    addRoutes: [],
+    cachedViews: []
   }
-}
-
-const actions = {
-  async generateRoutes({ commit, dispatch, rootGetters }) {
-    // 获取所有菜单
-    const { data } = await getRoleMenus(rootGetters.role)
-    // 扁平化嵌套菜单
-    const menus = flatMapDeep(data, 'children', item => item.name)
-    const accessedRoutes = filterRoutes(asyncRoutes, menus)
-    // 末尾插入 notFoundRoute
-    accessedRoutes.push(notFoundRoute)
-    commit('SET_ROUTES', accessedRoutes)
-    setTimeout(() => {
-      dispatch('setCacheViews')
-    }, 10)
-    return accessedRoutes
-  },
-  setCacheViews({ commit, state }) {
-    commit('SET_CACHE_VIEWS', findCachedViews(state.routes))
+  
+  const mutations = {
+    SET_ROUTES(state, routes) {
+      state.addRoutes = routes
+      state.routes = constantRoutes.concat(routes)
+    },
+    SET_CACHE_VIEWS(state, views) {
+      state.cachedViews = views
+    }
   }
-}
+  
+  const actions = {
+    async generateRoutes({ commit, dispatch, rootGetters }) {
+      // 获取所有菜单
+      const { data } = await getMenus(rootGetters.role)
+      // 扁平化嵌套菜单
+      const menus = flatMapDeep(data, 'children', item => item.name)
+      const accessedRoutes = filterRoutes(asyncRoutes, menus)
+      // 末尾插入 notFoundRoute
+      accessedRoutes.push(notFoundRoute)
+      commit('SET_ROUTES', accessedRoutes)
+      setTimeout(() => {
+        dispatch('setCacheViews')
+      }, 10)
+      return accessedRoutes
+    },
+    setCacheViews({ commit, state }) {
+      commit('SET_CACHE_VIEWS', findCachedViews(state.routes))
+    }
+  }
 
-export default {
-  namespaced: true,
-  state,
-  mutations,
-  actions
+  return {
+    namespaced: true,
+    state,
+    mutations,
+    actions
+  }
 }

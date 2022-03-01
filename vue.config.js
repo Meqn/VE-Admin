@@ -154,7 +154,7 @@ module.exports = {
   css: {
     loaderOptions: {
       scss: {
-        prependData: '@use "sass:math";@import "~@/styles/variables.scss";'
+        prependData: '@use "sass:math";@import "~@/styles/comm/variables.scss";'
       }
     }
   },

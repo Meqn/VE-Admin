@@ -5,14 +5,17 @@ import router from './router'
 import store from './store'
 
 import ElementUI from 'element-ui'
-import '@/styles/element-variables.scss'
+import '@/styles/elementUI/variables.scss'
 import '@/styles/index.scss'
 
 import AppComponents from '@/components'
 import '@/components/Icon/svg.js'
 
+import Layout from '@/layout'
+
 Vue.use(ElementUI, { size: 'medium' })
 Vue.use(AppComponents)
+Vue.use(Layout)
 
 Vue.config.productionTip = false
 

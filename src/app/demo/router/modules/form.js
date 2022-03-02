@@ -16,13 +16,13 @@ export default [
       },
       {
         path: 'step',
-        component: () => import('@demo/views/form/basic'),
+        component: () => import('@demo/views/form/step'),
         name: 'form_step',
         meta: { title: '分步表单' }
       },
       {
         path: 'advanced',
-        component: () => import('@demo/views/form/basic'),
+        component: () => import('@demo/views/form/advanced'),
         name: 'form_advanced',
         meta: { title: '高级表单' }
       }

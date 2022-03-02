@@ -20,13 +20,13 @@ export default [
         component: BlankView,
         name: 'list_table',
         redirect: '/list/table/list',
-        meta: { title: '表格列表', asMenu: true },
+        meta: { title: '查询表格', asMenu: true },
         children: [
           {
             path: 'list',
             component: () => import('@demo/views/list/table'),
             name: 'ListTableList',
-            meta: { hidden: true, title: '表格列表', automount: true, activeMenu: '/list/table', cache: true }
+            meta: { hidden: true, title: '列表', automount: true, activeMenu: '/list/table', cache: true }
           },
           {
             path: 'create',
@@ -35,16 +35,16 @@ export default [
             meta: { hidden: true, title: '创建表格', automount: true, activeMenu: '/list/table' }
           },
           {
-            path: 'detail',
-            component: () => import('@demo/views/form/basic'),
-            name: 'ListTableDetail',
-            meta: { hidden: true, title: '数据详情', automount: true, activeMenu: '/list/table' }
-          },
-          {
             path: 'edit',
             component: () => import('@demo/views/form/basic'),
             name: 'ListTableEdit',
             meta: { hidden: true, automount: true, activeMenu: '/list/table' }
+          },
+          {
+            path: '/list/table/list/:id/',
+            component: () => import('@demo/views/form/basic'),
+            name: 'ListTableDetail',
+            meta: { hidden: true, title: '数据详情', automount: true, activeMenu: '/list/table' }
           }
         ]
       },

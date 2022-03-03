@@ -22,13 +22,13 @@
 </template>
 
 <script>
-import resizeDirective from 'v-resize-observer/src/directive'
+import RO from 'v-resize-observer'
 import './style.scss'
 
 export default {
   name: 'VeForm',
   directives: {
-    resize: resizeDirective
+    resize: RO.directive
   },
   props: {
     // form

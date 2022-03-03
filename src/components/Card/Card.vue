@@ -24,7 +24,8 @@ export default {
       type: String,
       validator(val) {
         return ['default', 'small'].includes(val)
-      }
+      },
+      default: 'default'
     },
     tabList: Array,
     tabExtra: String,
@@ -89,20 +90,17 @@ export default {
   },
   render() {
     const {
-      headStyle = {},
-      bodyStyle = {},
-      bordered,
       size = 'default',
       type,
       tabProps = {},
       hasTabs,
-    } = this.$props
+    } = this
 
     const { $slots } = this;
     const classString = {
       [`${prefixCls}`]: true,
       [`${prefixCls}-loading`]: this.loading,
-      [`${prefixCls}-bordered`]: bordered,
+      [`${prefixCls}-bordered`]: this.bordered,
       [`${prefixCls}-ghost`]: this.ghost,
       [`${prefixCls}-hoverable`]: !!this.hoverable,
       [`${prefixCls}-contain-grid`]: this.isContainGrid($slots.default),
@@ -145,7 +143,7 @@ export default {
 
     if (headDom || tabsDom) {
       header = (
-        <div class={`${prefixCls}-head`} style={headStyle}>
+        <div class={`${prefixCls}-head`} style={this.headStyle}>
           {headDom}
           {tabsDom}
         </div>
@@ -160,7 +158,7 @@ export default {
     const children = $slots.default
     const bodyProps = {
       class: `${prefixCls}-body`,
-      style: bodyStyle,
+      style: this.bodyStyle || {},
       directives: [
         {
           name: 'loading',

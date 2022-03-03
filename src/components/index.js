@@ -38,5 +38,19 @@ if (typeof window !== 'undefined' && window.Vue) {
 
 export default {
   install,
-  ...components
+  Flex,
+  Icon,
+  Text,
+  Space,
+  Card,
+  CardGrid,
+  CardMeta,
+  Container,
+  PageHeader,
+  Table,
+  TableCell,
+  QueryForm,
+  Form,
+  FormGroup,
+  FormItem
 }

@@ -151,6 +151,7 @@ export default {
 1. 增加 request 方法
 2. print
   - [Print.js](https://github.com/crabbly/Print.js)
+  - https://github.com/Power-kxLee/vue-print-nb
   - https://zhuanlan.zhihu.com/p/87151162
 3. fullscreen
   - https://www.npmjs.com/package/screenfull

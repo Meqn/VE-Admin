@@ -45,12 +45,13 @@ export default {
         
         if (isEditable) {
           const _row = column.editing ? top.editingData[rowKey] : row
+          const scopeValue = { row: _row, column, $index }
           return (
             renderColumn
-              ? renderColumn(h, { row: _row, column, $index })
+              ? renderColumn(h, scopeValue)
               : defaultSlot
-                ? defaultSlot({ row: _row, column, $index })
-                : <Cell data={{ row: _row, column, $index }} rowKey={rowKey} fieldProps={this.option.fieldProps} fieldType={this.option.fieldType} />
+                ? defaultSlot(scopeValue)
+                : <Cell data={scopeValue} rowKey={rowKey} fieldProps={this.option.fieldProps} fieldType={this.option.fieldType} />
           )
         }
         

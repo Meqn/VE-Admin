@@ -2,11 +2,14 @@
   <el-container class="ve-layout" v-resize:debounce="$_resize">
     <div v-if="false" class="drawer-mask" />
 
-    <LayoutSider :width="`${siderWidth}px`" :style="{ paddingTop: `${headerHeight}px` }" />
+    <LayoutSider
+      :width="`${siderWidth}px`"
+      :style="{ paddingTop: `${headerHeight}px` }"
+    />
 
     <section class="ve-layout-main">
       <LayoutHeader :height="`${headerHeight}px`" />
-      <el-header :height="`${headerHeight}px`" style="background: transparent"></el-header>
+      <el-header :height="`${headerHeight}px`" style="background: transparent" />
 
       <LayoutMain />
       
@@ -40,7 +43,7 @@ export default {
   },
   computed: {
     siderWidth() {
-      return this.$store.getters.sideCollapsed ? 64 : 210
+      return this.$store.getters.sidebarCollapsed ? 64 : 210
     }
   },
   provide() {
@@ -52,10 +55,10 @@ export default {
     $_resize({ width }) {
       this.viewWidth = width
       const isMobile = width < 767
-      const sideCollapsed = width < 992
+      const sidebarCollapsed = width < 992
 
       this.$store.dispatch('app/toggleMobile', isMobile)
-      this.$store.dispatch('app/toggleSideBar', sideCollapsed)
+      this.$store.dispatch('app/toggleSideBar', sidebarCollapsed)
     }
   }
 }

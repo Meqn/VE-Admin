@@ -1,10 +1,10 @@
 <template>
-  <aside :class="['ve-layout-aside sidebar-dark', { 'is-collapse': sideCollapsed }]" :style="{ width }">
+  <aside :class="['ve-layout-aside sidebar-dark', { 'is-collapse': sidebarCollapsed }]" :style="{ width }">
     <el-scrollbar class="sidebar-scrollbar" wrap-class="sidebar-scrollbar-wrap">
       <el-menu
         class="sidebar-menu"
         :default-active="activeMenu"
-        :collapse="sideCollapsed"
+        :collapse="sidebarCollapsed"
         mode="vertical">
         <sidebar-item
           v-for="item in menus"
@@ -15,7 +15,7 @@
     </el-scrollbar>
     <div class="sidebar-links">
       <div class="sidebar-collapse" @click="toggleSideBar">
-        <i :class="[sideCollapsed ? 'el-icon-s-unfold' : 'el-icon-s-fold']"></i>
+        <i :class="[sidebarCollapsed ? 'el-icon-s-unfold' : 'el-icon-s-fold']"></i>
       </div>
     </div>
   </aside>
@@ -36,7 +36,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'sideCollapsed',
+      'sidebarCollapsed',
       'permissionRoutes'
     ]),
     menus() {
@@ -51,8 +51,8 @@ export default {
     }
   },
   methods: {
-    toggleSideBar(val) {
-      this.$store.dispatch('app/toggleSideBar', typeof val === 'boolean' ? val : !this.sideCollapsed)
+    toggleSideBar() {
+      this.$store.dispatch('app/toggleSideBar')
     },
     filterRoutes(routes, basePath = '/') {
       const res = []

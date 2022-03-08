@@ -36,7 +36,7 @@ $--sider-width: 210px;
   display: flex;
   color: #fff;
   background-color: $--layout-header-background-color;
-  box-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
+  box-shadow: 0px 1px 4px rgb(0 21 41 / 8%);
 
   .header-left, .header-center, .header-right{
     display: flex;

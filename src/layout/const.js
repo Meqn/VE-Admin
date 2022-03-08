@@ -27,5 +27,5 @@ const MediaQueryEnum = {
   xxl: {
     minWidth: 1600,
     matchMedia: '(min-width: 1600px)',
-  },
+  }
 }

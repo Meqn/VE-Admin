@@ -5,6 +5,7 @@ import Space from './Space'
 import { Card, CardGrid, CardMeta } from './Card'
 import Container from './Container'
 import PageHeader from './PageHeader'
+import PageContainer from './PageContainer'
 import { Table, TableCell } from './Table'
 import { Form, FormGroup, FormItem, QueryForm } from './Form'
 
@@ -16,6 +17,7 @@ const components = [
   Card, CardGrid, CardMeta,
   Container,
   PageHeader,
+  PageContainer,
   Table, TableCell,
   QueryForm,
   Form, FormGroup, FormItem
@@ -47,6 +49,7 @@ export default {
   CardMeta,
   Container,
   PageHeader,
+  PageContainer,
   Table,
   TableCell,
   QueryForm,

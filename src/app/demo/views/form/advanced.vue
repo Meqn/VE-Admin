@@ -1,5 +1,5 @@
 <template>
-<PageLayout
+<VePageContainer
   title="高级表单"
   content="高级表单常见于一次性输入和提交大批量数据的场景。"
   breadcrumb>
@@ -152,7 +152,7 @@
     <el-button @click="resetForm('form')">重置</el-button>
     <el-button type="primary" @click="submitForm('form')">立即创建</el-button>
   </VeFlex>
-</PageLayout>
+</VePageContainer>
 </template>
 
 <script>

@@ -1,11 +1,10 @@
 <template>
-<PageLayout
+<VePageContainer
   breadcrumb
   title="查询表格">
   <ve-card>
     <ve-table
       title="文章列表"
-      :table="tableOptions"
       :data="articleList"
       :columns="tableColumns"
       :loading="loading"
@@ -52,7 +51,7 @@
       <template #action-header><i class="el-icon-setting"/> 操作</template>
     </ve-table>
   </ve-card>
-</PageLayout>
+</VePageContainer>
 </template>
 
 <script>

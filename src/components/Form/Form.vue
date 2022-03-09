@@ -8,7 +8,7 @@
     :labelPosition="labelPosition"
     :labelWidth="labelWidth"
     :labelSuffix="labelSuffix"
-    :inline="inline"
+    :inline="false"
     :inlineMessage="inlineMessage"
     :statusIcon="statusIcon"
     :showMessage="showMessage"
@@ -22,19 +22,21 @@
 </template>
 
 <script>
-import RO from 'v-resize-observer'
+import resize from 'v-resize-observer'
+import { SPAN_BREAKPOINTS } from '../constant'
+import { getBreakpointSpan } from '../utils'
 import './style.scss'
 
 export default {
   name: 'VeForm',
   directives: {
-    resize: RO.directive
+    resize: resize.directive
   },
   props: {
     // form
     model: Object,
     rules: Object,
-    inline: Boolean,
+    // inline: Boolean, // 移除 inline 行内表单模式
     labelPosition: String,
     labelWidth: String,
     labelSuffix: String,
@@ -64,6 +66,13 @@ export default {
       columnNum: this.column || 3
     }
   },
+  computed: {
+    isVertical() {
+      return this.labelPosition === 'top'
+        ? true
+        : !this.labelWidth
+    }
+  },
   provide() {
     return {
       getColumn: this.getColumn,
@@ -82,15 +91,7 @@ export default {
       return this.column || this.columnNum
     },
     $_resize({ width }) {
-      if (width > 1366) {
-        this.columnNum = 4
-      } else if (width <= 1366 && width > 992) {
-        this.columnNum = 3
-      } else if (width <= 992 && width > 600) {
-        this.columnNum = 2
-      } else {
-        this.columnNum = 1
-      }
+      this.columnNum = getBreakpointSpan(width, SPAN_BREAKPOINTS, this.isVertical ? 'vertical' : 'default')
       this.$emit('resize', this.columnNum)
     }
   }

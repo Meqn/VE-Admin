@@ -202,3 +202,23 @@ export function getEvents(vnode) {
 export function getListeners(context) {
   return (context.$vnode ? context.$vnode.componentOptions.listeners : context.$listeners) || {}
 }
+
+/**
+ * 单行展示表单列数
+ * @param {*} width 容器宽度
+ * @param {*} breakpoints 断点列表
+ * @param {*} layout 布局方式
+ * @returns 
+ */
+export function getBreakpointSpan(width, breakpoints, layout = 'default') {
+  const points = breakpoints[layout]
+  if (width < points[0]) {
+    return 1
+  } else if (width >= points[0] && width < points[1]) {
+    return 2
+  } else if (width >= points[1] && width < points[2]) {
+    return 3
+  } else {
+    return 4
+  }
+}

@@ -1,59 +1,78 @@
 <template>
-  <aside :class="['ve-layout-aside sidebar-dark', { 'is-collapse': sidebarCollapsed }]" :style="{ width }">
-    <el-scrollbar class="sidebar-scrollbar" wrap-class="sidebar-scrollbar-wrap">
-      <el-menu
-        class="sidebar-menu"
-        :default-active="activeMenu"
-        :collapse="sidebarCollapsed"
-        mode="vertical">
-        <sidebar-item
+  <aside
+    :class="['ve-layout-sider', `layout-sider-${top.siderTheme}`, { 'layout-sider-collapsed': siderCollapsed }]"
+    :style="{ width: top.sidebarWidth + 'px' }">
+
+    <div class="ve-layout-header-logo sider-header" :style="{height: top.headerHeight + 'px'}">
+      <slot name="logo" v-if="top.layout === 'side'">
+        <HeaderLogo collapsed />
+      </slot>
+    </div>
+
+    <slot name="extra" />
+
+    <el-scrollbar class="sider-scrollbar" wrap-class="sider-scrollbar-wrap">
+      <el-menu class="sider-menu" v-bind="menuProps">
+        <SubMenu
           v-for="item in menus"
           :key="item.path"
           :item="item"
         />
       </el-menu>
     </el-scrollbar>
-    <div class="sidebar-links">
-      <div class="sidebar-collapse" @click="toggleSideBar">
-        <i :class="[sidebarCollapsed ? 'el-icon-s-unfold' : 'el-icon-s-fold']"></i>
-      </div>
+
+    <div class="sider-footer" v-if="showCollapsed || $slots.footer">
+      <Collapsed v-if="showCollapsed" :size="20" style="height: 48px" />
+      <slot name="footer" />
     </div>
   </aside>
 </template>
 
 <script>
 import { resolvePath } from '@/utils'
-import SidebarItem from './SidebarItem.vue'
-import { mapGetters } from 'vuex'
+import SubMenu from './SubMenu.vue'
+import HeaderLogo from '../header/HeaderLogo.vue'
+import Collapsed from './Collapsed.vue'
 
 export default {
   name: 'LayoutSider',
   components: {
-    SidebarItem
+    SubMenu,
+    HeaderLogo,
+    Collapsed
   },
-  props: {
-    width: String
+  inject: {
+    top: ['layout']
   },
   computed: {
-    ...mapGetters([
-      'sidebarCollapsed',
-      'permissionRoutes'
-    ]),
-    menus() {
-      return this.filterRoutes(this.permissionRoutes)
+    siderCollapsed() {
+      return this.top.siderCollapsed
     },
+    menus() {
+      return this.filterRoutes(this.top.routes)
+    },
+    // 当前激活菜单的 index
     activeMenu() {
       const { meta, path } = this.$route
       if (meta.activeMenu) {
         return meta.activeMenu
       }
       return path
+    },
+    menuProps() {
+      return {
+        ...(this.top.menus || {}),
+        defaultActive: this.activeMenu,
+        collapse: this.siderCollapsed,
+        mode: 'vertical'
+      }
+    },
+    showCollapsed() {
+      const { top } = this
+      return top.collapsed && top.collapsedPosition === 'bottom'
     }
   },
   methods: {
-    toggleSideBar() {
-      this.$store.dispatch('app/toggleSideBar')
-    },
     filterRoutes(routes, basePath = '/') {
       const res = []
       if (Array.isArray(routes) && routes.length > 0) {

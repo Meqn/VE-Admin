@@ -1,9 +1,9 @@
 <template>
   <el-dropdown @command="userCommand">
-    <VeFlex align="middle">
+    <div class="flex-middle">
       <el-avatar :size="24" :src="user.avatar"></el-avatar>
       <span class="ml-8">{{ user.nickname }}</span>
-    </VeFlex>
+    </div>
     <el-dropdown-menu slot="dropdown">
       <el-dropdown-item icon="el-icon-user" command="center">个人中心</el-dropdown-item>
       <el-dropdown-item icon="el-icon-setting" command="setting">账户设置</el-dropdown-item>

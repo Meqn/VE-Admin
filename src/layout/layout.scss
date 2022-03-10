@@ -1,6 +1,5 @@
-$--header-zindex: 99;
-$--sider-zindex: 90;
-$--sider-width: 210px;
+$--layout-zindex-1: 99;
+$--layout-zindex-2: 95;
 
 .ve-layout{
   position: relative;
@@ -15,10 +14,11 @@ $--sider-width: 210px;
   }
 
   &-main{
+    position: relative;
+    flex: 1;
+    display: flex; flex-direction: column;
     overflow-x: hidden;
     overflow-y: auto;
-    display: flex; flex-direction: column;
-    flex: 1;
     min-width: 0;
     height: 100%;
   }
@@ -29,42 +29,64 @@ $--sider-width: 210px;
     flex: 1;
     flex-basis: auto;
   }
+  &--mix{
+    .ve-layout-header{
+      z-index: $--layout-zindex-1;
+    }
+    .ve-layout-sider{
+      z-index: $--layout-zindex-2;
+    }
+  }
+  &--side{
+    .ve-layout-header{
+      z-index: $--layout-zindex-2;
+    }
+    .ve-layout-sider{
+      z-index: $--layout-zindex-1;
+    }
+  }
 }
 
-.ve-layout-header{
-  position: fixed; top: 0; left: 0; right: 0; z-index: $--header-zindex;
+// logo区域
+.ve-layout-header-logo{
+  box-sizing: border-box;
   display: flex;
-  color: #fff;
-  background-color: $--layout-header-background-color;
+  align-items: center;
+  font-size: 20px;
+  white-space: nowrap;
+  transition: all .3s;
+
+  img{
+    max-width: 80%;
+    max-height: 80%;
+  }
+}
+
+// header
+.ve-layout-header{
+  position: absolute; top: 0; right: 0;
+  display: flex;
+  width: 100%;
+  // color: #fff;
+  // background-color: $--layout-background-color;
   box-shadow: 0px 1px 4px rgb(0 21 41 / 8%);
 
-  .header-left, .header-center, .header-right{
+  &.layout-header-fixed {
+    position: fixed;
+    transition: width .3s cubic-bezier(.645, .045, .355, 1);
+  }
+  .header-logo{
+    height: 100%;
+    padding-left: 16px;
+    margin-left: -20px;
+  }
+  .header-center, .header-right{
     display: flex;
     align-items: center;
     height: 100%;
-  }
-  .header-left{
-    width: $--sider-width;
-    justify-content: center;
   }
   .header-center{
     flex: 1 1 0%;
-  }
-  .header-logo{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-
-    img{
-      height: 36px;
-      vertical-align: middle;
-    }
-    h1{
-      margin-left: 12px;
-      color: #fff;
-      font-size: 20px;
-    }
   }
   .header-item{
     display: flex;
@@ -74,25 +96,28 @@ $--sider-width: 210px;
     margin-left: 8px;
     color: inherit;
     cursor: pointer;
-    &:hover{
-      background-color: mix($--layout-header-background-color, #fff, 92%);
-    }
+    transition: all .3s;
   }
 }
 
-.ve-layout-aside{
+// sider
+.ve-layout-sider{
   overflow: hidden;
-  position: relative; z-index: $--sider-zindex;
+  position: relative;
   display: flex; flex-direction: column;
-  color: $--layout-aside-text-color;
-  background-color: $--layout-aside-background-color;
   box-shadow: 0 2px 8px 0 rgba(29, 35, 41, 0.1);
   transition: all 300ms ease-in;
-  
-  &.is-fixed{
-    position: fixed; top: 0; left: 0; bottom: 0; z-index: $--sider-zindex;
+
+  .sider-header{
+    padding-left: 16px;
+    margin-bottom: 8px;
   }
-  .sidebar-scrollbar{
+  &.layout-sider-collapsed{
+    .sider-header{
+      padding-left: 8px;
+    }
+  }
+  .sider-scrollbar{
     overflow-x: hidden !important;
     flex: 1;
     min-height: 0;
@@ -100,9 +125,13 @@ $--sider-width: 210px;
       overflow-x: hidden !important;
     }
   }
-  .sidebar-menu{
-    &:not(.el-menu--collapse){
+  .sider-menu{
+    /* &:not(.el-menu--collapse){
       width: $--sider-width;
+    } */
+    width: 100%;
+    .el-menu--collapse{
+      width: 64px;
     }
     &.el-menu{
       border-right: none;
@@ -117,25 +146,9 @@ $--sider-width: 210px;
         opacity: .85; //svg-icon color较重
       }
     }
-    &-link{
-      position: absolute; top: 0; right: 0; bottom: 0; left: 0;
-    }
     .el-menu-item{
       position: relative;
       transition: border-color 0s;
-    }
-    .el-menu-item.is-active,
-    .el-menu-item:hover, .el-menu-item:focus,
-    .el-submenu__title:hover{
-      background-color: $--layout-aside-active-background-color;
-    }
-    .el-menu-item.is-active{
-      border-right: 3px solid $--color-primary;
-    }
-    .el-submenu.is-active{
-      > .el-submenu__title{
-        color: $--layout-aside-active-text-color;
-      }
     }
     &.el-menu--collapse {
       .el-submenu {
@@ -154,13 +167,139 @@ $--sider-width: 210px;
       }
     }
   }
-  .sidebar-links{
-    border-top: 1px solid $--border-color-lighter;
-  }
-  .sidebar-collapse{
-    font-size: 20px;
-    line-height: 48px;
-    padding-left: 20px;
-    cursor: pointer;
+  .sider-footer{
+    padding-left: 16px;
+    border-top: 1px solid #ebeef5;
   }
 }
+
+// footer
+.ve-layout-footer{
+  color: $--color-text-secondary;
+  text-align: center;
+  padding: 24px 0 20px;
+
+  &-links{
+    margin-bottom: 8px;
+
+    .link-item:not(:last-child){
+      margin-right: 32px;
+    }
+    a{
+      color: $--color-text-secondary;
+      &:hover{
+        color: $--color-text-primary;
+      }
+    }
+  }
+}
+
+@mixin layoutTheme($mode) {
+  // 默认 dark
+  $text-color: $--layout-dark-text-color;
+  $background-color: $--layout-dark-background-color;
+  $item-background-active-color: mix($--layout-dark-background-color, #fff, 92%);
+  $menu-text-color: rgba(255, 255, 255, .65);
+  $menu-text-active-color: #ffffff;
+  $menu-background-color: #000c17;
+  $menu-background-active-color: $--color-primary;
+  $menu-border-color: $--color-primary;
+  $title-color: #fff;
+  $divider-color: rgba(255, 255, 255, .12);
+  // light 模式
+  @if $mode == light {
+    $text-color: $--layout-light-text-color;
+    $background-color: $--layout-light-background-color;
+    $item-background-active-color: mix($--layout-light-background-color, #000, 96%);
+    $menu-text-color: #606266;
+    $menu-text-active-color: $--color-primary;
+    $menu-background-color: $--layout-light-background-color;
+    $menu-background-active-color: mix($--color-primary, #fff, 12%);
+    $menu-border-color: $--color-primary;
+    $title-color: rgba(0, 0, 0, .85);
+    $divider-color: #ebeef5;
+  }
+  // header 区域
+  .ve-layout-header.layout-header-#{$mode}{
+    color: $text-color;
+    background-color: $background-color;
+
+    .ve-layout-header-logo{
+      color: $title-color;
+    }
+    .header-item{
+      &:hover{
+        background-color: $item-background-active-color;
+      }
+    }
+  }
+  // sider 区域
+  .ve-layout-sider.layout-sider-#{$mode}{
+    color: $text-color;
+    background-color: $background-color;
+
+    .ve-layout-header-logo{
+      color: $title-color;
+    }
+    .el-menu{
+      background-color: $background-color;
+      .el-menu.el-menu--inline{
+        background-color: $menu-background-color;
+      }
+      .el-menu-item, .el-submenu__title, .el-submenu__title i{
+        color: $menu-text-color;
+        background-color: transparent;
+      }
+      .el-menu-item:hover, .el-menu-item:focus,
+      .el-submenu__title:hover, .el-submenu__title:hover i{
+        color: $menu-text-active-color;
+      }
+      .el-menu-item.is-active{
+        color: $menu-text-active-color;
+        border-right: 3px solid $menu-border-color;
+        background-color: $menu-background-active-color;
+      }
+      .el-submenu.is-active{
+        > .el-submenu__title{
+          color: $menu-text-active-color;
+          i{
+            color: $menu-text-active-color;
+          }
+        }
+      }
+    }
+    .sider-footer{
+      border-top-color: $divider-color;
+    }
+  }
+  // sider 弹出菜单
+  .el-menu--vertical.layout-submenu-#{$mode}{
+    .el-menu{
+      background-color: $background-color;
+
+      .el-menu-item, .el-submenu__title, .el-submenu__title i{
+        color: $menu-text-color;
+        background-color: transparent;
+      }
+      .el-menu-item:hover, .el-menu-item:focus,
+      .el-submenu__title:hover, .el-submenu__title:hover i{
+        color: $menu-text-active-color;
+      }
+      .el-menu-item.is-active{
+        color: $menu-text-active-color;
+        background-color: $menu-background-active-color;
+      }
+      .el-submenu.is-active{
+        > .el-submenu__title{
+          color: $menu-text-active-color;
+          i{
+            color: $menu-text-active-color;
+          }
+        }
+      }
+    }
+  }
+}
+
+@include layoutTheme(dark);
+@include layoutTheme(light);

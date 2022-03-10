@@ -1,17 +1,12 @@
 <template>
-<el-header class="ve-layout-header pl-0" :height="height">
-  <div class="header-left">
+<el-header :class="['ve-layout-header', `layout-header-${top.headerTheme}`, { 'layout-header-fixed': isFixed }]" :height="height" :style="headStyles">
+  <div v-if="top.layout !== 'side'" class="ve-layout-header-logo header-logo" :style="{ width: top.siderWidth + 'px' }">
     <slot name="logo">
-      <a class="header-logo">
-        <template v-if="logo">
-          <img v-if="logo.url" :src="logo.url" alt="logo">
-          <h1 v-if="logo.text">{{ logo.text }}</h1>
-        </template>
-        <h1 v-else>管理平台</h1>
-      </a>
+      <HeaderLogo />
     </slot>
   </div>
   <div class="header-center">
+    <Collapsed v-if="showCollapsed" :size="20" class="mr-16" />
     <slot />
   </div>
   <div class="header-right">
@@ -27,9 +22,14 @@
 import Search from './Search'
 import Notice from './Notice'
 import Account from './Account.vue'
+import HeaderLogo from './HeaderLogo.vue'
+import Collapsed from '../sidebar/Collapsed.vue'
+
 export default {
   name: 'LayoutHeader',
   components: {
+    HeaderLogo,
+    Collapsed,
     Search,
     Notice,
     Account
@@ -37,9 +37,24 @@ export default {
   props: {
     height: String
   },
+  inject: {
+    top: ['layout']
+  },
   computed: {
-    logo() {
-      return this.$store.getters.logo
+    isFixed() {
+      return this.top.layout === 'side' ? !!this.top.fixedHeader : true
+    },
+    headStyles() {
+      const styleObj = {}
+      const { top } = this
+      if (top.layout === 'side' && top.fixedHeader) {
+        styleObj.width = `calc(100% - ${top.sidebarWidth}px)`
+      }
+      return styleObj
+    },
+    showCollapsed() {
+      const { top } = this
+      return top.collapsed && top.collapsedPosition === 'top'
     }
   }
 }

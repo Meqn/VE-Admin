@@ -8,8 +8,10 @@
     :fetch-suggestions="querySearch"
     value-key="label"
     placeholder="快速导航"
+    clearable
     @select="handleSelect"
     @blur="leaveSearchMode"
+    @clear="onClear"
   />
 </div>
 </template>
@@ -25,9 +27,12 @@ export default {
       value: ''
     }
   },
+  inject: {
+    top: ['layout']
+  },
   computed: {
     options() {
-      const routes = flatMapDeep(this.$store.getters.permissionRoutes, 'children', (item, parent) => ({
+      const routes = flatMapDeep(this.top.routes, 'children', (item, parent) => ({
         value: resolvePath((parent?.value || '/'), item.path || ''),
         label: item.meta?.title
       }))
@@ -41,6 +46,10 @@ export default {
         res = this.options.filter(item => item.label.includes(queryString))
       }
       cb(res)
+    },
+    onClear() {
+      this.$refs.input.activated = true
+      // document.activeElement.blur()
     },
     handleSelect(item) {
       if (item.value) {

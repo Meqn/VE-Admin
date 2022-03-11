@@ -83,7 +83,7 @@ export default {
   computed: {
     footStyles() {
       const { footStyle = {} } = this
-      const width = `calc(100% - ${this.layout.siderWidth}px)`
+      const width = `calc(100% - ${this.layout.sidebarWidth}px)`
       return { width: `${width}`, ...footStyle }
     }
   }

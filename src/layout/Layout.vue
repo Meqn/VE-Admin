@@ -3,14 +3,18 @@
     <div v-if="false" class="drawer-mask" />
 
     <LayoutSider>
-      <template v-if="$slots.menuHeader" #logo><slot name="menuHeader" /></template>
+      <template v-if="$scopedSlots.menuHeader" #logo>
+        <slot name="menuHeader" v-bind="headerData" />
+      </template>
       <template v-if="$slots.menuExtra" #extra><slot name="menuExtra" /></template>
       <template v-if="$slots.menuFooter" #footer><slot name="menuFooter" /></template>
     </LayoutSider>
 
     <section class="ve-layout-main">
       <LayoutHeader :height="`${headerHeight}px`">
-        <template v-if="$slots.menuHeader" #logo><slot name="menuHeader" /></template>
+        <template v-if="$scopedSlots.menuHeader" #logo>
+          <slot name="menuHeader" v-bind="headerData" />
+        </template>
         <template v-if="$slots.headerContent"><slot name="headerContent" /></template>
         <template v-if="$slots.headerRight" #right><slot name="headerRight" /></template>
       </LayoutHeader>
@@ -44,8 +48,9 @@ export default {
     resize: resizeDirective
   },
   props: {
+    loading: Boolean,
     title: {
-      type: String,
+      type: [String, Object],
       default: 'VE-Admin'
     },
     logo: {
@@ -100,6 +105,14 @@ export default {
     },
     hasFooter() {
       return this.footer || this.$slots.footer
+    },
+    headerData() {
+      const { layout, siderTheme, headerTheme } = this
+      return {
+        theme: layout === 'side' ? siderTheme : headerTheme,
+        mode: layout,
+        collapsed: this.siderCollapsed
+      }
     },
     footerProps() {
       const { footer } = this

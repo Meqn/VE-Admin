@@ -108,9 +108,11 @@ $--layout-zindex-2: 95;
   box-shadow: 0 2px 8px 0 rgba(29, 35, 41, 0.1);
   transition: all 300ms ease-in;
 
-  .sider-header{
-    padding-left: 16px;
-    margin-bottom: 8px;
+  .ve-layout--side & {
+    .sider-header{
+      padding-left: 16px;
+      margin-bottom: 8px;
+    }
   }
   &.layout-sider-collapsed{
     .sider-header{
@@ -216,7 +218,7 @@ $--layout-zindex-2: 95;
     $menu-background-color: $--layout-light-background-color;
     $menu-background-active-color: mix($--color-primary, #fff, 12%);
     $menu-border-color: $--color-primary;
-    $title-color: rgba(0, 0, 0, .85);
+    $title-color: $--color-primary;
     $divider-color: #ebeef5;
   }
   // header 区域
@@ -224,7 +226,7 @@ $--layout-zindex-2: 95;
     color: $text-color;
     background-color: $background-color;
 
-    .ve-layout-header-logo{
+    .ve-layout-header-logo, .ve-layout-header-logo a{
       color: $title-color;
     }
     .header-item{
@@ -238,7 +240,7 @@ $--layout-zindex-2: 95;
     color: $text-color;
     background-color: $background-color;
 
-    .ve-layout-header-logo{
+    .ve-layout-header-logo, .ve-layout-header-logo a{
       color: $title-color;
     }
     .el-menu{

@@ -55,11 +55,10 @@ $--color-gray: $--color-info;
 
 // layout
 $--layout-background-color: #f0f2f5;
-$--layout-header-background-color: #001529;
-$--layout-aside-background-color: #fff;
-$--layout-aside-text-color: #606266;
-$--layout-aside-active-text-color: $--color-primary;
-$--layout-aside-active-background-color: #EFF7FF;
+$--layout-dark-background-color: #001529;
+$--layout-dark-text-color: rgba(255, 255, 255, 0.89);
+$--layout-light-background-color: #fff;
+$--layout-light-text-color: #303133;
 
 // 2. 引入element-ui默认css变量，在页面中使用，具体变量详见: `./comm/element-var.scss`
 // ⚠️ sass变量覆盖，需要放在变量声明之前

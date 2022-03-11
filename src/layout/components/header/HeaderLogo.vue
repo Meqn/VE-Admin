@@ -1,13 +1,5 @@
-<template>
-  <a class="header-logo" @click="top.onMenuHeaderClick">
-    <img v-if="top.logo" :src="top.logo" alt="logo">
-    <template v-if="top.title">
-      <h1 v-show="collapsed && !top.siderCollapsed">{{ top.title }}</h1>
-    </template>
-  </a>
-</template>
-
 <script>
+import { isVNode } from '@/components/utils'
 export default {
   name: 'HeaderLogo',
   inject: {
@@ -15,6 +7,26 @@ export default {
   },
   props: {
     collapsed: Boolean
+  },
+  computed: {
+    showTitle() {
+      return this.collapsed ? !this.top.siderCollapsed : true
+    }
+  },
+  render() {
+    const { top, showTitle } = this
+    const title = typeof top.title === 'string'
+      ? (<h1 v-show={showTitle}>{top.title}</h1>)
+      : isVNode(top.title) && showTitle
+        ? top.title
+        : null
+    
+    return (
+      <a class="header-logo" onClick={top.onMenuHeaderClick}>
+        { top.logo && (<img src={top.logo} alt="logo" />) }
+        { title }
+      </a>
+    )
   }
 }
 </script>

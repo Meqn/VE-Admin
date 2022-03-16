@@ -93,7 +93,6 @@ $--layout-zindex-2: 95;
     align-items: center;
     height: 100%;
     padding: 0 12px;
-    margin-left: 8px;
     color: inherit;
     cursor: pointer;
     transition: all .3s;
@@ -116,7 +115,7 @@ $--layout-zindex-2: 95;
   }
   &.layout-sider-collapsed{
     .sider-header{
-      padding-left: 8px;
+      padding-left: 12px;
     }
   }
   .sider-scrollbar{
@@ -199,11 +198,12 @@ $--layout-zindex-2: 95;
 @mixin layoutTheme($mode) {
   // 默认 dark
   $text-color: $--layout-dark-text-color;
+  $text-active-color: mix($--layout-dark-text-color, #fff, 20%);
   $background-color: $--layout-dark-background-color;
   $item-background-active-color: mix($--layout-dark-background-color, #fff, 92%);
-  $menu-text-color: rgba(255, 255, 255, .65);
-  $menu-text-active-color: #ffffff;
-  $menu-background-color: #000c17;
+  $menu-text-color: $--layout-dark-text-color;
+  $menu-text-active-color: $text-active-color;
+  $menu-background-color: mix($--layout-dark-background-color, #000, 65%);
   $menu-background-active-color: $--color-primary;
   $menu-border-color: $--color-primary;
   $title-color: #fff;
@@ -211,9 +211,10 @@ $--layout-zindex-2: 95;
   // light 模式
   @if $mode == light {
     $text-color: $--layout-light-text-color;
+    $text-active-color: mix($--layout-light-text-color, #000, 60%);
     $background-color: $--layout-light-background-color;
     $item-background-active-color: mix($--layout-light-background-color, #000, 96%);
-    $menu-text-color: #606266;
+    $menu-text-color: $--layout-light-text-color;
     $menu-text-active-color: $--color-primary;
     $menu-background-color: $--layout-light-background-color;
     $menu-background-active-color: mix($--color-primary, #fff, 12%);
@@ -230,7 +231,8 @@ $--layout-zindex-2: 95;
       color: $title-color;
     }
     .header-item{
-      &:hover{
+      &:hover, &.is-active{
+        color: $text-active-color;
         background-color: $item-background-active-color;
       }
     }

@@ -15,6 +15,11 @@ $--color-danger: #FF3333 !default;
 /// color|1|Functional Color|1
 $--color-info: #909399 !default;
 
+/// color|1|Font Color|2
+$--color-text-primary: #1D2129 !default;
+$--color-text-regular: #4E5969 !default;
+$--color-text-secondary: #86909C !default;
+
 /* Link
 -------------------------- */
 $--link-color: mix(#ffffff, $--color-primary, 5%) !default;
@@ -56,9 +61,9 @@ $--color-gray: $--color-info;
 // layout
 $--layout-background-color: #f0f2f5;
 $--layout-dark-background-color: #001529;
-$--layout-dark-text-color: rgba(255, 255, 255, 0.89);
+$--layout-dark-text-color: rgba(255, 255, 255, .75);
 $--layout-light-background-color: #fff;
-$--layout-light-text-color: #303133;
+$--layout-light-text-color: $--color-text-regular;
 
 // 2. 引入element-ui默认css变量，在页面中使用，具体变量详见: `./comm/element-var.scss`
 // ⚠️ sass变量覆盖，需要放在变量声明之前

@@ -31,7 +31,7 @@
 <script>
 import { resolvePath } from '@/utils'
 import SubMenu from './SubMenu.vue'
-import HeaderLogo from '../header/HeaderLogo.vue'
+import HeaderLogo from '../header/Logo.vue'
 import Collapsed from './Collapsed.vue'
 
 export default {
@@ -61,7 +61,7 @@ export default {
     },
     menuProps() {
       return {
-        ...(this.top.menus || {}),
+        ...(this.top.menu || {}),
         defaultActive: this.activeMenu,
         collapse: this.siderCollapsed,
         mode: 'vertical'

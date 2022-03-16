@@ -27,12 +27,15 @@ export default {
       value: ''
     }
   },
+  props: {
+    routes: Array
+  },
   inject: {
     top: ['layout']
   },
   computed: {
     options() {
-      const routes = flatMapDeep(this.top.routes, 'children', (item, parent) => ({
+      const routes = flatMapDeep(this.routes, 'children', (item, parent) => ({
         value: resolvePath((parent?.value || '/'), item.path || ''),
         label: item.meta?.title
       }))
@@ -54,6 +57,9 @@ export default {
     handleSelect(item) {
       if (item.value) {
         this.$router.push(item.value)
+        this.$nextTick(() => {
+          this.value = ''
+        })
       }
     },
     enterSearchMode () {
@@ -79,6 +85,10 @@ export default {
     border: 0;
     border-bottom: 1px solid #22415e;
     transition: width 0.3s ease-in-out;
+
+    .layout-header-light & {
+      border-bottom-color: #e1e1e1;
+    }
 
     &.leave{
       width: 0px;

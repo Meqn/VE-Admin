@@ -62,6 +62,10 @@ export default {
       validator: (val) => ['side', 'top', 'mix'].includes(val),
       default: 'side'
     },
+    headerHeight: {
+      type: Number,
+      default: 56
+    },
     fixedHeader: Boolean,
     headerTheme: {
       type: String,
@@ -94,7 +98,6 @@ export default {
   },
   data() {
     return {
-      headerHeight: 56,
       viewWidth: 1920,
       siderCollapsed: this.defaultCollapsed
     }
@@ -136,6 +139,7 @@ export default {
 
       // this.$store.dispatch('app/toggleMobile', isMobile)
       this.toggleSideBar(width < 992)
+      this.$emit('resize', { width })
     },
     toggleSideBar(value) {
       if (value === this.siderCollapsed) return

@@ -1,5 +1,5 @@
 <template>
-<div class="header-search">
+<div :class="['header-search', { 'icon-right': iconAlign === 'right' }]">
   <ve-icon name="el-icon-search" :size="20" class="search-icon" @click="enterSearchMode" />
   <el-autocomplete
     :class="['search-input', searchMode ? 'enter' : 'leave']"
@@ -28,7 +28,8 @@ export default {
     }
   },
   props: {
-    routes: Array
+    routes: Array,
+    iconAlign: String
   },
   inject: {
     top: ['layout']
@@ -77,6 +78,9 @@ export default {
 
 <style lang="scss" scoped>
 .header-search{
+  &.icon-right{
+    flex-direction: row-reverse;
+  }
   .search-icon{
     cursor: pointer;
   }

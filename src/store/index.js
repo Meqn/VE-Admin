@@ -1,7 +1,18 @@
-export { default as createApp } from './modules/app'
-export { default as createUser } from './modules/user'
-export { default as createPermission } from './modules/permission'
-export { default as baseGetters } from './getters'
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+import getters from './getters'
+import user from './modules/user'
+
+Vue.use(Vuex)
+
+
+const store = new Vuex.Store({
+  modules: {
+    user
+  },
+  getters
+})
 
 // 获取所有 modules
 export function getModulesFromFiles(modulesFiles) {
@@ -18,3 +29,15 @@ export function getModulesFromFiles(modulesFiles) {
     return modules
   }, {})
 }
+
+// 动态注册 modules
+export function registerModules(modulesFiles) {
+  const modules = getModulesFromFiles(modulesFiles)
+  Object.keys(modules).forEach(name => {
+    store.registerModule(name, modules[name])
+  })
+}
+
+export { default as createPermission } from './modules/permission'
+
+export default store

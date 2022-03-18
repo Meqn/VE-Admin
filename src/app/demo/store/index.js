@@ -1,39 +1,18 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import store, { registerModules, createPermission } from '@/store'
 
-import { createApp, createPermission, createUser, baseGetters, getModulesFromFiles } from '@/store'
-
-import { userLogin, userLogout, getUserInfo, getMenus } from '@/api/user'
-import appConfig from '@demo/app.config'
+import { getMenus } from '@/api/user'
 import { resetRouter } from '@demo/router'
 import { constantRoutes, asyncRoutes, notFoundRoute } from '@demo/router/routes'
 
-Vue.use(Vuex)
-
-const appModule = createApp({
-  appName: 'demo',
-  appConfig
-})
-
-const userModule = createUser({
-  fetches: { userLogin, userLogout, getUserInfo },
-  resetRouter
-})
-
+// permission模块
 const permissionModule = createPermission({
-  fetches: { getMenus },
+  handlers: { getMenus, resetRouter },
   routes: { constantRoutes, asyncRoutes, notFoundRoute }
 })
+store.registerModule('permission', permissionModule)
 
+// 注册 ./modules 目录下的所有模块
 const modulesFiles = require.context('./modules', true, /\.js$/)
-const modules = getModulesFromFiles(modulesFiles)
+registerModules(modulesFiles)
 
-export default new Vuex.Store({
-  modules: {
-    app: appModule,
-    user: userModule,
-    permission: permissionModule,
-    ...modules
-  },
-  getters: baseGetters
-})
+export default store

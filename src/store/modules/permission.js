@@ -1,5 +1,3 @@
-// import { getMenus } from '@/api/user'
-// import { constantRoutes, asyncRoutes, notFoundRoute } from '@demo/router/routes'
 import { flatMapDeep } from '@/utils'
 
 /**
@@ -87,12 +85,12 @@ function flatMenus(menus) {
  * 权限路由参数
  * @param {object} param 参数
  * @param {object} param.routes 路由配置 {constantRoutes, asyncRoutes, notFoundRoute}
- * @param {object} param.fetches http请求结合 { getMenus }
+ * @param {object} param.handlers http请求结合 { getMenus }
  * @returns 
  */
-export default function createPermission({ routes = {}, fetches = {} }) {
-  const { getMenus } = fetches
-  const { constantRoutes, asyncRoutes, notFoundRoute } = routes
+export default function createPermission({ routes = {}, handlers = {} }) {
+  const { getMenus, resetRouter } = handlers
+  const { constantRoutes = [], asyncRoutes = [], notFoundRoute = [] } = routes
 
   const state = {
     routes: [],
@@ -112,21 +110,34 @@ export default function createPermission({ routes = {}, fetches = {} }) {
   
   const actions = {
     async generateRoutes({ commit, dispatch, rootGetters }) {
-      // 获取所有菜单
-      const { data } = await getMenus(rootGetters.role)
-      // 扁平化嵌套菜单
-      const menus = flatMapDeep(data, 'children', item => item.name)
-      const accessedRoutes = filterRoutes(asyncRoutes, menus)
-      // 末尾插入 notFoundRoute
-      accessedRoutes.push(notFoundRoute)
-      commit('SET_ROUTES', accessedRoutes)
-      setTimeout(() => {
-        dispatch('setCacheViews')
-      }, 10)
-      return accessedRoutes
+      try {
+        // 获取所有菜单
+        const { data } = await getMenus(rootGetters.role)
+        // 扁平化嵌套菜单
+        const menus = flatMapDeep(data, 'children', item => item.name)
+        const accessedRoutes = filterRoutes(asyncRoutes, menus)
+        // 末尾插入 notFoundRoute
+        accessedRoutes.push(notFoundRoute)
+
+        commit('SET_ROUTES', accessedRoutes)
+        setTimeout(() => {
+          dispatch('setCacheViews')
+        }, 10)
+        return accessedRoutes
+      } catch (error) {
+        console.error('generateRoutes', error)
+        return []
+      }
     },
     setCacheViews({ commit, state }) {
       commit('SET_CACHE_VIEWS', findCachedViews(state.routes))
+    },
+    resetRouter: {
+      root: true,
+      handler() {
+        console.log('dispatch:resetRouter')
+        resetRouter && resetRouter()
+      }
     }
   }
 

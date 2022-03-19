@@ -44,25 +44,33 @@ function getArticleItem() {
   }
 }
 
-export default {
-  'post:/article/': () => {
-    return ''
+export default [
+  {
+    url: '/article/',
+    type: 'post',
+    response: () => {}
   },
-  'put:/article/': () => {
-    return ''
-  },
-  'get:/article/': ({ page, pageSize, userId, title, createDate }) => {
-    // params = { page, pageSize, userId, title, createDate }
-    return {
-      count: 615,
-      previous: '',
-      next: '',
-      results: Array(pageSize || 10).fill('').map(v => {
+  {
+    url: '/article/',
+    type: 'get',
+    response({ query }) {
+      const { page, pageSize, userId, title, createDate } = query
+      const results = Array(Number(pageSize) || 10).fill('').map(v => {
         return getArticleItem()
       })
+      return {
+        count: 615,
+        previous: '',
+        next: '',
+        results
+      }
     }
   },
-  'get:/article/:id/': () => {
-    return getArticleItem()
+  {
+    url: '/article/1/',
+    type: 'get',
+    response() {
+      return getArticleItem()
+    }
   }
-}
+]

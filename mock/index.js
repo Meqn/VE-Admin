@@ -1,20 +1,31 @@
+import setupMock from './mock'
+
+import {
+  avatar,
+  constellation
+} from './const'
+
 import user from './user'
 import article from './article'
 
-const MockData = Object.assign({}, user, article)
+const mocks = [
+  ...user,
+  ...article
+]
 
-export default function request(options) {
-  const { url, method, params, data } = options
-  // const delay = Math.floor(Math.random() * 2000)
-  const delay = (Math.round(Math.random() * 2) + 1) * 1000 // 1s - 4s
-  console.log('request: ', `${method}:${url}`, delay)
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        code: 0,
-        message: 'ok',
-        data: MockData[`${method}:${url}`](params || data)
-      })
-    }, delay)
+setupMock({
+  enable: process.env.NODE_ENV === 'development',
+  timeout: '300-1500'
+}, function({ Mock, mockXHR }) {
+  // 创建自定义随机数
+  const Random = Mock.Random
+  Random.extend({
+    constellation: () => Random.pick(constellation),
+    avatar: () => Random.pick(avatar)
   })
-}
+
+  // 生成接口
+  mocks.forEach(item => {
+    mockXHR(item.url, item.type, item.response)
+  })
+})

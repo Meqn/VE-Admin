@@ -18,15 +18,15 @@ const menus = {
       name: 'form',
       children: [
         {
-          name: 'form_basic',
+          name: 'BasicForm',
           title: '基础表单'
         },
         {
-          name: 'form_step',
+          name: 'StepForm',
           title: '分步表单'
         },
         {
-          name: 'form_advanced',
+          name: 'AdvancedForm',
           title: '高级表单'
         }
       ]
@@ -36,11 +36,11 @@ const menus = {
       title: '列表页',
       children: [
         {
-          name: 'list_basic',
+          name: 'ListBasic',
           title: '标准列表'
         },
         {
-          name: 'list_table',
+          name: 'ViewListTable',
           title: '查询表格'
         },
         {
@@ -132,6 +132,16 @@ const menus = {
           title: '基本设置'
         }
       ]
+    },
+    {
+      name: 'ExternalLink',
+      title: '外链接',
+      children: [
+        {
+          name: 'BaiduLink',
+          title: 'baidu'
+        }
+      ]
     }
   ],
   editor: [
@@ -166,17 +176,46 @@ const menus = {
   ]
 }
 
-export default {
-  'post:/user/login/': ({ username }) => {
-    return getUser(username)
+export default [
+  {
+    url: '/user/login/',
+    type: 'post',
+    response({ body }) {
+      console.log('login', body)
+      return getUser(body.username)
+    }
   },
-  'post:/user/logout/': () => {
-    return {}
+  {
+    url: '/user/logout/',
+    type: 'post',
+    response: {}
   },
-  'get:/user/:id/': ({ role }) => {
-    return getUser(role.split('.')[2])
+  {
+    url: '/user/10/',
+    type: 'get',
+    response({ query }) {
+      console.log('query user', query)
+      return getUser(query.role?.split('.')[2])
+    }
   },
-  'get:/user/menus/': ({ role }) => {
-    return menus[role || 'admin']
+  {
+    url: '/user/menus/',
+    type: 'get',
+    response({ query }) {
+      console.log('/user/menus/', query, menus[query.role || 'admin'])
+      return menus[query.role || 'admin']
+    }
+  },
+  {
+    url: '/users/',
+    type: 'get',
+    response() {
+      return Array(5).fill('').map(() => ({
+        id: '@id',
+        name: '@cname',
+        avatar: '@avatar',
+        'gender|0-1': 1
+      }))
+    }
   }
-}
+]

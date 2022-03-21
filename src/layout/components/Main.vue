@@ -1,39 +1,23 @@
 <template>
   <main class="ve-layout-content">
     <transition name="fade-transform" mode="out-in">
-      <keep-alive :include="cachedViews">
-        <router-view :key="key" />
+      <!-- 1. 不能用 if 控制 keep-alive 存在, 否则缓存无效 -->
+      <!-- 2. <transition> 只能有单个子节点 -->
+      <!-- 3. <keep-alive> 使用 includes, 嵌套问题未找到有效方法解决 -->
+      <keep-alive>
+        <router-view v-if="$route.meta.cache" />
       </keep-alive>
     </transition>
+    
+    <transition name="fade-transform" mode="out-in">
+      <router-view v-if="!$route.meta.cache" />
+    </transition>
+
   </main>
 </template>
 
 <script>
-function queryCachedViews(routes, result = []) {
-  routes.forEach(route => {
-    if (route.meta?.cache) {
-      result.push(route.name)
-    }
-    if (route.children) {
-      queryCachedViews(route.children, result)
-    }
-  })
-  return result
-}
-
 export default {
-  name: 'LayoutMain',
-  inject: {
-    top: ['layout']
-  },
-  computed: {
-    cachedViews() {
-      // 需要缓存的 嵌套路由的父级组件必须是 `BlankView`, 否则需要将父组件 name追加到此处
-      return [].concat(queryCachedViews(this.top.routes))
-    },
-    key() {
-      return this.$route.path
-    }
-  }
+  name: 'LayoutMain'
 }
 </script>

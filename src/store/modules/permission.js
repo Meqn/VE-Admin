@@ -21,7 +21,7 @@ function findAllParent(name, nodes) {
 }
 
 /**
- * 需要遍历的路由
+ * 查找所有缓存路由及其父节点
  * @param {*} routes 
  * @returns 
  */
@@ -38,6 +38,24 @@ function findCachedViews(routes) {
     })
   })(routes)
   return Array.from(new Set(views))
+}
+
+/**
+ * 查找所有缓存路由
+ * @param {*} routes 路由
+ * @param {*} result 结果
+ * @returns 
+ */
+function queryCachedViews(routes, result = []) {
+  routes.forEach(route => {
+    if (route.meta?.cache) {
+      result.push(route.name)
+    }
+    if (route.children) {
+      queryCachedViews(route.children, result)
+    }
+  })
+  return result
 }
 
 /**
@@ -94,17 +112,13 @@ export default function createPermission({ routes = {}, handlers = {} }) {
 
   const state = {
     routes: [],
-    addRoutes: [],
-    cachedViews: []
+    addRoutes: []
   }
   
   const mutations = {
     SET_ROUTES(state, routes) {
       state.addRoutes = routes
       state.routes = constantRoutes.concat(routes)
-    },
-    SET_CACHE_VIEWS(state, views) {
-      state.cachedViews = views
     }
   }
   
@@ -120,22 +134,15 @@ export default function createPermission({ routes = {}, handlers = {} }) {
         accessedRoutes.push(notFoundRoute)
 
         commit('SET_ROUTES', accessedRoutes)
-        setTimeout(() => {
-          dispatch('setCacheViews')
-        }, 10)
         return accessedRoutes
       } catch (error) {
         console.error('generateRoutes', error)
         return []
       }
     },
-    setCacheViews({ commit, state }) {
-      commit('SET_CACHE_VIEWS', findCachedViews(state.routes))
-    },
     resetRouter: {
       root: true,
       handler() {
-        console.log('dispatch:resetRouter')
         resetRouter && resetRouter()
       }
     }

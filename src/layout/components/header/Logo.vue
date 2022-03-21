@@ -15,7 +15,7 @@ export default {
   },
   render() {
     const { top, showTitle } = this
-    const title = typeof top.title === 'string'
+    const titleDom = typeof top.title === 'string'
       ? (<h1 v-show={showTitle}>{top.title}</h1>)
       : isVNode(top.title) && showTitle
         ? top.title
@@ -24,7 +24,7 @@ export default {
     return (
       <a class="header-logo" onClick={top.onMenuHeaderClick}>
         { top.logo && (<img src={top.logo} alt="logo" />) }
-        { title }
+        { titleDom }
       </a>
     )
   }

@@ -246,7 +246,7 @@ export default {
   }
   .page-header{
     &-breadcrumb{
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
     &-heading{
       display: flex;

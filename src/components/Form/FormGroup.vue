@@ -61,7 +61,7 @@ export default {
   },
   render() {
     const { type, title, extra, $slots } = this
-    const $content = {
+    const contentDom = {
       grid: null,
       cell: null
     }
@@ -69,7 +69,7 @@ export default {
     if (type === 'cell') {
       // cell
       const items = this.getItems()
-      $content.cell = (
+      contentDom.cell = (
         <el-descriptions border column={this.columnNum} direction={this.direction} size={this.groupSize} class={['ve-form-cell', `ve-form-cell-${this.direction}`]}>
           { items.map(item => {
             const formItemProps = getFormItemProps({ ...item.props, size: this.groupSize }, this)
@@ -88,7 +88,7 @@ export default {
       )
     } else {
       // type = grid
-      $content.grid = (
+      contentDom.grid = (
         <el-row ref="row" type="flex" justify="start" align={this.align} gutter={this.gutter} class="ve-form-grid">
           {this.$slots.default}
         </el-row>
@@ -110,7 +110,7 @@ export default {
             : null
         }
 
-        <div class="ve-form-group-body">{$content[type] || this.$slots.default}</div>
+        <div class="ve-form-group-body">{contentDom[type] || this.$slots.default}</div>
       </div>
     )
   }

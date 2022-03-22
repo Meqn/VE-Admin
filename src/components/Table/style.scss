@@ -1,6 +1,10 @@
 $toolbarSize: 20px;
 
 .ve-table{
+  &-search{
+    border-bottom: 1px solid #f2f3f5;
+    margin-bottom: 8px;
+  }
   &-header{
     display: flex;
     align-items: center;

@@ -18,6 +18,8 @@ export default {
       default: 'span'
     },
     icon: String,
+    iconColor: String,
+    iconSize: Number,
     disabled: Boolean,
 
     code: Boolean,
@@ -49,6 +51,16 @@ export default {
         }
       }
       return ''
+    },
+    iconStyle() {
+      const styleObj = {}
+      if (this.iconColor && !this.disabled) {
+        styleObj['color'] = this.iconColor
+      }
+      if (this.iconSize) {
+        styleObj['font-size'] = this.iconSize + 'px'
+      }
+      return styleObj
     }
   },
   render(h) {
@@ -80,7 +92,7 @@ export default {
       <el-tooltip effect="dark" content={coplied ? 'coplied!' : 'copy'} placement="top">
         <Icon
           name={ coplied ? 'el-icon-document-checked' : 'el-icon-document-copy' }
-          class={ ['ml-4 copy-btn', { 'is-coplied': coplied }] }
+          class={ ['ml-4 button-copy', { 'is-coplied': coplied }] }
           onClick={ this.onCopy }
         />
       </el-tooltip>
@@ -88,9 +100,9 @@ export default {
     
     return (
       <tag
-        class={ ['ve-text', type ? `ve-text-${type}` : '', ellipsisClass, { 'is-disabled': disabled }, { 'is-hover': this.$listeners.click }] }
+        class={ ['ve-text', type ? `ve-text-${type}` : '', ellipsisClass, { 'is-hover': this.$listeners.click }, { 'is-disabled': disabled }] }
         onClick={ this.onClick }>
-        { icon ? <Icon name={icon} class="mr-4" /> : null }
+        { icon ? <Icon name={icon} class="mr-4" style={this.iconStyle} /> : null }
         { wrapper(this, this.$slots.default) }
         { copyable ? $copy : null }
         {this.$slots.right}
@@ -99,6 +111,7 @@ export default {
   },
   methods: {
     onClick() {
+      if (this.disabled) return false
       this.$emit('click')
     },
     onCopy(event) {
@@ -215,7 +228,7 @@ $type-colors: (
     font-weight: 600;
   }
 
-  .copy-btn{
+  .button-copy{
     color: $--color-primary;
     cursor: pointer;
     transition: all .3s ease;

@@ -20,7 +20,6 @@ export default {
     if (this.top.editable === 'cell') {
       const $field = this.$refs.field
       $field && $field.focus()
-      console.log('$field', $field)
     }
   },
   render() {

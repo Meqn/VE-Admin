@@ -63,7 +63,7 @@ export default {
   render() {
     const { spanNum, offset, visible } = this
     const groupType = this.group.type
-    const $formItems = {
+    const contentDom = {
       grid: null
     }
 
@@ -81,7 +81,7 @@ export default {
 
     // grid
     if (groupType === 'grid') {
-      $formItems.grid = (
+      contentDom.grid = (
         <el-col span={spanNum} offset={offset} vShow={visible} class="form-item-grid">
           <el-form-item { ...formItemProps }>
             {this.$slots.default}
@@ -92,7 +92,7 @@ export default {
     }
 
     return (
-      $formItems[groupType] || this.$slots.default
+      contentDom[groupType] || this.$slots.default
     )
   }
 }

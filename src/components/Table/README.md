@@ -62,8 +62,8 @@
 
 - table 事件, 详见 https://element.eleme.cn/#/zh-CN/component/table#table-events
 - pagination 事件
-  - `pagination-size-change`
-  - `pagination-current-change`
+  - `pagination-size-change(pageSize: number)`
+  - `pagination-current-change(page: number)`
   - `pagination-prev-click`
   - `pagination-next-click`
 - `value-change(data: object, key?: string)` 数据更新保存

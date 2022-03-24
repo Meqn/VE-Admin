@@ -11,11 +11,11 @@ import '@/styles/index.scss'
 import AppComponents from '@/components'
 import '@/components/Icon/svg.js'
 
-import Layout from '@/layout'
+// mock data
+import '@root/mock'
 
 Vue.use(ElementUI, { size: 'medium' })
 Vue.use(AppComponents)
-Vue.use(Layout)
 
 Vue.config.productionTip = false
 

@@ -35,7 +35,7 @@ function getArticleItem() {
     category: categories[randomNum(0, 11)],
     tags: ['管理后台', 'ElementUI', '路由', '权限验证'],
     author: userlist[randomNum(0, 14)],
-    createTime: new Date('2021-12-03 15:32:41'),
+    createTime: '@date',
     updateTime: new Date('2021-12-11 09:45:32'),
     viewCount: randomNum(100, 99999),
     likeCount: randomNum(5, 999),

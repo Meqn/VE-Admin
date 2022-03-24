@@ -57,7 +57,7 @@ function mockXHR(url, type = 'get', result) {
     }
     const data = typeof result === 'function' ? result.call(this, params) : result
     return Mock.mock({
-      code: 20000,
+      code: 0,
       message: 'ok',
       data
     })

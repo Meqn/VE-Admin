@@ -6,7 +6,6 @@ import user from './modules/user'
 
 Vue.use(Vuex)
 
-
 const store = new Vuex.Store({
   modules: {
     user
@@ -38,6 +37,6 @@ export function registerModules(modulesFiles) {
   })
 }
 
-export { default as createPermission } from './modules/permission'
+export { default as createPermission } from './comm/permission'
 
 export default store

@@ -62,16 +62,17 @@ function queryCachedViews(routes, result = []) {
  * 递归过滤 route
  * @param {Array} routes 
  * @param {Array} menus 
+ * @param {boolean} mount
  * @returns 
  */
 function filterRoutes(routes, menus, mount = false) {
   const res = []
-  if (Array.isArray(routes) && routes.length > 0 && menus) {
+  if (Array.isArray(routes) && Array.isArray(menus) && menus.length > 0) {
     routes.forEach(route => {
       const tmp = { ...route }
-      if (menus.includes(route.name) || (mount && route.meta?.automount)) {
+      if (menus.includes(route.name) || mount) {
         if (tmp.children) {
-          tmp.children = filterRoutes(tmp.children, menus, true)
+          tmp.children = filterRoutes(tmp.children, menus, route.meta?.automount)
         }
         res.push(tmp)
       }

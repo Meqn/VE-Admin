@@ -64,6 +64,7 @@ export default {
         ...(this.top.menu || {}),
         defaultActive: this.activeMenu,
         collapse: this.siderCollapsed,
+        collapseTransition: false,
         mode: 'vertical'
       }
     },

@@ -1,6 +1,6 @@
+# request
 
-
-
+简单封装 axios
 
 
 
@@ -42,3 +42,5 @@ export default {
 - [Axios封装之函数](https://juejin.cn/post/7053471988752318472)
 - [完整的Axios封装](https://juejin.cn/post/6968630178163458084)
 - [Axios取消功能详解](https://segmentfault.com/a/1190000039127387)
+- [axios-http](https://github.com/zhengxs2018/axios-http/)
+- 

@@ -1,4 +1,5 @@
 import Mock from 'mockjs'
+const Random = Mock.Random
 
 function createUrl(url) {
   return typeof url === 'string' ? RegExp(url + '(\\?.)?') : url
@@ -39,6 +40,36 @@ function param2obj(url) {
 }
 
 /**
+ * 格式化分页数据
+ * @param {*} result 
+ * @param {*} param 
+ * @returns 
+ */
+function pagination(result, { count = 100, page = 1, pageSize = 10 }) {
+  count = parseInt(count)
+  page = parseInt(page)
+  pageSize = parseInt(pageSize)
+
+  let results = []
+  const totalPage = Math.ceil(count / pageSize)
+
+  if (result) {
+    const currentPageSize = page < totalPage ? pageSize : (count - (pageSize * (totalPage - 1)))
+    results = Array(currentPageSize).fill('').map(() => {
+      return typeof result === 'function' ? result() : result
+    })
+  }
+  
+  return {
+    count,
+    previous: page === 1 ? null : `/?page=${page - 1}`,
+    next: page === totalPage ? null : `/?page=${page + 1}`,
+    results
+  }
+}
+
+
+/**
  * 给一个 type类型： default, list, pagination
  * 
  * @param {*} url 
@@ -62,6 +93,13 @@ function mockXHR(url, type = 'get', result) {
       data
     })
   })
+}
+
+export {
+  Mock,
+  Random,
+  mockXHR,
+  pagination
 }
 
 export default function setupMock(config = {}, setup) {

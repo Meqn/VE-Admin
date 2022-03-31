@@ -40,7 +40,7 @@ const menus = {
           title: '标准列表'
         },
         {
-          name: 'ViewListTable',
+          name: 'ListTable',
           title: '查询表格'
         },
         {

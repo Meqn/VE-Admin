@@ -5,12 +5,14 @@ import {
   constellation
 } from './const'
 
-import user from './user'
-import article from './article'
+import user from './modules/user'
+import article from './modules/article'
+import rule from './modules/rule'
 
 const mocks = [
   ...user,
-  ...article
+  ...article,
+  ...rule
 ]
 
 setupMock({

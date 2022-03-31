@@ -1,5 +1,5 @@
 import { randomNum } from '@/utils'
-import { userlist } from './utils'
+import { userlist } from '../utils'
 
 let articleId = 100
 const ArticleStatus = [

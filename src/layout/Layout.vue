@@ -33,7 +33,7 @@
 <script>
 import './layout.scss'
 import { LayoutHeader, LayoutSider, LayoutMain, LayoutFooter } from './components'
-import resizeDirective from 'v-resize-observer/src/directive'
+import ResizeObserver from 'v-resize-observer'
 import isPlainObject from 'lodash/isPlainObject'
 
 export default {
@@ -45,7 +45,7 @@ export default {
     LayoutFooter
   },
   directives: {
-    resize: resizeDirective
+    resize: ResizeObserver.directive
   },
   props: {
     loading: Boolean,

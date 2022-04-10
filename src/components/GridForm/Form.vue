@@ -24,11 +24,11 @@
 </template>
 
 <script>
-import resizeDirective from 'v-resize-observer/src/directive'
+import ResizeObserver from 'v-resize-observer'
 export default {
   name: 'VeGridForm',
   directives: {
-    resize: resizeDirective
+    resize: ResizeObserver.directive
   },
   props: {
     // cells

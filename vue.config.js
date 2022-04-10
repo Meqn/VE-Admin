@@ -161,7 +161,4 @@ module.exports = {
   // 默认情况下 babel-loader 会忽略所有 node_modules 中的文件, transpileDependencies可以设置显式转译依赖
   // https://cli.vuejs.org/config/#transpiledependencies
   // transpileDependencies: Array<string | RegExp>
-  transpileDependencies: [
-    /[/\\]node_modules[/\\]v-resize-observer[/\\]/
-  ]
 }

@@ -1,6 +1,7 @@
 {
   "name": "ve-admin",
   "description": "A vue admin.",
+  "homepage": "https://meqn.github.io/ve-admin",
   "keywords": [
     "vue",
     "vue-admin",
@@ -28,10 +29,11 @@
     "element-ui": "^2.15.7",
     "js-cookie": "^3.0.1",
     "lodash": "^4.17.21",
+    "mockjs": "^1.1.0",
     "nprogress": "^0.2.0",
     "print-js": "^1.6.0",
     "register-service-worker": "^1.7.1",
-    "v-resize-observer": "^1.6.0",
+    "v-resize-observer": "^1.6.3",
     "vue": "^2.6.14",
     "vue-router": "^3.5.3",
     "vuex": "^3.6.2"

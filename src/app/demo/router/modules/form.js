@@ -11,20 +11,20 @@ export default [
       {
         path: 'basic',
         component: () => import('@demo/views/form/basic'),
-        name: 'form_basic',
+        name: 'BasicForm',
         meta: { title: '基础表单' }
       },
       {
         path: 'step',
         component: () => import('@demo/views/form/step'),
-        name: 'form_step',
+        name: 'StepForm',
         meta: { title: '分步表单' }
       },
       {
         path: 'advanced',
         component: () => import('@demo/views/form/advanced'),
-        name: 'form_advanced',
-        meta: { title: '高级表单' }
+        name: 'AdvancedForm',
+        meta: { title: '高级表单', cache: true }
       }
     ]
   }

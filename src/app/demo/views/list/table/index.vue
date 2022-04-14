@@ -8,7 +8,9 @@
       :data="articleList"
       :columns="tableColumns"
       :loading="loading"
-      :pagination="pagination">
+      :pagination="pagination"
+      @pagination-size-change="handleChangePageSize"
+      @pagination-current-change="handleCurrentPage">
       <template #search>
         <VeQueryForm :model="articlesParams" label-suffix=" :">
           <VeFormItem prop="title" label="文章标题">
@@ -59,6 +61,7 @@ import { getArticleList } from '@/api/article'
 export default {
   name: 'TableList',
   data() {
+    const { page = 1, pageSize = 10 } = this.$route.query
     return {
       loading: false,
       form: {
@@ -70,8 +73,8 @@ export default {
         author: '',
         status: '',
         createTime: '',
-        page: 1,
-        pageSize: 20
+        page: parseInt(page),
+        pageSize: parseInt(pageSize)
       },
       articleList: [],
       tableColumns: [
@@ -79,16 +82,13 @@ export default {
         { prop: 'title', label: '文章标题', minWidth: 200, visible: true, showOverflowTooltip: true },
         { prop: 'category', label: '分类', width: 120, visible: true, render: (h, { row }) => h('span', row.category?.name) },
         { prop: 'author', label: '作者', visible: true, slots: { default: 'author' } },
-        { prop: 'createTime', label: '创建时间', width: 180, sortable: true, visible: true, formatter: this.formatterDate },
+        { prop: 'createTime', label: '创建时间', width: 180, sortable: true, visible: true },
         { prop: 'status', label: '状态', visible: true, slots: { default: 'status' } },
         { prop: 'viewCount', label: '浏览量', visible: true, render: (h, { row }) => (<ve-text icon="el-icon-view">{row.viewCount}</ve-text>) },
         { prop: 'commentsCount', label: '评论数', visible: true, render: (h, { row }) => (<ve-text icon="el-icon-chat-dot-square">{row.commentsCount}</ve-text>) },
         { prop: 'action', label: '操作', width: '150px', slots: { default: 'action', header: 'action-header' } }
       ],
-      pagination: {
-        total: 0,
-        pageSize: 15
-      },
+      pageTotal: 0,
       content: '',
       articleStatusType: {
         publish: 'success',
@@ -98,8 +98,25 @@ export default {
       }
     }
   },
-  mounted() {
+  computed: {
+    pagination() {
+      const { page, pageSize } = this.articlesParams
+      return {
+        total: this.pageTotal,
+        currentPage: page,
+        pageSize
+      }
+    }
+  },
+  created() {
+    console.log('TableList: created!')
+
     this.getArticleList()
+    this.$watch('articlesParams', (value) => {
+      const { query, path } = this.$route
+      const { page = 1, pageSize = 10 } = value
+      this.$router.replace({ path, query: { ...query, page, pageSize } })
+    }, { deep: true })
   },
   methods: {
     getArticleList() {
@@ -108,7 +125,7 @@ export default {
         .then(({ data }) => {
           console.log('getArticleList ', data)
           if (data && data.count > 0) {
-            this.pagination.total = data.count
+            this.pageTotal = data.count
             this.articleList = data.results
           }
         })
@@ -127,8 +144,7 @@ export default {
       this.$refs['searchForm'].resetForm()
     },
     formatterDate(row, column, cellValue, index) {
-      // console.log(row, column, cellValue, index)
-      return cellValue.getTime()
+      return new Date(cellValue).getTime()
     },
     formatterProject(row, column, cellValue, index) {
       return `<a>${cellValue} - ${index}</a>`
@@ -138,6 +154,14 @@ export default {
     },
     onClickText(text) {
       console.log('click text ...')
+    },
+    handleChangePageSize(pageSize) {
+      this.articlesParams.pageSize = pageSize
+      this.getArticleList()
+    },
+    handleCurrentPage(page) {
+      this.articlesParams.page = page
+      this.getArticleList()
     }
   }
 }

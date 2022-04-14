@@ -64,7 +64,7 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.loading = true
-          this.login(this.form).then(() => {
+          this.login(this.form).then((res) => {
             this.$message({
               type: 'success',
               message: '登录成功!'
@@ -89,7 +89,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background-color: $--background-color;
+  background-color: $--layout-background-color;
 }
 .login-form{
   position: absolute; top: 40%; left: 50%;

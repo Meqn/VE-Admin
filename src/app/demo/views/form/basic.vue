@@ -114,6 +114,9 @@ export default {
       }
     };
   },
+  created() {
+    console.log('BasicForm: created!')
+  },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {

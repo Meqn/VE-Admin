@@ -1,6 +1,6 @@
-import request from '@root/mock'
+import request from '@/utils/request'
 
-export function userLogin(data) {
+export function userLogin(data = {}) {
   return request({
     url: '/user/login/',
     method: 'post',
@@ -8,7 +8,7 @@ export function userLogin(data) {
   })
 }
 
-export function userLogout(data) {
+export function userLogout(data = {}) {
   return request({
     url: '/user/logout/',
     method: 'post',
@@ -18,7 +18,7 @@ export function userLogout(data) {
 
 export function getUserInfo(userId) {
   return request({
-    url: '/user/:id/',
+    url: '/user/10/',
     method: 'get',
     params: {
       role: userId
@@ -26,7 +26,7 @@ export function getUserInfo(userId) {
   })
 }
 
-export function getRoleMenus(role) {
+export function getMenus(role) {
   return request({
     url: '/user/menus/',
     method: 'get',

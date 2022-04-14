@@ -12,39 +12,38 @@ export default [
       {
         path: 'basic',
         component: () => import('@demo/views/form/basic'),
-        name: 'list_basic',
+        name: 'ListBasic',
         meta: { title: '标准列表' }
       },
       {
         path: 'table',
         component: BlankView,
-        name: 'list_table',
-        redirect: '/list/table/list',
-        meta: { title: '查询表格', asMenu: true },
+        name: 'ListTable',
+        meta: { title: '查询表格', asMenu: true, automount: true },
         children: [
           {
-            path: 'list',
+            path: '',
             component: () => import('@demo/views/list/table'),
-            name: 'ListTableList',
-            meta: { hidden: true, title: '列表', automount: true, activeMenu: '/list/table', cache: true }
+            name: 'TableList',
+            meta: { hidden: true, title: '列表', activeMenu: '/list/table', cache: true }
           },
           {
             path: 'create',
             component: () => import('@demo/views/form/basic'),
-            name: 'ListTableCreate',
-            meta: { hidden: true, title: '创建表格', automount: true, activeMenu: '/list/table' }
+            name: 'TableCreate',
+            meta: { hidden: true, title: '创建表格', activeMenu: '/list/table' }
           },
           {
             path: 'edit',
             component: () => import('@demo/views/form/basic'),
-            name: 'ListTableEdit',
-            meta: { hidden: true, automount: true, activeMenu: '/list/table' }
+            name: 'TableEdit',
+            meta: { hidden: true, activeMenu: '/list/table' }
           },
           {
-            path: '/list/table/list/:id/',
+            path: '/list/table/:id/',
             component: () => import('@demo/views/form/basic'),
-            name: 'ListTableDetail',
-            meta: { hidden: true, title: '数据详情', automount: true, activeMenu: '/list/table' }
+            name: 'TableDetail',
+            meta: { hidden: true, title: '数据详情', activeMenu: '/list/table' }
           }
         ]
       },

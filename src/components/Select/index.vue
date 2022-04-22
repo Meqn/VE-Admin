@@ -1,13 +1,10 @@
 <script>
-const popClass = 've-select-popper-' + Math.floor(Math.random() * Date.now()).toString(36) // 唯一性
-
 export default {
   name: 'VeSelect',
   props: {
     value: [Number, String, Boolean, Array],
     remote: Boolean,
     remoteMethod: Function, // 必须是 PromiseFn
-    popperClass: String,
     /** 自定义props */
     options: Array, // 列表数据
     immediate: Boolean // 是否立即执行 (默认有值，可用于编辑状态)
@@ -28,7 +25,7 @@ export default {
       list: []
     }
   },
-  created() {
+  mounted() {
     if (this.remote && this.immediate) {
       this.$_queryData()
     } else if (this.options) {
@@ -41,16 +38,30 @@ export default {
         this.list = val
       }
     })
+
+    this.$nextTick(() => {
+      // 限制最大宽度，避免select-option内容过长超出屏幕
+      try {
+        const winWidth = window.innerWidth || document.body.clientWidth
+        const selectLeft = this.$el?.getBoundingClientRect().left
+        const $popper = this.$refs.select?.$refs.popper.$el
+        if ($popper && selectLeft >= 0) {
+          $popper.style.maxWidth = Math.round(winWidth - selectLeft - 20) + 'px'
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    })
   },
   render(h) {
     const selectProps = {
+      ref: 'select',
       props: {
         ...this.$attrs,
         value: this.val,
         remote: this.remote,
         loading: this.loading,
-        remoteMethod: this.$_queryData,
-        popperClass: this.popperClass ? (`${popClass} ${this.popperClass}`) : popClass
+        remoteMethod: this.$_queryData
       },
       on: {
         ...this.$listeners,
@@ -85,20 +96,6 @@ export default {
     )
   },
   methods: {
-    $_setSelectPopperStyle() {
-      // 限制最大宽度，避免select-option内容过长超出屏幕
-      try {
-        const winWidth = window.innerWidth || document.body.clientWidth
-        const selectLeft = this.$el?.getBoundingClientRect().left
-        let maxWidth = this.$el.clientWidth
-        if (selectLeft) {
-          maxWidth = Math.round(winWidth - selectLeft - 20)
-        }
-        document.querySelector(`.${popClass}`).style['max-width'] = maxWidth + 'px'
-      } catch (error) {
-        console.error(error)
-      }
-    },
     $_queryData(text) {
       try {
         if (this.loading) return
@@ -121,8 +118,6 @@ export default {
     },
     // 获取焦点状态
     $_onFocus() {
-      this.$_setSelectPopperStyle()
-      
       if (this.remote && !this.list?.length) {
         this.$_queryData()
       }

@@ -9,8 +9,11 @@ export default {
     },
     itemClick: Function
   },
+  inject: {
+    top: 'select'
+  },
   render(h) {
-    const $defaultSlot = this.$scopedSlots.default
+    const $defaultSlot = this.top.$scopedSlots.default || this.$scopedSlots.default
     return (
       <div class="select-option-item" onClick={this.onClick}>
         { $defaultSlot ? $defaultSlot({ item: this.source, index: this.index }, h) : this.source.label }

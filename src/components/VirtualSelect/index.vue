@@ -6,7 +6,6 @@
   placement="bottom-start"
   :disabled="disabled"
   transition="el-zoom-in-top"
-  :popper-options="popperOptions"
   :append-to-body="popperAppendToBody"
   :popper-class="popoverClass">
 
@@ -26,18 +25,20 @@
     :multiple-limit="multipleLimit"
     :filterable="false"
     :popper-append-to-body="false"
-    @remove-tag="deleteItem"
+    @remove-tag="$_removeItemTag"
+    @clear="$_clearItem"
     @click.native="showSelect = !showSelect">
     <el-option v-for="item in selectedOption" :key="item[valueKey]" :label="item.label" :value="item[valueKey]" />
   </el-select>
 
-  <div class="select-search">
+  <div v-if="filterable" class="select-search">
     <el-input
       placeholder="输入关键字"
       v-model="queryText"
       style="width: 100%"
       :size="selectSize"
       clearable
+      suffix-icon="el-icon-search"
       @input="debouncedQueryChange"
     />
   </div>
@@ -50,20 +51,23 @@
     :estimate-size="itemHeight"
     :keeps="keeps"
     item-class="el-select-dropdown__item"
-    :item-class-add="itemSelectedClass"
-    :extra-props="{ itemClick }"
+    :item-class-add="$_itemSelectedClass"
+    :extra-props="{ itemClick: $_clickItem }"
     :item-scoped-slots="{
       default: itemRender
     }"
+    wrap-tag="ul"
+    item-tag="li"
     footer-class="select-dropdown-footer"
-    @totop="onScrollToTop"
-    @tobottom="onScrollToBottom">
+    @totop="$_onScrollToTop"
+    @tobottom="$_onScrollToBottom">
     <template v-if="$slots.header" #header>
       <slot name="header" />
     </template>
     <template #footer>
       <div v-if="loading" :class="['tip-message', { more: currentPage > 1 }]">{{ loadingText }}</div>
       <div v-if="!loading && optionList.length === 0" class="tip-message">{{ noDataText }}</div>
+      <slot name="footer" />
     </template>
   </VirtualList>
 </el-popover>
@@ -129,7 +133,7 @@ export default {
       type: Number,
       default: 20
     },
-    pagination: Object // { total, pageCount, currentPage, pageSize }
+    pagination: Object // { total, pageCount, page, pageSize }
   },
   provide() {
     return {
@@ -158,9 +162,10 @@ export default {
       selectedValue: this.multiple ? [].concat(this.value) : this.value || '',
       selectedOption: [], // 用于初始化 el-select 的 el-option数据
       optionList: [],
+      rawOptions: [], // 拷贝 options 数据, 用于筛选
       showSelect: false,
       itemComponent: Item,
-      currentPage: this.pagination?.currentPage || 1,
+      currentPage: this.pagination?.page || 1,
       queryText: ''
     }
   },
@@ -243,18 +248,22 @@ export default {
         }
 
         // 2. select focus
-        this.$refs.select?.focus()
+        // this.$refs.select?.focus()
 
         // 3. 重置 dropdown scroll 位置
         this.scrollToIndex()
       }
     },
     value(val) {
-      this.selectedValue = val
+      this.selectedValue = this.multiple ? [].concat(val) : val
     },
     options(val) {
       if (!this.remote) {
         this.optionList = val
+
+        if (this.filterable) {
+          this.rawOptions = [...val]
+        }
       }
     },
     valueOptions: {
@@ -280,24 +289,13 @@ export default {
   },
   created() {
     this.debouncedQueryChange = debounce((val) => {
-      this.handleQueryChange(val)
+      this.$_handleQueryChange(val)
     }, this.remote ? 300 : 0)
   },
   mounted() {
-    this.initOptionData(() => {
-      // 初始化数据 => 更新 selectedOption
-      this.$nextTick(() => {
-        const { selectedOption, selectedOptionKeys, valueKey } = this
-        const list = this.selectedIndex.map(i => this.optionList[i])
-        if (selectedOption.length === 0) {
-          this.selectedOption = list
-        } else {
-          const newList = list.reduce((arr, item) => {
-            return !selectedOptionKeys.includes(item[valueKey]) ? arr.concat(item) : arr
-          }, [])
-          this.selectedOption.push(...newList)
-        }
-      })
+    // 初始化数据 => 更新 selectedOption
+    this.$_initOptionList(() => {
+      this.$nextTick(this.$_initSelectedOption)
     })
 
     this.$nextTick(() => {
@@ -318,61 +316,85 @@ export default {
     })
   },
   methods: {
-    // 初始化 optionList 数据
-    initOptionData(callback) {
+    // 初始化 option下拉项 数据
+    $_initOptionList(callback) {
       if (this.remote && this.immediate) {
         this.$_queryData('', callback)
       } else if (this.options) {
         this.optionList = this.options
+        if (this.filterable) {
+          this.rawOptions = [...this.options]
+        }
         callback && callback(this.optionList)
       }
     },
-    handleRemoveIteme(item) {},
-    handleClearClick(event) {
-      // this.deleteSelected(event)
-    },
-    doDestroy() {
-      const $popper = this.$refs.popover?.$refs.popper
-      if ($popper) {
-        $popper.doDestroy()
+    // 初始化 selectedOption 数据
+    $_initSelectedOption() {
+      const { selectedOption, selectedOptionKeys, valueKey } = this
+      const list = this.selectedIndex.map(i => this.optionList[i])
+      if (selectedOption.length === 0) {
+        this.selectedOption = list
+      } else {
+        const newList = list.reduce((arr, item) => {
+          return !selectedOptionKeys.includes(item[valueKey]) ? arr.concat(item) : arr
+        }, [])
+        this.selectedOption.push(...newList)
       }
     },
-    handleClose() {
-      this.visible = false;
-    },
-    itemClick(item, index) {
+    $_clickItem(item, index) {
       if (this.disabled) return
+      if (item.disabled) return
 
       const currentValue = item[this.valueKey]
+      const valueIndex = this.multiple
+        ? this.selectedValue.indexOf(currentValue)
+        : -1
       
+      if (valueIndex === -1) {
+        this.handleAddItem(item)
+      } else {
+        this.handleDeleteItem(currentValue, valueIndex)
+      }
+    },
+    $_clearItem(val) {
+      this.$emit('change', this.selectedValue)
+      this.$emit('clear')
+      this.selectedOption = []
+      this.visible = false
+    },
+    $_removeItemTag(val) {
+      this.$emit('change', this.selectedValue)
+      this.$emit('remove-tag', val)
+      this.$_deleteSelectedOption(val)
+      this.$_updatePopper(200)
+    },
+    handleAddItem(item) {
+      const currentValue = item[this.valueKey]
       if (this.multiple) {
-        const { selectedValue } = this
-        const valIndex = selectedValue.indexOf(currentValue)
-        if (valIndex !== -1) {
-          selectedValue.splice(valIndex, 1)
-          this.$emit('change', selectedValue)
-          this.deleteSelectedOption(item)
-        } else {
-          this.$emit('change', selectedValue.concat(currentValue))
-          this.addSelectedOption(item)
-        }
+        this.$emit('change', this.selectedValue.concat(currentValue))
       } else {
         if (currentValue === this.selectedValue) return
         this.$emit('change', currentValue)
         this.visible = false
-        this.addSelectedOption(item)
       }
+      this.$_addSelectedOption(item)
       this.$_updatePopper()
     },
-    deleteItem(val) {
+    handleDeleteItem(val, index) {
+      if (this.multiple) {
+        this.selectedValue.splice(index, 1)
+      } else {
+        this.selectedValue = ''
+        this.visible = false
+      }
       this.$emit('change', this.selectedValue)
-      this.$emit('remove-tag', val)
+      // this.$emit('remove-tag', val)
 
-      this.deleteSelectedOption(val)
+      this.$_deleteSelectedOption(val)
       this.$_updatePopper(200)
     },
     // 追加 已选中 对应的 options
-    addSelectedOption(item) {
+    $_addSelectedOption(item) {
       if (this.multiple) {
         if (!this.selectedOptionKeys.includes(item[this.valueKey])) {
           this.selectedOption.push(item)
@@ -382,7 +404,7 @@ export default {
       }
     },
     // 移除 已选中 对应的 options
-    deleteSelectedOption(val) {
+    $_deleteSelectedOption(val) {
       if (this.multiple) {
         const index = this.selectedOptionKeys.indexOf(val)
         if (index !== -1) {
@@ -396,12 +418,15 @@ export default {
     $_updatePopper(later = 100) {
       if (this.multiple && !this.collapseTags) {
         setTimeout(() => {
-          this.$refs.popover.updatePopper()
+          this.updatePopper()
         }, later)
       }
     },
-    itemSelectedClass(index) {
-      return this.selectedIndex.includes(index) ? 'selected' : ''
+    $_itemSelectedClass(index) {
+      const item = this.optionList[index]
+      const disableClass = item.disabled ? 'is-disabled' : ''
+      const checkClass = [].concat(this.value).includes(item[this.valueKey]) ? 'selected' : ''
+      return [checkClass, disableClass].filter(v => !!v).join(' ')
     },
     $_queryData(text, callback) {
       if (this.loading) return
@@ -414,11 +439,40 @@ export default {
       if (remote && remoteMethod) {
         this.loading = true
         remoteMethod({ text: text || '', page: currentPage }).then(data => {
-          this.optionList = this.optionList.concat(data)
+          this.optionList = currentPage === 1 ? [].concat(data) : this.optionList.concat(data)
           callback && callback(this.optionList)
         }).finally(() => {
           this.loading = false
         })
+      }
+    },
+    $_onScrollToTop() {
+      this.$emit('scrollTop')
+    },
+    $_onScrollToBottom() {
+      this.$emit('scrollBottom')
+
+      if (!this.loading && this.remote && this.pagination && this.currentPage < this.pageCount) {
+        this.currentPage++
+        this.$nextTick(() => {
+          this.$_queryData(this.queryText)
+        })
+      }
+    },
+    // 过滤查询
+    $_handleQueryChange(val) {
+      if (this.remote) {
+        this.currentPage = 1
+        this.$_queryData(val)
+      } else if (this.filterMethod) {
+        this.filterMethod(val)
+      } else {
+        if (val) {
+          this.optionList = this.rawOptions.filter(item => item.label?.includes(val))
+        } else {
+          this.optionList = [...this.rawOptions]
+        }
+        this.scrollToIndex()
       }
     },
     // 重置 dropdown 滚动位置
@@ -429,28 +483,20 @@ export default {
         itemIndex ? $scroll.scrollToIndex(itemIndex) : $scroll.reset()
       })
     },
-    onScrollToTop() {
-      console.log('scroll top ...')
-      this.$emit('scrollTop')
+    updatePopper() {
+      this.$refs.popover?.updatePopper()
     },
-    onScrollToBottom() {
-      console.log('scroll bottom ...')
-      this.$emit('scrollBottom')
-
-      if (!this.loading && this.remote && this.pagination && this.currentPage < this.pageCount) {
-        this.currentPage++
-        this.$nextTick(() => {
-          this.$_queryData(this.queryText)
-        })
+    doDestroy() {
+      const $popper = this.$refs.popover?.$refs.popper
+      if ($popper) {
+        $popper.doDestroy()
       }
     },
-    handleQueryChange(val) {
-      console.log('change queryText', val)
-      if (this.remote) {
-        this.currentPage = 1
-        this.optionList = []
-        this.$_queryData(val)
-      }
+    focus() {
+      this.visible = true
+    },
+    blur() {
+      this.visible = false
     }
   }
 }
@@ -470,6 +516,7 @@ export default {
     display: none !important;
   } */
 }
+
 .el-select-dropdown.ve-virtual-select-dropdown{
   padding: 0;
   &.is-multiple .el-select-dropdown__item.selected::after{
@@ -491,6 +538,7 @@ export default {
     }
   }
 }
+
 .el-select-dropdown__list.select-dropdown-list{
   width: 100%;
   // height: 280px;

@@ -3,6 +3,7 @@ export default {
   name: 'VeSelect',
   props: {
     value: [Number, String, Boolean, Array],
+    multiple: Boolean,
     remote: Boolean,
     remoteMethod: Function, // 必须是 PromiseFn
     /** 自定义props */
@@ -14,28 +15,27 @@ export default {
     event: 'change'
   },
   data() {
-    const { multiple } = this.$attrs
-    const defaultVal = !multiple
+    const defaultVal = !this.multiple
       ? this.value || ''
       : Array.isArray(this.value) ? this.value : []
     
     return {
       loading: false,
       val: defaultVal,
-      list: []
+      optionList: []
     }
   },
   mounted() {
     if (this.remote && this.immediate) {
       this.$_queryData()
     } else if (this.options) {
-      this.list = this.options
+      this.optionList = this.options
     }
 
     this.$watch('value', val => (this.val = val))
     this.$watch('options', val => {
       if (!this.remote) {
-        this.list = val
+        this.optionList = val
       }
     })
 
@@ -43,10 +43,10 @@ export default {
       // 限制最大宽度，避免select-option内容过长超出屏幕
       try {
         const winWidth = window.innerWidth || document.body.clientWidth
-        const selectLeft = this.$el?.getBoundingClientRect().left
+        const { left } = this.$el.getBoundingClientRect()
         const $popper = this.$refs.select?.$refs.popper.$el
-        if ($popper && selectLeft >= 0) {
-          $popper.style.maxWidth = Math.round(winWidth - selectLeft - 20) + 'px'
+        if ($popper) {
+          $popper.style.maxWidth = Math.round(winWidth - left - 20) + 'px'
         }
       } catch (error) {
         console.error(error)
@@ -59,6 +59,7 @@ export default {
       props: {
         ...this.$attrs,
         value: this.val,
+        multiple: this.multiple,
         remote: this.remote,
         loading: this.loading,
         remoteMethod: this.$_queryData
@@ -66,8 +67,7 @@ export default {
       on: {
         ...this.$listeners,
         change: this.$_onChange,
-        focus: this.$_onFocus,
-        clear: this.$_onClear
+        focus: this.$_onFocus
       }
     }
 
@@ -81,9 +81,9 @@ export default {
     return (
       <el-select {...selectProps}>
         {
-          this.list.map(item => {
+          this.optionList.map((item, index) => {
             const scopedSlots = $defaultSlot ? {
-              default: () => $defaultSlot(item)
+              default: () => $defaultSlot({ item, index })
             } : {}
             return (
               <el-option key={item.value} label={item.label} value={item.value} disabled={item.disabled} {...{ scopedSlots }} />
@@ -96,50 +96,37 @@ export default {
     )
   },
   methods: {
-    $_queryData(text) {
+    $_queryData(text = '') {
       try {
         if (this.loading) return
-        if (!text && this.list.length > 0) return
-        if (this.remoteMethod) {
+        if (this.remote && this.remoteMethod) {
           this.loading = true
-          this.remoteMethod(text).then(data => {
-            this.list = data
+          this.remoteMethod({ text }).then(data => {
+            this.optionList = data
           }).finally(() => {
-            if (!this.loading) {
-              // 配合 clear 事件
-              this.list = []
-            }
             this.loading = false
           })
         }
       } catch (error) {
-        this.list = []
+        this.optionList = []
       }
     },
     // 获取焦点状态
     $_onFocus() {
-      if (this.remote && !this.list?.length) {
+      if (this.remote && !this.optionList?.length) {
         this.$_queryData()
       }
       this.$emit('focus')
     },
-    // 清空过滤文本
-    $_onClear() {
-      if (this.remote) {
-        this.loading = false
-        this.list = []
-      }
-      this.$emit('clear')
-    },
     $_onChange(val) {
-      const index = this.list.findIndex(v => v.value === val)
-      this.$emit('change', val, this.list[index])
+      const index = this.optionList.findIndex(v => v.value === val)
+      this.$emit('change', val, this.optionList[index])
     },
     focus() {
-      this.$refs['select']?.focus()
+      this.$refs.select?.focus()
     },
     blur() {
-      this.$refs['select']?.blur()
+      this.$refs.select?.blur()
     }
   }
 }

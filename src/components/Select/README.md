@@ -7,16 +7,14 @@
 
 
 ## props
-> 同 `el-select`
+- `el-select` 属性
+  - `remote-method: Function` : 必须是 PromiseFn
+- `options: Array<object>` : 下拉列表数据
+- `immediate: Boolean` : 是否立即执行 (默认有值，可用于编辑状态)
 
-新增：
-- `options`: Array, // 列表数据
-- `immediate`: Boolean, // 是否立即执行 (默认有值，可用于编辑状态)
-
-> 注：`remote-method` 必须是返回一个 `Promise`方法
 
 ## slots
-- `default(item)`
+- `default({ item, index })`
 
 
 
@@ -27,7 +25,6 @@
   v-model="user"
   remote
   immediate
-  clearable
   :remote-method="queryUsers"
   placeholder="选择用户">
   <template #default="item">{{item.value}} -- {{item.label}}</template>
@@ -42,8 +39,8 @@ export default {
     }
   },
   methods: {
-    queryUsers(text) {
-      return getUsers({ name: text }).then(({ data }) => {
+    queryUsers(query) {
+      return getUsers({ name: query }).then(({ data }) => {
         return data.map(item => ({
           label: item.name,
           value: item.id

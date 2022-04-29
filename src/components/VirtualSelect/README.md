@@ -8,9 +8,9 @@
   - `remote-method: Function` : 必须是 PromiseFn
 - `width: String` : 宽度
 - `options: Array<object>` : 下拉列表数据
-- `value-options: Array<object>` : 默认值 列表数据
+- `value-options: Array<object>` : 默认值列表数据, 用于初始化分页模式下的初始值
 - `immediate: Boolean` : 立即请求数据
-- `itemRender: Node` : 列表项内容, 参数({ item, index })
+- `itemRender: VNode` : 列表项内容, 参数({ item, index })
 - `itemHeight: Number` : 列表项高度
 - `keeps: Number` : --
 - `pagination: Object` : 分页配置
@@ -93,4 +93,3 @@ export default {
   }
 }
 ```
-

@@ -17,7 +17,7 @@ VueRouter.prototype.replace = function replace(location, onResolve, onReject) {
 Vue.use(VueRouter)
 
 // 创建默认路由
-export default function createRouter(routes) {
+export default function createRouter(routes = []) {
   return new VueRouter({
     routes
   })

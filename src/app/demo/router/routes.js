@@ -53,14 +53,11 @@ export const constantRoutes = [
         meta: { title: 'dashboard', icon: 'el-icon-s-operation' }
       }
     ]
-  }
-  // ⚠️注： 1. 404页面必须放在末尾 !!!
+  },
+  // ⚠️注： 1. 未找到页面路由 必须放在末尾 !!!
   //       2. 如果是动态载入路由，必须将不匹配路径(path="*")跳转404 route从初始路由中移除
-  // { path: '*', redirect: '/404', hidden: true }
+  { path: '*', name: 'NotFound', redirect: '/404', hidden: true }
 ]
 
 // 异步路由
 export const asyncRoutes = [].concat(formRoutes, listRoutes, profileRoutes, exceptionRoutes, resultRoutes, accountRoutes, externalRoutes)
-
-// 未找到页面路由
-export const notFoundRoute = { path: '*', redirect: '/404', hidden: true }

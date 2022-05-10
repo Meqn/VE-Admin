@@ -9,7 +9,7 @@ import PageContainer from './PageContainer'
 import { Table, TableCell } from './Table'
 import { Form, FormGroup, FormItem, QueryForm } from './Form'
 import Select from './Select'
-import VirtualSelect from './VirtualSelect'
+import SelectVirtual from './SelectVirtual'
 
 const components = [
   Flex,
@@ -24,7 +24,7 @@ const components = [
   QueryForm,
   Form, FormGroup, FormItem,
   Select,
-  VirtualSelect
+  SelectVirtual
 ]
 
 const install = function(Vue) {

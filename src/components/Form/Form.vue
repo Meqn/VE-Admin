@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import resize from 'v-resize-observer'
+import ResizeObserver from 'v-resize-observer'
 import { SPAN_BREAKPOINTS } from '../constant'
 import { getBreakpointSpan } from '../utils'
 import './style.scss'
@@ -30,7 +30,7 @@ import './style.scss'
 export default {
   name: 'VeForm',
   directives: {
-    resize: resize.directive
+    resize: ResizeObserver.directive
   },
   props: {
     // form

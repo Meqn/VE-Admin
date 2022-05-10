@@ -25,9 +25,15 @@ const CONFIG_SPAN_BREAKPOINTS = {
 } */
 
 export const SPAN_BREAKPOINTS = {
-  default: [680, 1062, 1440],
-  vertical: [600, 992, 1366]
+  default: [720, 1200, 1600],
+  vertical: [640, 1024, 1440]
 }
 
-
+export const GRID_RESPONSIVE = {
+  xs: 24,
+  sm: 12,
+  md: 8,
+  lg: 6,
+  xl: 4,
+}
 

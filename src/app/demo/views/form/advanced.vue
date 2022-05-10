@@ -17,30 +17,16 @@
           </el-input>
         </ve-form-item>
         <ve-form-item prop="store.owner" label="仓库管理员" required>
-          <el-select v-model="form.store.owner" placeholder="请选择" class="w-full">
-            <el-option
-              v-for="item in userList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+          <ve-select v-model="form.store.owner" :options="userList" placeholder="请选择" class="w-full" />
         </ve-form-item>
         <ve-form-item prop="store.approver" required>
           <ve-text slot="label">
             审批人
             <el-tooltip slot="right" effect="dark" content="仓库的管理对象" placement="top">
-              <ve-text type="info" class="ml-8"><ve-icon name="el-icon-warning-outline" /></ve-text>
+              <ve-icon name="el-icon-warning-outline" class="ml-8" />
             </el-tooltip>
           </ve-text>
-          <el-select v-model="form.store.approver" placeholder="请选择" class="w-full">
-            <el-option
-              v-for="item in userList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+          <ve-select v-model="form.store.approver" :options="userList" placeholder="请选择" class="w-full" />
         </ve-form-item>
         <ve-form-item prop="store.dateRange" label="生效日期" required>
           <el-date-picker
@@ -74,24 +60,10 @@
           <el-input v-model="form.task.desc"></el-input>
         </ve-form-item>
         <ve-form-item prop="task.executor" label="执行人" required>
-          <el-select v-model="form.store.executor" placeholder="请选择" class="w-full">
-            <el-option
-              v-for="item in userList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+          <ve-select v-model="form.task.executor" :options="userList" placeholder="请选择" class="w-full" />
         </ve-form-item>
         <ve-form-item prop="task.officer" label="责任人" required>
-          <el-select v-model="form.store.officer" placeholder="请选择" class="w-full">
-            <el-option
-              v-for="item in userList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+          <ve-select v-model="form.task.officer" :options="userList" placeholder="请选择" class="w-full" />
         </ve-form-item>
         <ve-form-item prop="task.dateRange" label="生效日期" required>
           <el-date-picker

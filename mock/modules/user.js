@@ -92,11 +92,11 @@ const menus = {
       title: '结果页',
       children: [
         {
-          name: 'result_success',
+          name: 'ResultSuccess',
           title: '成功页'
         },
         {
-          name: 'result_fail',
+          name: 'ResultFail',
           title: '失败页'
         }
       ]
@@ -210,7 +210,7 @@ export default [
     url: '/users/',
     type: 'get',
     response() {
-      return Array(5).fill('').map(() => ({
+      return Array(35).fill('').map(() => ({
         id: '@id',
         name: '@cname',
         avatar: '@avatar',

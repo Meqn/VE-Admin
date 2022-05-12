@@ -163,6 +163,12 @@ export default {
           { required: true, message: '请输入仓库名', trigger: 'blur' },
           { min: 5, max: 40, message: '长度在 5 到 40 个字符', trigger: 'blur' }
         ],
+        'store.url': [
+          { required: true, message: '请输入仓库域名', trigger: 'blur' }
+        ],
+        'store.owner': [
+          { required: true, message: '请选择仓库管理员', trigger: 'change' }
+        ],
         'store.dateRange': [
           { required: true, message: '请选择起止时间', trigger: 'change' }
         ]

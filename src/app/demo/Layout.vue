@@ -74,10 +74,10 @@ export default {
   },
   computed: {
     user() {
-      return this.$store.getters.user
+      return this.$store.getters?.user || {}
     },
     routes() {
-      return this.$store.state.permission.routes
+      return this.$store.state.permission?.routes || []
     },
     collapse() {
       return this.$refs.layout.siderCollapsed
@@ -86,9 +86,9 @@ export default {
       return {
         copyright: '2022 VE-Admin. All Rights Reserved',
         links: [
-          { title: 'baidu', href: 'http://baidu.com' },
+          { title: 'baidu', href: 'https://baidu.com' },
           { title: <strong>github</strong>, href: 'http://github.com' },
-          { title: 'google', href: 'http://gogole.com' }
+          { title: 'google', href: 'https://gogole.com' }
         ]
       }
     }

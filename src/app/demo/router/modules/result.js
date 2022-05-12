@@ -10,14 +10,14 @@ export default [
     children: [
       {
         path: 'success',
-        component: () => import('@demo/views/form/basic'),
-        name: 'result_success',
+        component: () => import('@demo/views/result/success'),
+        name: 'ResultSuccess',
         meta: { title: '成功页' }
       },
       {
         path: 'fail',
-        component: () => import('@demo/views/form/basic'),
-        name: 'result_fail',
+        component: () => import('@demo/views/result/fail'),
+        name: 'ResultFail',
         meta: { title: '失败页' }
       }
     ]

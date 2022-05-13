@@ -76,10 +76,9 @@ import './style.scss'
 import Column from './Column'
 import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
+import isPlainObject from 'lodash/isPlainObject'
 import { TableSetting, TableDensity, TableReload, TablePrint, TableFullscreen } from './components'
 import { EDIT_CLASS, ROW_INDEX, ROW_KEY, TABLE_METHODS, ALERT_MESSAGE } from './constant'
-
-const isObject = arg => arg !== null && typeof arg === 'object'
 
 // 定义对象不可枚举属性
 function defineNonEnumKey(obj, key, value) {
@@ -132,7 +131,7 @@ export default {
   },
   provide() {
     return {
-      top: this
+      table: this
     }
   },
   data() {
@@ -256,7 +255,7 @@ export default {
     },
     // 设置 rowKey 和 rowIndex
     $_setRowKey(row, index) {
-      if (isObject(row)) {
+      if (isPlainObject(row)) {
         let rowKey = row[ROW_KEY] // 唯一值
         // 设置每行唯一值
         if (!rowKey) {
@@ -273,7 +272,7 @@ export default {
       return null
     },
     $_getRowKey(row) {
-      return isObject(row)
+      return isPlainObject(row)
         ? row[ROW_KEY]
         : this.rowDataMap[row]
           ? row
@@ -337,7 +336,7 @@ export default {
       }
     },
     $_setEditCell(cell, editing = true) {
-      if (editing && isObject(cell) && cell.row && cell.column) {
+      if (editing && isPlainObject(cell) && cell.row && cell.column) {
         const { row, column } = cell
         const rowKey = row[ROW_KEY]
         const colKey = column.property

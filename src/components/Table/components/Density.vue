@@ -28,7 +28,9 @@ export default {
       default: 'medium'
     }
   },
-  inject: ['top'],
+  inject: {
+    top: 'table'
+  },
   data() {
     return {
       list: [

@@ -15,7 +15,9 @@ export default {
       default: () => {}
     }
   },
-  inject: ['top'],
+  inject: {
+    top: 'table'
+  },
   mounted() {
     if (this.top.editable === 'cell') {
       const $field = this.$refs.field

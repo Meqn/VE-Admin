@@ -7,7 +7,9 @@ export default {
   props: {
     option: Object
   },
-  inject: ['top'],
+  inject: {
+    top: 'table'
+  },
   render(h) {
     const top = this.top
     const { render: renderColumn, slots, editable, prop } = this.option

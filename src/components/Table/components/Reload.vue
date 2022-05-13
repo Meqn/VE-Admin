@@ -18,7 +18,9 @@ export default {
       default: '刷新'
     }
   },
-  inject: ['top'],
+  inject: {
+    top: 'table'
+  },
   methods: {
     onClick() {
       this.top.refresh()

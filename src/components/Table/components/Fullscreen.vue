@@ -7,7 +7,9 @@ import Fullscreen from '../../Fullscreen'
 export default {
   name: 'TableFullscreen',
   components: { Fullscreen },
-  inject: ['top'],
+  inject: {
+    top: 'table'
+  },
   data() {
     return {
       targetElem: ''

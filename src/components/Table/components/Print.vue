@@ -19,7 +19,9 @@ export default {
       default: '打印'
     }
   },
-  inject: ['top'],
+  inject: {
+    top: 'table'
+  },
   methods: {
     onClick() {
       this.top.print()

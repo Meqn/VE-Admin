@@ -64,7 +64,9 @@ export default {
   components: {
     Icon
   },
-  inject: ['top'],
+  inject: {
+    top: 'table'
+  },
   props: {
     data: {
       type: Object,

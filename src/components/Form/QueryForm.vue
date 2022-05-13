@@ -22,7 +22,7 @@
       <div class="form-action-content">
         <slot name="action" v-bind="{ collapsed: isCollapsed }">
           <el-button @click="$_resetForm">{{ resetText }}</el-button>
-          <el-button type="primary" @click="$_submitForm" :loading="loading">{{ searchText }}</el-button>
+          <el-button type="primary" @click="$_submitForm" :loading="submitting">{{ searchText }}</el-button>
           <el-link
             v-if="hasCollapse"
             :class="['form-collapse', { 'is-collapse': isCollapsed }]"
@@ -91,15 +91,21 @@ export default {
     collapsed: {
       type: Boolean,
       default: true
+    },
+    loading: {
+      type: Boolean,
+      default: undefined
     }
   },
   data() {
     return {
-      loading: false,
       isCollapsed: this.collapsed,
       column: 1,
       actionOffset: 1
     }
+  },
+  inject: {
+    table: { default: '' }
   },
   computed: {
     hasCollapse() {
@@ -108,6 +114,12 @@ export default {
         return nodes.length >= this.column
       }
       return false
+    },
+    submitting() {
+      const { loading, table } = this
+      return typeof loading === 'boolean'
+        ? loading
+        : (table && table.loading) || false
     }
   },
   methods: {
@@ -120,19 +132,15 @@ export default {
     $_submitForm() {
       this.$refs['searchForm'].validate((valid) => {
         if (valid) {
-          this.loading = true
           this.$emit('submit')
         } else {
-          return false;
+          return false
         }
       })
     },
     $_resetForm() {
       this.$refs['searchForm'].resetFields()
       this.$emit('reset')
-    },
-    finish() {
-      this.loading = false
     },
     /**
      * 控制展开与隐藏 (含初始状态)

@@ -1,10 +1,16 @@
 # 1. VeForm
 
-表单组件，在`el-form` 之上增加了两种自适应布局设置。
-
-> 属性同 `el-form`
+表单组件，同 `el-form`，并增加了两种自适应布局设置。
 
 ![image-20220218153847456](https://cdn.jsdelivr.net/gh/Meqn/store/imgs/20220218/image-20220218153847456-5e48ed.png)
+
+
+## props
+- `el-form` 属性
+  - `inline` 属性被移除
+- `column: number` : 一行显示列数
+
+
 
 # 2. VeFormGroup
 
@@ -55,6 +61,7 @@
 - `resetText: string` : 重置按钮文本
 - `searchText: string` : 查询按钮文本
 - `collapsed: boolean` : 默认收起
+- `loading: boolean` : 搜索中
 
 ## scope-slots
 
@@ -64,7 +71,3 @@
 
 - `submit`
 - `reset`
-
-## methods
-
-- `finish()` 搜索完成 (`loading = false`)

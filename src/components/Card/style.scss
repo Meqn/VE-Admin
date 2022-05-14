@@ -86,6 +86,10 @@ $--card-head-padding-sm: math.div($--card-head-padding, 2);
   &-body{
     padding: $--card-padding;
     @include clearfix;
+
+    .card-title{
+      @include title;
+    }
   }
   
   // tabs

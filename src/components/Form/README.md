@@ -71,3 +71,8 @@
 
 - `submit`
 - `reset`
+
+## methods
+
+- `submit`
+- `reset`

@@ -21,8 +21,8 @@
     <FormItem :offset="actionOffset" label="0" label-width="1px" class="form-action">
       <div class="form-action-content">
         <slot name="action" v-bind="{ collapsed: isCollapsed }">
-          <el-button @click="$_resetForm">{{ resetText }}</el-button>
-          <el-button type="primary" @click="$_submitForm" :loading="submitting">{{ searchText }}</el-button>
+          <el-button @click="reset">{{ resetText }}</el-button>
+          <el-button type="primary" @click="submit" :loading="submitting">{{ searchText }}</el-button>
           <el-link
             v-if="hasCollapse"
             :class="['form-collapse', { 'is-collapse': isCollapsed }]"
@@ -129,7 +129,7 @@ export default {
         this.toggleCollapse(false)
       })
     },
-    $_submitForm() {
+    submit() {
       this.$refs['searchForm'].validate((valid) => {
         if (valid) {
           this.$emit('submit')
@@ -138,7 +138,7 @@ export default {
         }
       })
     },
-    $_resetForm() {
+    reset() {
       this.$refs['searchForm'].resetFields()
       this.$emit('reset')
     },

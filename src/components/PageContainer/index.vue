@@ -5,7 +5,7 @@
     <slot name="header" />
   </div>
   <PageHeader
-    v-else
+    v-if="hasPageHeader"
     :ghost="ghost"
     :breadcrumb="breadcrumb"
     :title="title"
@@ -81,6 +81,10 @@ export default {
   },
   inject: ['layout'],
   computed: {
+    hasPageHeader() {
+      const { header, breadcrumb, title, content, extra } = this.$slots
+      return !header && (breadcrumb || this.breadcrumb || title || this.title || content || this.content || extra || this.extra || this.tabList)
+    },
     footStyles() {
       const { footStyle = {} } = this
       const width = `calc(100% - ${this.layout.sidebarWidth}px)`

@@ -65,6 +65,9 @@ $--layout-dark-text-color: rgba(255, 255, 255, .75);
 $--layout-light-background-color: #fff;
 $--layout-light-text-color: $--color-text-regular;
 
+// divider
+$--divider-border-color: rgba(0, 0, 0, .06);
+
 // 2. 引入element-ui默认css变量，在页面中使用，具体变量详见: `./comm/element-var.scss`
 // ⚠️ sass变量覆盖，需要放在变量声明之前
 @import "~element-ui/packages/theme-chalk/src/common/var.scss";

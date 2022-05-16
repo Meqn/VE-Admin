@@ -66,3 +66,15 @@
     margin-bottom: 1em;
   }
 }
+
+// el-descriptions
+.el-descriptions[ghost], .el-descriptions[transparent]{
+  .el-descriptions__body{
+    background-color: transparent;
+  }
+}
+
+// el-divider
+.el-divider{
+  background-color: $--divider-border-color;
+}

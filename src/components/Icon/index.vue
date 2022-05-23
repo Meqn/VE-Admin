@@ -32,27 +32,29 @@ export default {
       return 'svg'
     },
     iconStyle() {
-      const { color, size, rotate } = this
-      const obj = {}
-      if (this.iconType === 'external') {
-        obj['background-image'] = `url(${this.name})`
+      const { color, size, rotate, iconType } = this
+      const styleObj = {}
+
+      const [currentColor, fillColor] = Array.isArray(color) ? color : [color]
+      currentColor && (styleObj['color'] = currentColor)
+      if (fillColor) {
+        styleObj['fill'] = fillColor
+        styleObj['stroke'] = fillColor
       }
+      
       if (size) {
-        obj['fontSize'] = size + 'px'
+        styleObj['fontSize'] = size + 'px'
       }
-      if (typeof color === 'string') {
-        obj['color'] = color
+
+      if (iconType === 'external') {
+        styleObj['background-image'] = `url(${this.name})`
       }
-      if (Array.isArray(color)) {
-        obj['color'] = color[0]
-        if (color.length > 1) {
-          obj['fill'] = color[1]
-        }
-      }
+
       if (typeof rotate === 'number') {
-        obj['transform'] = `rotate(${rotate}deg)`
+        styleObj['transform'] = `rotate(${rotate}deg)`
       }
-      return obj
+
+      return styleObj
     }
   }
 }
@@ -67,8 +69,9 @@ export default {
   vertical-align: baseline;
   line-height: 1;
   font-style: normal;
-  fill: currentColor;
   color: currentColor;
+  fill: currentColor;
+  stroke: currentColor;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -82,5 +85,22 @@ export default {
   height: 1em;
   display: inline-block;
   font-style: normal;
+}
+
+// 自定义 iconfont
+[class^="ve-icon-"], [class*=" ve-icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'iconfont' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  vertical-align: baseline;
+  display: inline-block;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 </style>

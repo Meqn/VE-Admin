@@ -1,6 +1,8 @@
 <script>
 import Icon from '../Icon'
 import Copy from 'copy-to-clipboard'
+import { isObject, isVNode } from '../utils'
+
 export default {
   name: 'VeText',
   components: {
@@ -30,7 +32,7 @@ export default {
     italic: Boolean,
     underline: Boolean,
 
-    copyable: Boolean,
+    copyable: [Boolean, Object], // { text, onCopy, icon, tooltips }
     ellipsis: [Boolean, Number]
   },
   data() {
@@ -61,10 +63,32 @@ export default {
         styleObj['font-size'] = this.iconSize + 'px'
       }
       return styleObj
+    },
+    copyConfig() {
+      const { copyable } = this
+      const conf = {
+        icon: ['el-icon-document-copy', 'el-icon-document-checked'],
+        tooltips: ['copy', 'coplied!']
+      }
+      if (copyable) {
+        if (isObject(copyable)) {
+          return {
+            ...copyable,
+            icon: Array.isArray(copyable.icon) ? copyable.icon : conf.icon,
+            tooltips: copyable.tooltips
+              ? Array.isArray(copyable.tooltips)
+                ? copyable.tooltips
+                : conf.tooltips
+              : false
+          }
+        }
+        return conf
+      }
+      return false
     }
   },
   render(h) {
-    const { tag, type, disabled, icon, ellipsisClass, copyable, coplied } = this
+    const { tag, type, disabled, icon, ellipsisClass } = this
 
     function wrapper(
       { code, keyboard, delete: del, mark, strong, italic, underline } = this,
@@ -87,16 +111,6 @@ export default {
 
       return renderContent
     }
-
-    const $copy = (
-      <el-tooltip effect="dark" content={coplied ? 'coplied!' : 'copy'} placement="top">
-        <Icon
-          name={ coplied ? 'el-icon-document-checked' : 'el-icon-document-copy' }
-          class={ ['ml-4 button-copy', { 'is-coplied': coplied }] }
-          onClick={ this.onCopy }
-        />
-      </el-tooltip>
-    )
     
     return (
       <tag
@@ -104,12 +118,33 @@ export default {
         onClick={ this.onClick }>
         { icon ? <Icon name={icon} class="mr-4" style={this.iconStyle} /> : null }
         { wrapper(this, this.$slots.default) }
-        { copyable ? $copy : null }
+        { this.renderCopy() }
         {this.$slots.right}
       </tag>
     )
   },
   methods: {
+    renderCopy() {
+      const { copyConfig, coplied } = this
+      if (!copyConfig) return null
+
+      const { icon, tooltips } = copyConfig
+      const iconDom = isVNode(icon[0]) && isVNode(icon[1])
+        ? (<span onClick={ this.onCopy }>{coplied ? icon[1] : icon[0]}</span>)
+        : (<Icon name={coplied ? icon[1] : icon[0]} class={ ['ml-4 button-copy', { 'is-coplied': coplied }] } onClick={ this.onCopy } />)
+      const tooltipsDom = (
+        <el-tooltip effect="dark" placement="top">
+          <template slot="content">{coplied ? tooltips[1] : tooltips[0]}</template>
+          {iconDom}
+        </el-tooltip>
+      )
+      
+      if (copyConfig) {
+        return copyConfig.tooltips === false ? iconDom : tooltipsDom
+      } else {
+        return null
+      }
+    },
     onClick() {
       if (this.disabled) return false
       this.$emit('click')
@@ -117,13 +152,20 @@ export default {
     onCopy(event) {
       event.stopPropagation()
       event.preventDefault()
+      if (this.coplied) return
       // this.$slots.default = VNode
       // VNode.elm = Element
-      const text = this.$slots.default?.[0]?.elm?.textContent
+      const { copyConfig } = this
+      const text = copyConfig.text ? copyConfig.text : this.$slots.default?.[0]?.elm?.textContent
       if (text) {
         const result = Copy(text)
         if (result) {
           this.coplied = true
+
+          this.$nextTick(() => {
+            typeof copyConfig.onCopy === 'function' && copyConfig.onCopy(event)
+          })
+
           setTimeout(() => {
             this.coplied = false
           }, 1000)
